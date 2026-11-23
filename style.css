@@ -939,6 +939,16 @@ body:not(.hud-settings-open) #hud .ctrl-hud-btn {
 .web-play-cta b { display: block; font: 700 13.5px/1.1 var(--fd, 'Fredoka', sans-serif); color: #fff; }
 .web-play-cta small { display: block; font: 800 10.5px/1.1 var(--fb, 'Nunito', sans-serif); color: #a8f09c; }
 html.is-native-cap .web-play-cta { display: none !important; }
+html.is-mobile-touch .web-play-cta {
+  left: max(12px, env(safe-area-inset-left, 0px));
+  bottom: max(92px, calc(env(safe-area-inset-bottom, 0px) + 92px));
+  padding: 6px 11px;
+  gap: 7px;
+  border-radius: 13px;
+}
+html.is-mobile-touch .web-play-cta .wpc-ic { width: 22px; height: 22px; font-size: 11px; }
+html.is-mobile-touch .web-play-cta b { font-size: 11.5px; }
+html.is-mobile-touch .web-play-cta small { font-size: 9px; }
 
 /* v8.3.1: Unmistakable Characters Button + Full-Screen Interactive 3D Character Selection Showcase */
 .chars-title-btn {
@@ -1091,4 +1101,534 @@ html.is-mobile-touch #title > #btnDesktopChars { display: none !important; }
   .cs-bio-top b { font-size: 13.5px; }
   .cs-bio p { font-size: 10.5px; line-height: 1.25; }
   .cs-done-btn { padding: 8px 12px; font-size: 13.5px; border-radius: 12px; }
+}
+
+/* ==========================================================================
+ * v8.5.0: Premium AAA Desktop Main Screen — Open 3D World + Frosted Glass UI
+ * Strictly scoped to desktop (`html:not(.is-mobile-touch)`) so mobile stays untouched.
+ * ========================================================================== */
+.desk-nav-rail,
+.desk-menu-btn,
+.world-picker-backdrop,
+.picker-close-btn {
+  display: none;
+}
+
+html:not(.is-mobile-touch) #title {
+  display: block;
+  padding: 0;
+  background:
+    linear-gradient(100deg, rgba(12, 20, 15, 0.56) 0%, rgba(12, 20, 15, 0.24) 30%, rgba(12, 20, 15, 0) 58%),
+    linear-gradient(180deg, rgba(12, 20, 15, 0.26) 0%, rgba(12, 20, 15, 0) 20%, rgba(12, 20, 15, 0) 76%, rgba(12, 20, 15, 0.34) 100%) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Hide redundant inline clutter on desktop (moved to sleek left rail + 3D Character Select + Menu popover) */
+html:not(.is-mobile-touch) #title > #btnDesktopChars,
+html:not(.is-mobile-touch) #title .spirit-picker,
+html:not(.is-mobile-touch) #title .seeker-picker,
+html:not(.is-mobile-touch) #title #progStrip {
+  display: none !important;
+}
+
+/* Top-Left: Unified Frosted Glass Profile Pill */
+html:not(.is-mobile-touch) #title .player-row {
+  position: fixed;
+  top: 20px;
+  left: 26px;
+  z-index: 26;
+  margin: 0;
+  padding: 0;
+  width: auto;
+  max-width: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+}
+html:not(.is-mobile-touch) #title .gamertag-box {
+  padding: 6px 10px 6px 14px;
+  border-radius: 999px;
+  background: rgba(18, 28, 22, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(255, 240, 204, 0.24);
+  box-shadow: 0 8px 24px rgba(10, 18, 12, 0.30);
+  color: #fffaf0;
+  gap: 8px;
+}
+html:not(.is-mobile-touch) #title .gt-lbl {
+  display: none;
+}
+html:not(.is-mobile-touch) #title .gt-input {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 242, 210, 0.20);
+  border-radius: 999px;
+  color: #fffdf6;
+  padding: 4px 12px;
+  width: 132px;
+  font-family: var(--fd, 'Fredoka', sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+}
+html:not(.is-mobile-touch) #title .gt-input:focus {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: #ffd36b;
+  outline: none;
+}
+html:not(.is-mobile-touch) #title .gt-dice {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 248, 232, 0.14);
+  border: 1px solid rgba(255, 242, 210, 0.22);
+  color: #fff;
+  box-shadow: none;
+  transition: transform 0.14s ease, background 0.14s ease;
+}
+html:not(.is-mobile-touch) #title .gt-dice:hover {
+  background: rgba(255, 218, 124, 0.28);
+  transform: translateY(-1px);
+}
+
+/* Upper-Left: Sculpted Hero Wordmark Floating Cleanly Over Sunlit Sky */
+html:not(.is-mobile-touch) #title .title-head {
+  position: fixed;
+  top: 76px;
+  left: 28px;
+  z-index: 22;
+  margin: 0;
+  text-align: left;
+  max-width: 360px;
+  pointer-events: none;
+}
+html:not(.is-mobile-touch) #title .logo {
+  font-size: clamp(46px, 4.7vw, 66px);
+  line-height: 0.96;
+  letter-spacing: -0.02em;
+  color: #fffdf5;
+  text-shadow:
+    0 4px 0 rgba(36, 48, 28, 0.72),
+    0 12px 30px rgba(10, 20, 12, 0.45);
+}
+html:not(.is-mobile-touch) #title .logo em {
+  color: #ffd059;
+  font-style: normal;
+}
+html:not(.is-mobile-touch) #title .tag {
+  margin: 8px 0 0;
+  font-size: 13.5px;
+  font-weight: 800;
+  line-height: 1.35;
+  color: rgba(255, 252, 242, 0.92);
+  text-shadow: 0 2px 10px rgba(10, 18, 12, 0.65);
+  max-width: 315px;
+}
+html:not(.is-mobile-touch) #title #lobbyOfflineBanner {
+  pointer-events: auto;
+  margin: 10px 0 0;
+  font-size: 12px;
+  padding: 5px 12px;
+}
+
+/* Left Vertical Navigation Rail — 3 Sleek Frosted Glass Cards */
+html:not(.is-mobile-touch) #title .desk-nav-rail {
+  position: fixed;
+  left: 26px;
+  top: 214px;
+  z-index: 25;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+html:not(.is-mobile-touch) .desk-nav-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px 10px 10px;
+  border-radius: 20px;
+  background: rgba(18, 29, 22, 0.74);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(255, 240, 204, 0.22);
+  box-shadow: 0 10px 28px rgba(8, 16, 10, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  color: #fffdf6;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.16s cubic-bezier(.22, 1, .36, 1), border-color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
+}
+html:not(.is-mobile-touch) .desk-nav-card:hover {
+  transform: translateX(5px);
+  background: rgba(24, 39, 29, 0.86);
+  border-color: rgba(255, 214, 108, 0.78);
+  box-shadow: 0 14px 34px rgba(8, 16, 10, 0.44), 0 0 0 1px rgba(255, 214, 108, 0.28);
+}
+html:not(.is-mobile-touch) .desk-nav-card:active {
+  transform: translateX(2px) scale(0.99);
+}
+html:not(.is-mobile-touch) .dnc-thumb-wrap {
+  width: 56px;
+  height: 46px;
+  border-radius: 13px;
+  overflow: hidden;
+  flex: 0 0 56px;
+  border: 1.5px solid rgba(255, 232, 174, 0.45);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+html:not(.is-mobile-touch) .dnc-thumb-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+html:not(.is-mobile-touch) .dnc-icon-badge {
+  width: 48px;
+  height: 46px;
+  border-radius: 13px;
+  flex: 0 0 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38), 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+html:not(.is-mobile-touch) .dnc-icon-badge.champ {
+  background: linear-gradient(145deg, #ffd86f 0%, #e89624 100%);
+}
+html:not(.is-mobile-touch) .dnc-icon-badge.journey {
+  background: linear-gradient(145deg, #6fda62 0%, #2f8a3d 100%);
+}
+html:not(.is-mobile-touch) .dnc-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1 1 auto;
+  gap: 1px;
+}
+html:not(.is-mobile-touch) .dnc-kicker {
+  font: 900 9.5px/1.1 var(--fb, 'Nunito', sans-serif);
+  letter-spacing: 0.12em;
+  color: #ffd773;
+  text-transform: uppercase;
+}
+html:not(.is-mobile-touch) .dnc-body b {
+  font: 700 16px/1.15 var(--fd, 'Fredoka', sans-serif);
+  color: #fffef9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+html:not(.is-mobile-touch) .dnc-body em {
+  font-style: normal;
+  font: 700 11.5px/1.2 var(--fb, 'Nunito', sans-serif);
+  color: rgba(236, 245, 232, 0.78);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+html:not(.is-mobile-touch) .dnc-chev {
+  font: 800 22px/1 var(--fb, 'Nunito', sans-serif);
+  color: rgba(255, 224, 146, 0.72);
+  padding-right: 2px;
+  transition: transform 0.16s ease, color 0.16s ease;
+}
+html:not(.is-mobile-touch) .desk-nav-card:hover .dnc-chev {
+  transform: translateX(3px);
+  color: #ffd773;
+}
+
+/* Top-Right: Ultra-Clean 2-Button Utility Bar (Party + Menu Gear) */
+html:not(.is-mobile-touch) #title > #btnDesktopParty {
+  position: fixed !important;
+  top: 20px !important;
+  left: auto !important;
+  right: 126px !important;
+  z-index: 30;
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: rgba(18, 28, 22, 0.74) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(255, 240, 204, 0.24) !important;
+  color: #fffdf5 !important;
+  font: 700 14px/1 var(--fd, 'Fredoka', sans-serif);
+  box-shadow: 0 8px 22px rgba(10, 18, 12, 0.28) !important;
+  transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+}
+html:not(.is-mobile-touch) #title > #btnDesktopParty:hover {
+  background: rgba(28, 44, 33, 0.88) !important;
+  border-color: #ffd36b !important;
+  transform: translateY(-1px);
+}
+
+html:not(.is-mobile-touch) #title > #btnDesktopMenu {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  position: fixed;
+  top: 20px;
+  right: 26px;
+  z-index: 32;
+  height: 42px;
+  padding: 0 15px;
+  border-radius: 999px;
+  background: rgba(18, 28, 22, 0.74);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(255, 240, 204, 0.24);
+  color: #fffdf5;
+  font: 700 14px/1 var(--fd, 'Fredoka', sans-serif);
+  box-shadow: 0 8px 22px rgba(10, 18, 12, 0.28);
+  cursor: pointer;
+  transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+}
+html:not(.is-mobile-touch) #title > #btnDesktopMenu:hover,
+html:not(.is-mobile-touch) #title.desk-menu-open > #btnDesktopMenu {
+  background: rgba(28, 44, 33, 0.92);
+  border-color: #ffd36b;
+  transform: translateY(-1px);
+}
+
+/* Collapse the 4 old top-right clutter pills into a sleek dropdown under ⚙️ Menu */
+html:not(.is-mobile-touch) #title > #btnTitleTutorial,
+html:not(.is-mobile-touch) #title > #btnTitleQuickSettings,
+html:not(.is-mobile-touch) #title > #btnTitleFpsCap,
+html:not(.is-mobile-touch) #title > #btnTitleQuality {
+  position: fixed !important;
+  right: 26px !important;
+  left: auto !important;
+  width: 176px !important;
+  height: 38px !important;
+  padding: 0 14px !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  border-radius: 13px !important;
+  background: rgba(18, 29, 22, 0.92) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(255, 240, 204, 0.24) !important;
+  color: #fffdf5 !important;
+  font: 700 13.5px/1 var(--fd, 'Fredoka', sans-serif) !important;
+  box-shadow: 0 10px 24px rgba(8, 14, 10, 0.36) !important;
+  z-index: 35 !important;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px) scale(0.96);
+  transition: opacity 0.16s ease, transform 0.16s ease, border-color 0.14s ease;
+}
+html:not(.is-mobile-touch) #title > #btnTitleTutorial { top: 72px !important; }
+html:not(.is-mobile-touch) #title > #btnTitleQuickSettings { top: 116px !important; }
+html:not(.is-mobile-touch) #title > #btnTitleFpsCap { top: 160px !important; }
+html:not(.is-mobile-touch) #title > #btnTitleQuality { top: 204px !important; }
+
+html:not(.is-mobile-touch) #title.desk-menu-open > #btnTitleTutorial,
+html:not(.is-mobile-touch) #title.desk-menu-open > #btnTitleQuickSettings,
+html:not(.is-mobile-touch) #title.desk-menu-open > #btnTitleFpsCap,
+html:not(.is-mobile-touch) #title.desk-menu-open > #btnTitleQuality {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+html:not(.is-mobile-touch) #title.desk-menu-open > #btnTitleTutorial:hover,
+html:not(.is-mobile-touch) #title.desk-menu-open > #btnTitleQuickSettings:hover,
+html:not(.is-mobile-touch) #title.desk-menu-open > #btnTitleFpsCap:hover,
+html:not(.is-mobile-touch) #title.desk-menu-open > #btnTitleQuality:hover {
+  border-color: #ffd36b !important;
+  background: rgba(34, 52, 38, 0.96) !important;
+}
+
+/* World Picker: Sleek Centered Glassmorphic Modal (Opened from World Card!) */
+html:not(.is-mobile-touch) #title .world-picker-backdrop {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 44;
+  background: rgba(10, 18, 12, 0.56);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+html:not(.is-mobile-touch) #title.world-modal-open .world-picker-backdrop {
+  opacity: 1;
+  pointer-events: auto;
+}
+html:not(.is-mobile-touch) #title .world-picker {
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+  z-index: 46 !important;
+  width: min(820px, 90vw) !important;
+  max-width: 820px !important;
+  max-height: 86vh;
+  overflow-y: auto;
+  margin: 0 !important;
+  padding: 20px 22px 22px !important;
+  border-radius: 26px !important;
+  background: rgba(255, 251, 240, 0.97) !important;
+  border: 2.5px solid rgba(255, 224, 152, 0.85) !important;
+  box-shadow: 0 24px 64px rgba(8, 16, 10, 0.55) !important;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -46%) scale(0.95);
+  transition: opacity 0.2s ease, transform 0.22s cubic-bezier(.22, 1, .36, 1);
+}
+html:not(.is-mobile-touch) #title.world-modal-open .world-picker {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+html:not(.is-mobile-touch) #title .picker-hdr {
+  margin-bottom: 12px;
+}
+html:not(.is-mobile-touch) #title .picker-hdr-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+html:not(.is-mobile-touch) #title .picker-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 0;
+  background: #ede4cf;
+  color: #463f30;
+  font: 900 14px/1 var(--fb, 'Nunito', sans-serif);
+  cursor: pointer;
+}
+html:not(.is-mobile-touch) #title .picker-close-btn:hover {
+  background: #ffd97a;
+}
+html:not(.is-mobile-touch) #title .map-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+}
+html:not(.is-mobile-touch) #title .map-card.quick-play-card {
+  grid-column: 1 / -1 !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  padding: 8px 14px !important;
+  gap: 14px !important;
+}
+html:not(.is-mobile-touch) #title .map-card.quick-play-card .map-thumb {
+  width: 112px !important;
+  height: 54px !important;
+  flex: 0 0 112px !important;
+}
+
+/* Bottom-Right: Sculptural AAA Play Buttons (Hide & Seek) */
+html:not(.is-mobile-touch) #title .modes {
+  position: fixed;
+  right: 26px;
+  bottom: 26px;
+  z-index: 26;
+  margin: 0 !important;
+  display: flex;
+  flex-direction: row;
+  gap: 14px;
+}
+html:not(.is-mobile-touch) #title .mode {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 13px;
+  width: auto;
+  min-width: 224px;
+  padding: 15px 22px 15px 18px;
+  border-radius: 22px;
+  text-align: left;
+  border: 2px solid rgba(255, 255, 255, 0.34);
+  cursor: pointer;
+  transition: transform 0.16s cubic-bezier(.22, 1, .36, 1), filter 0.16s ease, box-shadow 0.16s ease;
+}
+html:not(.is-mobile-touch) #title .mode .tut-first-pill,
+html:not(.is-mobile-touch) #title .mode .tut-mode-badge {
+  position: absolute !important;
+  top: -12px !important;
+  right: 14px !important;
+  margin: 0 !important;
+  padding: 3px 10px !important;
+  font-size: 10px !important;
+  white-space: nowrap;
+  box-shadow: 0 3px 8px rgba(15, 24, 12, 0.34) !important;
+}
+html:not(.is-mobile-touch) #title .mode .mi {
+  font-size: 32px;
+  line-height: 1;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.22));
+  margin: 0;
+}
+html:not(.is-mobile-touch) #title .mode .m-txt {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+html:not(.is-mobile-touch) #title .mode b {
+  font: 700 21px/1.05 var(--fd, 'Fredoka', sans-serif);
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.24);
+  margin: 0;
+}
+html:not(.is-mobile-touch) #title .mode small {
+  font: 800 12px/1.2 var(--fb, 'Nunito', sans-serif);
+  color: rgba(255, 255, 255, 0.90);
+  margin: 0;
+}
+html:not(.is-mobile-touch) #title .mode-hide {
+  background: linear-gradient(155deg, #5cc74e 0%, #2f8a36 100%) !important;
+  box-shadow: 0 6px 0 #1e5c24, 0 16px 36px rgba(10, 26, 14, 0.44), inset 0 2px 0 rgba(255, 255, 255, 0.35) !important;
+}
+html:not(.is-mobile-touch) #title .mode-seek {
+  background: linear-gradient(155deg, #43b0fa 0%, #1d6fc4 100%) !important;
+  box-shadow: 0 6px 0 #134a87, 0 16px 36px rgba(10, 22, 40, 0.44), inset 0 2px 0 rgba(255, 255, 255, 0.35) !important;
+}
+html:not(.is-mobile-touch) #title .mode:hover {
+  transform: translateY(-3px) scale(1.02);
+  filter: brightness(1.06);
+}
+html:not(.is-mobile-touch) #title .mode:active {
+  transform: translateY(3px) scale(0.99);
+}
+
+/* Bottom-Left: Subtle Web Install CTA + Clean Micro-Note */
+html:not(.is-mobile-touch) #title .web-play-cta {
+  left: 26px;
+  bottom: 26px;
+  background: rgba(18, 29, 22, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(118, 212, 98, 0.65);
+  box-shadow: 0 8px 24px rgba(8, 16, 10, 0.34);
+}
+html:not(.is-mobile-touch) #title .note {
+  position: fixed;
+  left: 26px;
+  bottom: 8px;
+  margin: 0;
+  font-size: 10.5px;
+  font-weight: 800;
+  color: rgba(255, 252, 240, 0.72);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.02em;
+  display: none;
+}
+html.is-native-cap:not(.is-mobile-touch) #title .note {
+  display: block;
+  bottom: 24px;
+}
+
+@media (max-width: 960px) {
+  html:not(.is-mobile-touch) #title .desk-nav-rail { width: 256px; top: 196px; }
+  html:not(.is-mobile-touch) #title .mode { min-width: 186px; padding: 13px 16px; }
+  html:not(.is-mobile-touch) #title .mode b { font-size: 18px; }
 }

@@ -23,7 +23,7 @@
 <link rel="apple-touch-icon" href="assets/app_icons/apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="stylesheet" href="assets/fonts/fonts.css">
-<link rel="stylesheet" href="style.css?v=33">
+<link rel="stylesheet" href="style.css?v=34">
 <link rel="stylesheet" href="hider_tricks.css?v=2">
 <link rel="stylesheet" href="seeker_gadgets.css?v=4">
 <link rel="stylesheet" href="world_events.css?v=4">
@@ -107,8 +107,9 @@
 
   <!-- TITLE -->
   <div id="title" class="screen on">
-    <button id="btnDesktopParty" class="party-title-btn" type="button" aria-label="Friends Party">🎉 Friends Party</button>
+    <button id="btnDesktopParty" class="party-title-btn" type="button" aria-label="Friends Party">🎉 Party</button>
     <button id="btnDesktopChars" class="chars-title-btn" type="button" aria-label="3D Character Selection">🎭 Characters</button>
+    <button id="btnDesktopMenu" class="desk-menu-btn" type="button" aria-label="Settings and Info" aria-expanded="false">⚙️ <span>Menu</span></button>
     <button id="btnTitleTutorial" class="tut-title-btn" type="button" aria-label="How to Play Tutorial">🎓 How to Play</button>
     <button id="btnTitleQuality" class="gfx-pill title-gfx" type="button" data-tier="ultra" aria-label="Graphics quality">✨ Ultra</button>
     <div class="title-head">
@@ -117,8 +118,46 @@
       <div id="lobbyOfflineBanner" class="offline-notice hidden" role="status" aria-live="polite">📡 Offline Mode — No internet connection detected. Playing solo 5v5 with smart AI!</div>
     </div>
 
+    <!-- v8.5 Premium AAA Desktop Left Navigation Rail (auto-hidden on mobile touch) -->
+    <nav id="desktopNavRail" class="desk-nav-rail" aria-label="Lobby navigation">
+      <button id="btnDesktopWorldPicker" class="desk-nav-card desk-world-card" type="button">
+        <span class="dnc-thumb-wrap"><img id="dnwThumb" src="assets/concepts/map_overview.webp" alt="Selected World"></span>
+        <span class="dnc-body">
+          <small class="dnc-kicker">WORLD</small>
+          <b id="dnwTitle">⚡ Quick Play</b>
+          <em id="dnwSub">Fastest 5v5 · Any Map</em>
+        </span>
+        <span class="dnc-chev">›</span>
+      </button>
+      <button id="btnDesktopChampCard" class="desk-nav-card desk-champ-card" type="button">
+        <span class="dnc-icon-badge champ">🎭</span>
+        <span class="dnc-body">
+          <small class="dnc-kicker">CHAMPIONS</small>
+          <b id="dncTitle">3D Character Select</b>
+          <em id="dncSub">Sprout · Mina</em>
+        </span>
+        <span class="dnc-chev">›</span>
+      </button>
+      <button id="btnDesktopJourneyCard" class="desk-nav-card desk-journey-card" type="button">
+        <span class="dnc-icon-badge journey">🎁</span>
+        <span class="dnc-body">
+          <small class="dnc-kicker">JOURNEY &amp; BLASTERS</small>
+          <b id="dnjTitle">Lv. 1 · Rewards</b>
+          <em id="dnjSub">Unlocks, Blasters &amp; Perks</em>
+        </span>
+        <span class="dnc-chev">›</span>
+      </button>
+    </nav>
+
+    <div id="worldPickerBackdrop" class="world-picker-backdrop" aria-hidden="true"></div>
     <div class="world-picker">
-      <div class="picker-hdr"><span>🗺️ Choose a Storybook World</span><em id="activeWorldBadge">Cosy Village</em></div>
+      <div class="picker-hdr">
+        <span>🗺️ Choose a Storybook World</span>
+        <div class="picker-hdr-right">
+          <em id="activeWorldBadge">Cosy Village</em>
+          <button id="btnCloseWorldPicker" class="picker-close-btn" type="button" aria-label="Close world selector">✕</button>
+        </div>
+      </div>
       <div class="map-grid" id="mapGrid" role="listbox" aria-label="Select world"></div>
     </div>
 
@@ -141,10 +180,10 @@
     </div>
 
     <div class="modes">
-      <button class="mode" id="btnHide"><span class="mi">🎭</span><b>Hide · 5v5</b><small>5 Spirits vs 5 Seekers.<br>Morph, parkour &amp; survive!</small></button>
-      <button class="mode" id="btnSeek"><span class="mi">💦</span><b>Seek · 5v5</b><small>5 Seekers vs 5 Spirits.<br>Team up &amp; spray the fakes!</small></button>
+      <button class="mode mode-hide" id="btnHide"><span class="mi">🎭</span><span class="m-txt"><b>Hide · 5v5</b><small>Morph, paint &amp; outsmart</small></span></button>
+      <button class="mode mode-seek" id="btnSeek"><span class="mi">💦</span><span class="m-txt"><b>Seek · 5v5</b><small>Team up &amp; soak the fakes</small></span></button>
     </div>
-    <p class="note">6 Handcrafted 3D Storybook Worlds · 5v5 Online &amp; Offline Prop Hunt · <a class="note-link" href="./privacy.html" target="_blank" rel="noopener">Privacy</a></p>
+    <p class="note">6 Handcrafted 3D Worlds · 5v5 Online &amp; Offline · <a class="note-link" href="./privacy.html" target="_blank" rel="noopener">Privacy</a></p>
     <a id="webPlayStoreCta" class="web-play-cta" href="https://play.google.com/store/apps/details?id=com.hueseek.game&amp;utm_source=web_play&amp;utm_medium=lobby_cta&amp;utm_campaign=v84_launch" target="_blank" rel="noopener" aria-label="Download Hue and Seek on Google Play">
       <span class="wpc-ic">▶</span>
       <span><b>Get on Google Play</b> <small>Android · Free · Zero Ads</small></span>
@@ -279,7 +318,7 @@
     </div>
   </div>
 </div>
-<script type="module" src="main.js?v=142"></script>
+<script type="module" src="main.js?v=143"></script>
 <script>
 if (window.Capacitor) document.documentElement.classList.add('is-native-cap');
 if ('serviceWorker' in navigator) {

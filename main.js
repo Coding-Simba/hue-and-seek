@@ -3106,6 +3106,31 @@ function updateWorldPickerUI() {
     ? '⚡ Quick Play · Any Map'
     : `${def.badge} · ${def.title}`;
   if ($('hudWorld')) $('hudWorld').textContent = def.title;
+  syncDesktopLobbyCards();
+}
+
+function syncDesktopLobbyCards() {
+  const def = MAP_REGISTRY[activeMapId] || MEADOW_DEF;
+  const thumb = $('dnwThumb');
+  if (thumb && def.preview) thumb.src = def.preview;
+  const wTitle = $('dnwTitle');
+  if (wTitle) wTitle.textContent = quickPlayAnyMap ? '⚡ Quick Play' : (MAP_SHORT_TITLES[activeMapId] || def.title);
+  const wSub = $('dnwSub');
+  if (wSub) wSub.textContent = quickPlayAnyMap ? 'Fastest 5v5 · Any Map' : (def.badge || 'Storybook World');
+
+  const spId = selectedSpirit === 'auto' ? activeMapId : selectedSpirit;
+  const spObj = SPIRIT_OPTIONS.find((o) => o.id === spId) || SPIRIT_OPTIONS[1];
+  const skObj = SEEKER_OPTIONS.find((o) => o.id === selectedSeeker) || SEEKER_OPTIONS[0];
+  const cSub = $('dncSub');
+  if (cSub && spObj && skObj) cSub.textContent = `${spObj.icon} ${spObj.label}  ·  ${skObj.icon} ${skObj.label}`;
+
+  const lvTxt = $('progLevelBadge')?.textContent?.trim() || '⭐ Lv. 1';
+  const tokTxt = $('progTokenCount')?.textContent?.trim() || '60';
+  const nextTxt = $('progNextUnlockPill')?.textContent?.trim() || 'Blasters & Perks';
+  const jTitle = $('dnjTitle');
+  if (jTitle) jTitle.textContent = `${lvTxt.replace(/^⭐\s*/, '')} · 🪙 ${tokTxt}`;
+  const jSub = $('dnjSub');
+  if (jSub) jSub.textContent = nextTxt;
 }
 
 function renderWorldPickerUI() {
@@ -3142,6 +3167,7 @@ function renderWorldPickerUI() {
       if (targetMap === 'any') {
         quickPlayAnyMap = true;
         audio.tap();
+        $('title')?.classList.remove('world-modal-open');
         updateWorldPickerUI();
         if (mobileLobby) mobileLobby.refresh();
         return;
@@ -3156,6 +3182,7 @@ function renderWorldPickerUI() {
       }
       quickPlayAnyMap = false;
       audio.tap();
+      $('title')?.classList.remove('world-modal-open');
       selectMap(targetMap);
       });
     }
@@ -3206,16 +3233,16 @@ function ensureLobbyPreviewGroup() {
   if (lobbyPreviewGroup) return lobbyPreviewGroup;
   lobbyPreviewGroup = new THREE.Group();
   lobbyPreviewGroup.name = 'LobbyChampionPreview';
-  // Warm sunlit stone-and-moss pedestal disc beneath the featured 3D champion
+  // Subtle warm sunlit stone-and-moss pedestal disc beneath the featured 3D champion
   const ped = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.68, 0.78, 0.14, 24),
-    new THREE.MeshStandardMaterial({ color: 0xe6d4b3, roughness: 0.85, metalness: 0.0 })
+    new THREE.CylinderGeometry(0.46, 0.54, 0.11, 24),
+    new THREE.MeshStandardMaterial({ color: 0xcab58f, roughness: 0.88, metalness: 0.0 })
   );
-  ped.position.y = -0.07;
+  ped.position.y = -0.055;
   ped.receiveShadow = true;
   const mossRim = new THREE.Mesh(
-    new THREE.TorusGeometry(0.69, 0.055, 10, 28),
-    new THREE.MeshStandardMaterial({ color: 0x6ea848, roughness: 0.82 })
+    new THREE.TorusGeometry(0.47, 0.04, 10, 28),
+    new THREE.MeshStandardMaterial({ color: 0x67a143, roughness: 0.84 })
   );
   mossRim.rotation.x = Math.PI * 0.5;
   mossRim.position.y = -0.01;
@@ -3289,15 +3316,15 @@ function updateLobbyChampionPreview(dt, now) {
     return;
   }
 
-  // Frame the live 3D champion cleanly in the right foreground beside the Lobby UI
+  // Frame the live 3D champion heroically in the open center-right spotlight of the clean AAA Lobby
   camera.updateMatrixWorld();
   camera.getWorldDirection(_lpForward);
   _lpRight.set(1, 0, 0).applyQuaternion(camera.quaternion);
   _lpUp.set(0, 1, 0).applyQuaternion(camera.quaternion);
   const aspect = Math.max(0.75, camera.aspect || 1.77);
-  const rightOff = aspect > 1.35 ? 3.25 : 1.95;
-  const downOff = aspect > 1.35 ? 0.65 : 0.78;
-  const dist = aspect > 1.35 ? 4.95 : 5.25;
+  const rightOff = aspect > 1.35 ? 1.85 : 1.05;
+  const downOff = aspect > 1.35 ? 0.34 : 0.52;
+  const dist = aspect > 1.35 ? 5.25 : 5.15;
   lobbyPreviewGroup.position.copy(camera.position)
     .addScaledVector(_lpForward, dist)
     .addScaledVector(_lpRight, rightOff)
@@ -3377,6 +3404,76 @@ function wireCharacterSelectUI() {
       openCharacterSelect();
     });
   }
+  const titleEl = $('title');
+  const worldBtn = $('btnDesktopWorldPicker');
+  if (worldBtn && !worldBtn.dataset.wired) {
+    worldBtn.dataset.wired = '1';
+    worldBtn.addEventListener('click', (e) => {
+      e.stopPropagation(); sfx.unlock(); audio.tap();
+      titleEl?.classList.remove('desk-menu-open');
+      $('btnDesktopMenu')?.setAttribute('aria-expanded', 'false');
+      titleEl?.classList.toggle('world-modal-open');
+    });
+  }
+  const closeWorldBtn = $('btnCloseWorldPicker');
+  const worldBackdrop = $('worldPickerBackdrop');
+  for (const el of [closeWorldBtn, worldBackdrop]) {
+    if (el && !el.dataset.wired) {
+      el.dataset.wired = '1';
+      el.addEventListener('click', (e) => {
+        e.stopPropagation(); audio.tap();
+        titleEl?.classList.remove('world-modal-open');
+      });
+    }
+  }
+  const champCard = $('btnDesktopChampCard');
+  if (champCard && !champCard.dataset.wired) {
+    champCard.dataset.wired = '1';
+    champCard.addEventListener('click', (e) => {
+      e.stopPropagation(); sfx.unlock(); audio.tap();
+      titleEl?.classList.remove('world-modal-open', 'desk-menu-open');
+      openCharacterSelect();
+    });
+  }
+  const journeyCard = $('btnDesktopJourneyCard');
+  if (journeyCard && !journeyCard.dataset.wired) {
+    journeyCard.dataset.wired = '1';
+    journeyCard.addEventListener('click', (e) => {
+      e.stopPropagation(); sfx.unlock(); audio.tap();
+      titleEl?.classList.remove('world-modal-open', 'desk-menu-open');
+      $('btnOpenWardrobe')?.click();
+    });
+  }
+  const menuBtn = $('btnDesktopMenu');
+  if (menuBtn && !menuBtn.dataset.wired) {
+    menuBtn.dataset.wired = '1';
+    menuBtn.addEventListener('click', (e) => {
+      e.stopPropagation(); sfx.unlock(); audio.tap();
+      titleEl?.classList.remove('world-modal-open');
+      const isOpen = titleEl?.classList.toggle('desk-menu-open');
+      menuBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+    document.addEventListener('click', (e) => {
+      if (!titleEl?.classList.contains('desk-menu-open')) return;
+      if (e.target.closest('#btnDesktopMenu, #btnTitleTutorial, #btnTitleQuality, #btnTitleFpsCap, #btnTitleQuickSettings, #mobQuickSettings')) return;
+      titleEl.classList.remove('desk-menu-open');
+      menuBtn.setAttribute('aria-expanded', 'false');
+    });
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && titleEl) {
+        titleEl.classList.remove('world-modal-open', 'desk-menu-open');
+        menuBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+  const progStripEl = $('progStrip');
+  if (progStripEl && !progStripEl.dataset.deskObs && typeof MutationObserver !== 'undefined') {
+    progStripEl.dataset.deskObs = '1';
+    new MutationObserver(() => syncDesktopLobbyCards()).observe(progStripEl, {
+      subtree: true, characterData: true, childList: true
+    });
+  }
+  syncDesktopLobbyCards();
   const closeBtn = $('btnCloseCharSelect');
   if (closeBtn && !closeBtn.dataset.wired) {
     closeBtn.dataset.wired = '1';
