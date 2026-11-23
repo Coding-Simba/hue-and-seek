@@ -698,6 +698,8 @@ export function createTutorialManager(env = {}) {
   function skipCurrentTutorial() {
     const mode = activeMode;
     const src = launchSource;
+    const steps = getStepsForMode(mode);
+    env.track?.('tutorial_skip', { mode, step: stepIdx, stepId: steps[stepIdx]?.id || '', source: src });
     markRoleDone(mode);
     if (document.pointerLockElement) document.exitPointerLock();
     stopAndRestoreMap();
@@ -735,6 +737,7 @@ export function createTutorialManager(env = {}) {
     coachEl?.setAttribute('data-mode', activeMode);
 
     ensureWaypoint3D();
+    env.track?.('tutorial_start', { mode: activeMode, source: launchSource });
     enterStep(0);
   }
 
@@ -946,6 +949,7 @@ export function createTutorialManager(env = {}) {
 
     const steps = getStepsForMode(activeMode);
     const isFinal = stepIdx >= steps.length - 1;
+    env.track?.('tutorial_step', { mode: activeMode, step: stepIdx, stepId: steps[stepIdx]?.id || '', final: isFinal });
 
     clearTimeout(stepAdvanceTimer);
     stepAdvanceTimer = setTimeout(() => {
@@ -962,6 +966,7 @@ export function createTutorialManager(env = {}) {
     const mode = activeMode;
     const rewardKey = mode === 'seek' ? STORAGE_REWARD_SEEK : STORAGE_REWARD_HIDE;
     const firstReward = safeGetStorage(rewardKey) !== '1';
+    env.track?.('tutorial_complete', { mode, firstReward });
     markRoleDone(mode);
 
     if (document.pointerLockElement) document.exitPointerLock();

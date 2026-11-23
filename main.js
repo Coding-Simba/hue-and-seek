@@ -24,7 +24,8 @@ import { createWorldEventsManager } from './world_events.js?v=5';
 import { createMatchFlowManager } from './match_flow.js?v=8';
 import { createViralHighlightsManager } from './viral_highlights.js?v=9';
 import { createProgressionManager } from './progression.js?v=12';
-import { createCloudSave } from './cloud_save.js?v=2';
+import { createCloudSave } from './cloud_save.js?v=3';
+import { createAnalytics } from './analytics.js?v=1';
 import { CLOUD_CONFIG } from './cloud_config.js?v=1';
 import { createElementalGunsManager, ELEMENTAL_GUN_SPECS, getElementSpec } from './elemental_guns.js?v=14';
 import {
@@ -66,7 +67,8 @@ import { createMobileControlsManager } from './mobile_controls.js?v=11';
 import { createMobileLobbyManager } from './mobile_lobby.js?v=12';
 import { createMobilePerfManager, probeHalfFloatSupport } from './mobile_perf.js?v=8';
 import { createSeekerSkyDropManager } from './seeker_skydrop.js?v=9';
-import { createTutorialManager } from './tutorial.js?v=2';
+import { createTutorialManager } from './tutorial.js?v=3';
+const GAME_VERSION = '8.4.0';
 import { createHueLayerManager, HUE_RULES } from './hue_layer.js?v=4';
 import { createStatusFxManager } from './status_fx.js?v=1';
 import { createGenreKingManager } from './genre_king.js?v=2';
@@ -79,6 +81,7 @@ THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
 THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
 THREE.Mesh.prototype.raycast = acceleratedRaycast;
 
+let analytics = null;
 let hiderTricks = null, seekerGadgets = null, worldEvents = null, matchFlow = null, viralHighlights = null, progression = null, elementalGuns = null, hueLayer = null, statusFx = null, cloudSave = null, genreKing = null, painterlyGfx = null, tier1Visuals = null, nextGenBridge = null, nextGenAssets = null;
 let mobileControls = null, mobileLobby = null, mobilePerf = null, seekerSkyDrop = null, tutorial = null;
 let endRoundTO = 0, nonMasterEndTO = 0, nervesToastTO = 0;
@@ -3178,6 +3181,7 @@ function renderWorldPickerUI() {
       quickPlayAnyMap = false;
       audio.tap();
       $('title')?.classList.remove('world-modal-open');
+      if (analytics) analytics.track('world_select', { map: targetMap });
       selectMap(targetMap);
       });
     }
@@ -3367,6 +3371,7 @@ function renderCharSelectUI() {
 }
 
 function openCharacterSelect(initialRole) {
+  if (analytics) analytics.screen('characters');
   if (initialRole === 'seeker' || initialRole === 'spirit') lobbyPreviewRole = initialRole;
   charSelectOpen = true;
   charSelectUserYaw = 0;
@@ -3503,9 +3508,11 @@ function wireCharacterSelectUI() {
       if (lobbyPreviewRole === 'seeker') {
         selectedSeeker = cid;
         try { localStorage.setItem('hs_selected_seeker', selectedSeeker); } catch (_) {}
+        if (analytics) analytics.track('character_select', { role: 'seeker', id: cid });
       } else {
         selectedSpirit = cid;
         try { localStorage.setItem('hs_selected_spirit', selectedSpirit); } catch (_) {}
+        if (analytics) analytics.track('character_select', { role: 'spirit', id: cid });
       }
       charSelectUserYaw = 0;
       renderCharSelectUI();
@@ -5068,6 +5075,10 @@ function showQueueWhileLoading(mode, opts) {
 }
 
 function enterMatchQueue(mode = 'hide', opts = {}) {
+  if (analytics && !opts._anTracked) {
+    opts._anTracked = true;
+    analytics.track('play_click', { mode, map: quickPlayAnyMap ? 'any' : activeMapId, ready: !!READY, offline: !!(MP && MP.isOffline && MP.isOffline()) });
+  }
   if (!READY) {
     showQueueWhileLoading(mode, opts);
     setTimeout(() => enterMatchQueue(mode, opts), 80);
@@ -5640,6 +5651,19 @@ cloudSave = createCloudSave({ config: CLOUD_CONFIG, canReload: () => G.phase ===
 cloudSave.mountUI();
 cloudSave.start();
 
+// Anonymous gameplay analytics (matches played, where players stop, session length, retention).
+try {
+  analytics = createAnalytics({
+    config: CLOUD_CONFIG,
+    version: GAME_VERSION,
+    getToken: () => cloudSave.getAuthToken(),
+  });
+  analytics.start({
+    level: progression ? (progression.getLevel?.() || 0) : 0,
+    tutHideDone: !!(tutorial && tutorial.shouldRunFirstTime && !tutorial.shouldRunFirstTime('hide')),
+  });
+} catch (_) { analytics = null; }
+
 const broadcastLocalGadgetIfAuth = (payload, srcChar) => {
   if (!MP || !MP.isLiveSession() || !payload) return;
   if (payload.k === 'decoy_pop') {
@@ -6032,6 +6056,7 @@ function startTutorialRound(mode = 'hide') {
 }
 
 tutorial = createTutorialManager({
+  track: (name, props) => { if (analytics) analytics.track(name, props); },
   THREE,
   G,
   scene,
@@ -6186,7 +6211,9 @@ function startHide(roster = null) {
     roster._seriesStarted = true;
     if (progression) progression.resetMatchSessionCounter();
     if (matchFlow) matchFlow.startSeries(roster);
+    if (analytics) analytics.matchStart({ mode: 'hide', map: activeMapId, online: !!(MP && MP.isLiveSession && MP.isLiveSession()), humans: roster.humanCount || 1 });
   }
+  if (analytics) analytics.roundStart({ round: matchFlow ? matchFlow.getRoundNumber() : 1, mode: 'hide' });
   clearRound();
   AI.resetMatchIntel();
   AI.setDifficulty(hueLayer ? hueLayer.currentBotDifficulty() : 0.5);
@@ -6319,7 +6346,9 @@ function startSeek(roster = null) {
     roster._seriesStarted = true;
     if (progression) progression.resetMatchSessionCounter();
     if (matchFlow) matchFlow.startSeries(roster);
+    if (analytics) analytics.matchStart({ mode: 'seek', map: activeMapId, online: !!(MP && MP.isLiveSession && MP.isLiveSession()), humans: roster.humanCount || 1 });
   }
+  if (analytics) analytics.roundStart({ round: matchFlow ? matchFlow.getRoundNumber() : 1, mode: 'seek' });
   clearRound();
   AI.resetMatchIntel();
   AI.setDifficulty(hueLayer ? hueLayer.currentBotDifficulty() : 0.5);
@@ -6676,7 +6705,20 @@ function endRound(win, title, sub, emoji, fromNet = false) {
   const finishRoundFlow = () => {
     if (G.phase !== 'end') return;
     if (matchFlow) {
+      const roundNo = matchFlow.getRoundNumber();
       const res = matchFlow.handleRoundEnd({ win, title, sub, emoji, fromNet, cinematicPlayed });
+      if (analytics && !G.isTutorial) {
+        analytics.roundEnd({ round: roundNo, win: !!win, mode: G.mode });
+        if (res && res.seriesOver) {
+          const st = matchFlow.getSeriesState ? matchFlow.getSeriesState() : {};
+          analytics.matchEnd({
+            win: (st.yourSquadScore || 0) > (st.rivalSquadScore || 0),
+            draw: (st.yourSquadScore || 0) === (st.rivalSquadScore || 0),
+            yourScore: st.yourSquadScore || 0,
+            rivalScore: st.rivalSquadScore || 0,
+          });
+        }
+      }
       if (res && res.seriesOver) {
         if (progression && !G.isTutorial) {
           progression.consumeTrialElemGun();
@@ -7987,19 +8029,21 @@ $('btnFire').addEventListener('pointerdown', (e) => { e.stopPropagation(); sfx.u
 for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) $('btnFire').addEventListener(ev, () => { G.firing = false; });
 tap('btnHide', () => enterMatchQueue('hide'));
 tap('btnSeek', () => enterMatchQueue('seek'));
-tap('btnAgain', () => enterMatchQueue(G.mode === 'seek' ? 'seek' : 'hide'));
-if ($('btnRematch')) tap('btnRematch', rematchLobby);
-tap('btnSwitch', () => enterMatchQueue(G.mode === 'hide' ? 'seek' : 'hide'));
+tap('btnAgain', () => { if (analytics) analytics.track('play_again', { mode: G.mode || 'hide', map: activeMapId }); enterMatchQueue(G.mode === 'seek' ? 'seek' : 'hide'); });
+if ($('btnRematch')) tap('btnRematch', () => { if (analytics) analytics.track('rematch_click', { mode: G.mode || 'hide', map: activeMapId }); rematchLobby(); });
+tap('btnSwitch', () => { if (analytics) analytics.track('switch_side', { nextMode: G.mode === 'hide' ? 'seek' : 'hide' }); enterMatchQueue(G.mode === 'hide' ? 'seek' : 'hide'); });
 if ($('btnNextMap')) tap('btnNextMap', () => {
   const mode = G.mode || 'hide';
   const unlockedMaps = MAP_ORDER.filter((m) => !progression || progression.isMapUnlocked(m));
   const pool = unlockedMaps.length ? unlockedMaps : ['meadow'];
   const curIdx = Math.max(0, pool.indexOf(activeMapId));
   const nxt = pool[(curIdx + 1) % pool.length];
+  if (analytics) analytics.track('next_map_click', { map: nxt });
   selectMap(nxt);
   enterMatchQueue(mode === 'seek' ? 'seek' : 'hide');
 });
-if ($('btnCancelQueue')) tap('btnCancelQueue', toMenu);
+if ($('btnCancelQueue')) tap('btnCancelQueue', () => { if (analytics) analytics.track('queue_cancel', { map: activeMapId }); toMenu(); });
+if ($('webPlayStoreCta')) $('webPlayStoreCta').addEventListener('click', () => { if (analytics) { analytics.track('store_cta_click', { target: 'google_play' }); analytics.flush({ keepalive: true }); } });
 tap('btnMenu', toMenu); tap('btnQuit', toMenu);
 function toggleMute() { $('btnMute').textContent = audio.toggleMute() ? '🔇' : '🔊'; }
 tap('btnMute', toggleMute); $('btnMute').textContent = audio.isMuted() ? '🔇' : '🔊';
@@ -8046,6 +8090,11 @@ if ($('btnDesktopParty')) tap('btnDesktopParty', () => { if (mobileLobby) mobile
 if (mobilePerf && mobilePerf.onQualityChange) mobilePerf.onQualityChange(syncQualityButtons);
 syncQualityButtons();
 function toMenu() {
+  if (analytics) {
+    if (G.isTutorial) analytics.track('tutorial_exit', { mode: G.mode || '', phase: G.phase || '' });
+    else if (analytics.inMatch()) analytics.matchQuit({ phase: G.over ? 'end' : (G.phase || ''), round: matchFlow ? matchFlow.getRoundNumber() : 1 });
+    analytics.screen('lobby');
+  }
   try { endCinematic.stop(false); } catch (_) {}
   clearTimeout(vsIntroTimer);
   clearInterval(vsTickInterval);
@@ -9276,6 +9325,7 @@ function loop(rawNow) {
 requestAnimationFrame(loop);
 window.__hs = {
   get cloudSave() { return cloudSave; },
+  get analytics() { return analytics; },
   G, AI, MP, TEAM_SIZE, spots, startHide, startSeek, startTutorialRound, spawnTutorialDummy, clearTutorialDummies,
   enterMatchQueue, playVsIntro, toMenu, selectMap, stepSim,
   MAP_ORDER, MAP_REGISTRY, ENTER, SLOTS, LIVE, blockers,

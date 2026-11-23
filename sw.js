@@ -1,5 +1,5 @@
 /* Hue & Seek — Mobile PWA & Offline Service Worker */
-const CACHE_NAME = 'hueseek-mobile-v33';
+const CACHE_NAME = 'hueseek-mobile-v34';
 
 const CORE_SHELL = [
   './',
@@ -24,6 +24,7 @@ const CORE_SHELL = [
   './status_fx.js',
   './cloud_save.js',
   './cloud_config.js',
+  './analytics.js',
   './haptics.js',
   './viral_highlights.js',
   './world_optimizer.js',

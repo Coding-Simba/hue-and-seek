@@ -26,6 +26,7 @@
     <ul>
       <li><strong>Gameplay Progress (Local &amp; Optional Cloud Save):</strong> Your chosen in-game gamertag, level, XP, tokens, unlocked cosmetics, and preferences are stored locally on your device. When you are online, an anonymous cloud backup (linked only to a randomly generated 20-character recovery code) is stored in Google Firebase Firestore so you can restore your progress on a new device.</li>
       <li><strong>Online Multiplayer Matchmaking:</strong> During live 5v5 online matches, your temporary match state (display name, character selection, position, and gameplay events) is relayed in real time via Photon Realtime Cloud or secure WebSocket relays. Match positions are ephemeral and are not stored after a match ends.</li>
+      <li><strong>Anonymous Gameplay Analytics:</strong> To understand which worlds and modes players enjoy, how many matches are played, and where players drop off or hit bugs, the game sends anonymous gameplay event summaries (linked only to a random device install ID, never your gamertag, email, or advertising ID) to Google Firebase Firestore. Deleting your data in-game clears your local analytics ID.</li>
       <li><strong>No Sensitive Personal Data:</strong> We do not collect your real name, email address, precise GPS location, contacts, photos, or microphone/camera recordings.</li>
     </ul>
 

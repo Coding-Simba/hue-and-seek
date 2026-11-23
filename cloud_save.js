@@ -276,17 +276,17 @@ export function createCloudSave(env = {}) {
       }
     }
     try {
-      if (store && typeof store.removeItem === 'function') {
+      if (storage && typeof storage.removeItem === 'function') {
         const keys = [];
-        for (let i = 0; i < (store.length || 0); i++) {
-          const k = store.key(i);
+        for (let i = 0; i < (storage.length || 0); i++) {
+          const k = storage.key(i);
           if (k && k.startsWith('hs_')) keys.push(k);
         }
-        for (const k of keys) store.removeItem(k);
-        store.removeItem(opt.profileKey);
-        store.removeItem(opt.nameKey);
-        store.removeItem(opt.metaKey);
-        store.removeItem(opt.authKey);
+        for (const k of keys) storage.removeItem(k);
+        storage.removeItem(opt.profileKey);
+        storage.removeItem(opt.gamertagKey);
+        storage.removeItem(opt.metaKey);
+        storage.removeItem(opt.authKey);
       }
     } catch (_) { /* ignore */ }
     meta = { code: '', rev: 0, lastSyncAt: 0 };
@@ -539,6 +539,8 @@ export function createCloudSave(env = {}) {
     deleteAllData,
     getStatus,
     getCode: () => meta.code,
+    /** Anonymous guest token, shared with analytics so one guest account is used per install. */
+    getAuthToken: () => getToken(),
     onStatus: (cb) => { listeners.add(cb); return () => listeners.delete(cb); },
     mountUI,
   };
