@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://coding-simba.github.io/hue-and-seek/">
+  <a href="https://oxadow.com/hue-and-seek/">
     <img src="https://img.shields.io/badge/PLAY%20IN%20BROWSER-INSTANT%203D%20WEBGL-2ea44f?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Play in Browser" />
   </a>
   <a href="https://play.google.com/store/apps/details?id=com.hueseek.game&utm_source=github&utm_medium=readme_badge&utm_campaign=v84_launch">
@@ -18,7 +18,7 @@
 
 **Morph into everyday props, paint yourself to match any surface, or hunt down disguised spirits with 5 elemental water blasters — 100% free with zero ads.**
 
-- 🌐 **Play Live Right Now (Desktop & Mobile Browser):** https://coding-simba.github.io/hue-and-seek/
+- 🌐 **Play Live Right Now (Desktop & Mobile Browser):** https://oxadow.com/hue-and-seek/
 - 📱 **Get on Google Play (Android):** https://play.google.com/store/apps/details?id=com.hueseek.game
 - 📦 **Direct Signed Android APK (v8.4.0):** [GitHub Releases](https://github.com/Coding-Simba/hue-and-seek/releases/latest)
 
