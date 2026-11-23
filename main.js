@@ -3111,26 +3111,21 @@ function updateWorldPickerUI() {
 
 function syncDesktopLobbyCards() {
   const def = MAP_REGISTRY[activeMapId] || MEADOW_DEF;
-  const thumb = $('dnwThumb');
-  if (thumb && def.preview) thumb.src = def.preview;
   const wTitle = $('dnwTitle');
-  if (wTitle) wTitle.textContent = quickPlayAnyMap ? '⚡ Quick Play' : (MAP_SHORT_TITLES[activeMapId] || def.title);
-  const wSub = $('dnwSub');
-  if (wSub) wSub.textContent = quickPlayAnyMap ? 'Fastest 5v5 · Any Map' : (def.badge || 'Storybook World');
+  if (wTitle) wTitle.textContent = quickPlayAnyMap ? 'Quick Play' : (MAP_SHORT_TITLES[activeMapId] || def.title);
 
   const spId = selectedSpirit === 'auto' ? activeMapId : selectedSpirit;
   const spObj = SPIRIT_OPTIONS.find((o) => o.id === spId) || SPIRIT_OPTIONS[1];
   const skObj = SEEKER_OPTIONS.find((o) => o.id === selectedSeeker) || SEEKER_OPTIONS[0];
   const cSub = $('dncSub');
-  if (cSub && spObj && skObj) cSub.textContent = `${spObj.icon} ${spObj.label}  ·  ${skObj.icon} ${skObj.label}`;
+  if (cSub && spObj && skObj) cSub.textContent = `${spObj.label} · ${skObj.label}`;
 
-  const lvTxt = $('progLevelBadge')?.textContent?.trim() || '⭐ Lv. 1';
+  const lvTxt = ($('progLevelBadge')?.textContent?.trim() || 'Lv. 1').replace(/^⭐\s*/, '');
   const tokTxt = $('progTokenCount')?.textContent?.trim() || '60';
-  const nextTxt = $('progNextUnlockPill')?.textContent?.trim() || 'Blasters & Perks';
   const jTitle = $('dnjTitle');
-  if (jTitle) jTitle.textContent = `${lvTxt.replace(/^⭐\s*/, '')} · 🪙 ${tokTxt}`;
-  const jSub = $('dnjSub');
-  if (jSub) jSub.textContent = nextTxt;
+  if (jTitle) jTitle.textContent = lvTxt;
+  const profStats = $('deskProfStats');
+  if (profStats) profStats.textContent = `${lvTxt} · ${tokTxt} Tokens`;
 }
 
 function renderWorldPickerUI() {
@@ -3316,15 +3311,15 @@ function updateLobbyChampionPreview(dt, now) {
     return;
   }
 
-  // Frame the live 3D champion heroically in the open center-right spotlight of the clean AAA Lobby
+  // Frame the live 3D champion cleanly in the open right-midground beside the centered crest & play dock
   camera.updateMatrixWorld();
   camera.getWorldDirection(_lpForward);
   _lpRight.set(1, 0, 0).applyQuaternion(camera.quaternion);
   _lpUp.set(0, 1, 0).applyQuaternion(camera.quaternion);
   const aspect = Math.max(0.75, camera.aspect || 1.77);
-  const rightOff = aspect > 1.35 ? 1.85 : 1.05;
-  const downOff = aspect > 1.35 ? 0.34 : 0.52;
-  const dist = aspect > 1.35 ? 5.25 : 5.15;
+  const rightOff = aspect > 1.35 ? 2.15 : 1.15;
+  const downOff = aspect > 1.35 ? 0.14 : 0.45;
+  const dist = aspect > 1.35 ? 5.45 : 5.25;
   lobbyPreviewGroup.position.copy(camera.position)
     .addScaledVector(_lpForward, dist)
     .addScaledVector(_lpRight, rightOff)

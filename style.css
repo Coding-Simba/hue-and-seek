@@ -1104,296 +1104,174 @@ html.is-mobile-touch #title > #btnDesktopChars { display: none !important; }
 }
 
 /* ==========================================================================
- * v8.5.0: Premium AAA Desktop Main Screen — Open 3D World + Frosted Glass UI
+ * v8.6.0: Concept 1 — Storybook Wooden & Brass Crest Main Screen (Desktop)
  * Strictly scoped to desktop (`html:not(.is-mobile-touch)`) so mobile stays untouched.
  * ========================================================================== */
-.desk-nav-rail,
+.c1-sub-bar,
 .desk-menu-btn,
 .world-picker-backdrop,
-.picker-close-btn {
+.picker-close-btn,
+.crest-logo-img,
+.desk-prof-stats,
+.crest-5v5,
+.crest-emblem,
+.c1-svg-ic {
   display: none;
+}
+
+@keyframes crestFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+@keyframes crestSheen {
+  0% { transform: translateX(-160%) skewX(-24deg); }
+  100% { transform: translateX(270%) skewX(-24deg); }
 }
 
 html:not(.is-mobile-touch) #title {
   display: block;
   padding: 0;
   background:
-    linear-gradient(100deg, rgba(12, 20, 15, 0.56) 0%, rgba(12, 20, 15, 0.24) 30%, rgba(12, 20, 15, 0) 58%),
-    linear-gradient(180deg, rgba(12, 20, 15, 0.26) 0%, rgba(12, 20, 15, 0) 20%, rgba(12, 20, 15, 0) 76%, rgba(12, 20, 15, 0.34) 100%) !important;
+    radial-gradient(64% 54% at 50% 42%, rgba(255, 244, 210, 0) 35%, rgba(20, 28, 18, 0.50) 100%),
+    linear-gradient(180deg, rgba(16, 26, 18, 0.34) 0%, rgba(16, 26, 18, 0) 22%, rgba(16, 26, 18, 0) 62%, rgba(14, 22, 16, 0.68) 100%) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
 
-/* Hide redundant inline clutter on desktop (moved to sleek left rail + 3D Character Select + Menu popover) */
+/* Hide redundant inline desktop boxes (moved into centered Storybook Crest + Oak & Brass Sub-Bar) */
 html:not(.is-mobile-touch) #title > #btnDesktopChars,
 html:not(.is-mobile-touch) #title .spirit-picker,
 html:not(.is-mobile-touch) #title .seeker-picker,
-html:not(.is-mobile-touch) #title #progStrip {
+html:not(.is-mobile-touch) #title #progStrip,
+html:not(.is-mobile-touch) #title .logo,
+html:not(.is-mobile-touch) #title .tag {
   display: none !important;
 }
 
-/* Top-Left: Unified Frosted Glass Profile Pill */
+/* Top-Left: Carved Oak & Gilded Brass Player Profile Medallion */
 html:not(.is-mobile-touch) #title .player-row {
   position: fixed;
-  top: 20px;
+  top: 22px;
   left: 26px;
-  z-index: 26;
+  z-index: 28;
   margin: 0;
   padding: 0;
   width: auto;
   max-width: none;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 8px;
 }
 html:not(.is-mobile-touch) #title .gamertag-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
   padding: 6px 10px 6px 14px;
   border-radius: 999px;
-  background: rgba(18, 28, 22, 0.72);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1.5px solid rgba(255, 240, 204, 0.24);
-  box-shadow: 0 8px 24px rgba(10, 18, 12, 0.30);
-  color: #fffaf0;
-  gap: 8px;
+  background: linear-gradient(180deg, #3c2b1c 0%, #261a10 100%);
+  border: 2px solid #d4a756;
+  box-shadow: 0 6px 18px rgba(15, 10, 4, 0.45), inset 0 1px 0 rgba(255, 232, 174, 0.35);
+  color: #fff7e2;
 }
-html:not(.is-mobile-touch) #title .gt-lbl {
-  display: none;
+html:not(.is-mobile-touch) #title .gt-lbl { display: none; }
+html:not(.is-mobile-touch) #title .gt-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.1;
+  gap: 1px;
 }
 html:not(.is-mobile-touch) #title .gt-input {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 242, 210, 0.20);
-  border-radius: 999px;
-  color: #fffdf6;
-  padding: 4px 12px;
-  width: 132px;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: #fff7e2;
+  padding: 1px 4px;
+  margin-left: -4px;
+  width: 118px;
   font-family: var(--fd, 'Fredoka', sans-serif);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 14.5px;
+  font-weight: 700;
 }
 html:not(.is-mobile-touch) #title .gt-input:focus {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: #ffd36b;
-  outline: none;
+  background: rgba(255, 236, 186, 0.14);
+  outline: 1.5px solid #ffd573;
+}
+html:not(.is-mobile-touch) #title .desk-prof-stats {
+  display: block;
+  font: 800 10.5px/1.1 var(--fb, 'Nunito', sans-serif);
+  color: #f0c975;
+  white-space: nowrap;
 }
 html:not(.is-mobile-touch) #title .gt-dice {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: rgba(255, 248, 232, 0.14);
-  border: 1px solid rgba(255, 242, 210, 0.22);
-  color: #fff;
+  background: rgba(255, 224, 148, 0.14);
+  border: 1px solid rgba(212, 167, 86, 0.55);
+  color: #ffefca;
   box-shadow: none;
+  font-size: 13px;
   transition: transform 0.14s ease, background 0.14s ease;
 }
 html:not(.is-mobile-touch) #title .gt-dice:hover {
-  background: rgba(255, 218, 124, 0.28);
+  background: rgba(255, 214, 118, 0.28);
   transform: translateY(-1px);
 }
 
-/* Upper-Left: Sculpted Hero Wordmark Floating Cleanly Over Sunlit Sky */
-html:not(.is-mobile-touch) #title .title-head {
-  position: fixed;
-  top: 76px;
-  left: 28px;
-  z-index: 22;
-  margin: 0;
-  text-align: left;
-  max-width: 360px;
-  pointer-events: none;
-}
-html:not(.is-mobile-touch) #title .logo {
-  font-size: clamp(46px, 4.7vw, 66px);
-  line-height: 0.96;
-  letter-spacing: -0.02em;
-  color: #fffdf5;
-  text-shadow:
-    0 4px 0 rgba(36, 48, 28, 0.72),
-    0 12px 30px rgba(10, 20, 12, 0.45);
-}
-html:not(.is-mobile-touch) #title .logo em {
-  color: #ffd059;
-  font-style: normal;
-}
-html:not(.is-mobile-touch) #title .tag {
-  margin: 8px 0 0;
-  font-size: 13.5px;
-  font-weight: 800;
-  line-height: 1.35;
-  color: rgba(255, 252, 242, 0.92);
-  text-shadow: 0 2px 10px rgba(10, 18, 12, 0.65);
-  max-width: 315px;
-}
-html:not(.is-mobile-touch) #title #lobbyOfflineBanner {
-  pointer-events: auto;
-  margin: 10px 0 0;
-  font-size: 12px;
-  padding: 5px 12px;
-}
-
-/* Left Vertical Navigation Rail — 3 Sleek Frosted Glass Cards */
-html:not(.is-mobile-touch) #title .desk-nav-rail {
-  position: fixed;
-  left: 26px;
-  top: 214px;
-  z-index: 25;
-  width: 300px;
-  display: flex;
-  flex-direction: column;
-  gap: 11px;
-}
-html:not(.is-mobile-touch) .desk-nav-card {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 14px 10px 10px;
-  border-radius: 20px;
-  background: rgba(18, 29, 22, 0.74);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1.5px solid rgba(255, 240, 204, 0.22);
-  box-shadow: 0 10px 28px rgba(8, 16, 10, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  color: #fffdf6;
-  text-align: left;
-  cursor: pointer;
-  transition: transform 0.16s cubic-bezier(.22, 1, .36, 1), border-color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
-}
-html:not(.is-mobile-touch) .desk-nav-card:hover {
-  transform: translateX(5px);
-  background: rgba(24, 39, 29, 0.86);
-  border-color: rgba(255, 214, 108, 0.78);
-  box-shadow: 0 14px 34px rgba(8, 16, 10, 0.44), 0 0 0 1px rgba(255, 214, 108, 0.28);
-}
-html:not(.is-mobile-touch) .desk-nav-card:active {
-  transform: translateX(2px) scale(0.99);
-}
-html:not(.is-mobile-touch) .dnc-thumb-wrap {
-  width: 56px;
-  height: 46px;
-  border-radius: 13px;
-  overflow: hidden;
-  flex: 0 0 56px;
-  border: 1.5px solid rgba(255, 232, 174, 0.45);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-html:not(.is-mobile-touch) .dnc-thumb-wrap img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-html:not(.is-mobile-touch) .dnc-icon-badge {
-  width: 48px;
-  height: 46px;
-  border-radius: 13px;
-  flex: 0 0 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38), 0 4px 12px rgba(0, 0, 0, 0.25);
-}
-html:not(.is-mobile-touch) .dnc-icon-badge.champ {
-  background: linear-gradient(145deg, #ffd86f 0%, #e89624 100%);
-}
-html:not(.is-mobile-touch) .dnc-icon-badge.journey {
-  background: linear-gradient(145deg, #6fda62 0%, #2f8a3d 100%);
-}
-html:not(.is-mobile-touch) .dnc-body {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  flex: 1 1 auto;
-  gap: 1px;
-}
-html:not(.is-mobile-touch) .dnc-kicker {
-  font: 900 9.5px/1.1 var(--fb, 'Nunito', sans-serif);
-  letter-spacing: 0.12em;
-  color: #ffd773;
-  text-transform: uppercase;
-}
-html:not(.is-mobile-touch) .dnc-body b {
-  font: 700 16px/1.15 var(--fd, 'Fredoka', sans-serif);
-  color: #fffef9;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-html:not(.is-mobile-touch) .dnc-body em {
-  font-style: normal;
-  font: 700 11.5px/1.2 var(--fb, 'Nunito', sans-serif);
-  color: rgba(236, 245, 232, 0.78);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-html:not(.is-mobile-touch) .dnc-chev {
-  font: 800 22px/1 var(--fb, 'Nunito', sans-serif);
-  color: rgba(255, 224, 146, 0.72);
-  padding-right: 2px;
-  transition: transform 0.16s ease, color 0.16s ease;
-}
-html:not(.is-mobile-touch) .desk-nav-card:hover .dnc-chev {
-  transform: translateX(3px);
-  color: #ffd773;
-}
-
-/* Top-Right: Ultra-Clean 2-Button Utility Bar (Party + Menu Gear) */
+/* Top-Right: Carved Oak & Brass Party + Gear Medallions */
 html:not(.is-mobile-touch) #title > #btnDesktopParty {
   position: fixed !important;
-  top: 20px !important;
+  top: 22px !important;
   left: auto !important;
-  right: 126px !important;
+  right: 80px !important;
   z-index: 30;
-  height: 42px;
+  height: 44px;
   padding: 0 16px;
   border-radius: 999px;
-  background: rgba(18, 28, 22, 0.74) !important;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1.5px solid rgba(255, 240, 204, 0.24) !important;
-  color: #fffdf5 !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(180deg, #3c2b1c 0%, #261a10 100%) !important;
+  border: 2px solid #d4a756 !important;
+  color: #fff6df !important;
   font: 700 14px/1 var(--fd, 'Fredoka', sans-serif);
-  box-shadow: 0 8px 22px rgba(10, 18, 12, 0.28) !important;
-  transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+  box-shadow: 0 6px 16px rgba(15, 10, 4, 0.42), inset 0 1px 0 rgba(255, 232, 174, 0.32) !important;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+html:not(.is-mobile-touch) #title > #btnDesktopParty .c1-svg-ic {
+  display: inline-block;
 }
 html:not(.is-mobile-touch) #title > #btnDesktopParty:hover {
-  background: rgba(28, 44, 33, 0.88) !important;
-  border-color: #ffd36b !important;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  filter: brightness(1.12);
 }
 
 html:not(.is-mobile-touch) #title > #btnDesktopMenu {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
   position: fixed;
-  top: 20px;
+  top: 22px;
   right: 26px;
   z-index: 32;
-  height: 42px;
-  padding: 0 15px;
-  border-radius: 999px;
-  background: rgba(18, 28, 22, 0.74);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1.5px solid rgba(255, 240, 204, 0.24);
-  color: #fffdf5;
-  font: 700 14px/1 var(--fd, 'Fredoka', sans-serif);
-  box-shadow: 0 8px 22px rgba(10, 18, 12, 0.28);
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #3c2b1c 0%, #261a10 100%);
+  border: 2px solid #d4a756;
+  color: #ffdf88;
+  box-shadow: 0 6px 16px rgba(15, 10, 4, 0.42), inset 0 1px 0 rgba(255, 232, 174, 0.32);
   cursor: pointer;
-  transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+  transition: transform 0.15s ease, filter 0.15s ease;
 }
 html:not(.is-mobile-touch) #title > #btnDesktopMenu:hover,
 html:not(.is-mobile-touch) #title.desk-menu-open > #btnDesktopMenu {
-  background: rgba(28, 44, 33, 0.92);
-  border-color: #ffd36b;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  filter: brightness(1.14);
 }
 
-/* Collapse the 4 old top-right clutter pills into a sleek dropdown under ⚙️ Menu */
+/* Oak & Brass Dropdown under Gear Medallion */
 html:not(.is-mobile-touch) #title > #btnTitleTutorial,
 html:not(.is-mobile-touch) #title > #btnTitleQuickSettings,
 html:not(.is-mobile-touch) #title > #btnTitleFpsCap,
@@ -1401,29 +1279,27 @@ html:not(.is-mobile-touch) #title > #btnTitleQuality {
   position: fixed !important;
   right: 26px !important;
   left: auto !important;
-  width: 176px !important;
+  width: 178px !important;
   height: 38px !important;
   padding: 0 14px !important;
   justify-content: flex-start !important;
   text-align: left !important;
   border-radius: 13px !important;
-  background: rgba(18, 29, 22, 0.92) !important;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1.5px solid rgba(255, 240, 204, 0.24) !important;
-  color: #fffdf5 !important;
+  background: linear-gradient(180deg, #3a291a 0%, #241910 100%) !important;
+  border: 1.5px solid #d4a756 !important;
+  color: #fff6df !important;
   font: 700 13.5px/1 var(--fd, 'Fredoka', sans-serif) !important;
-  box-shadow: 0 10px 24px rgba(8, 14, 10, 0.36) !important;
+  box-shadow: 0 10px 24px rgba(10, 8, 4, 0.48) !important;
   z-index: 35 !important;
   opacity: 0;
   pointer-events: none;
   transform: translateY(-8px) scale(0.96);
-  transition: opacity 0.16s ease, transform 0.16s ease, border-color 0.14s ease;
+  transition: opacity 0.16s ease, transform 0.16s ease, filter 0.14s ease;
 }
-html:not(.is-mobile-touch) #title > #btnTitleTutorial { top: 72px !important; }
-html:not(.is-mobile-touch) #title > #btnTitleQuickSettings { top: 116px !important; }
-html:not(.is-mobile-touch) #title > #btnTitleFpsCap { top: 160px !important; }
-html:not(.is-mobile-touch) #title > #btnTitleQuality { top: 204px !important; }
+html:not(.is-mobile-touch) #title > #btnTitleTutorial { top: 76px !important; }
+html:not(.is-mobile-touch) #title > #btnTitleQuickSettings { top: 120px !important; }
+html:not(.is-mobile-touch) #title > #btnTitleFpsCap { top: 164px !important; }
+html:not(.is-mobile-touch) #title > #btnTitleQuality { top: 208px !important; }
 
 html:not(.is-mobile-touch) #title.desk-menu-open > #btnTitleTutorial,
 html:not(.is-mobile-touch) #title.desk-menu-open > #btnTitleQuickSettings,
@@ -1437,17 +1313,217 @@ html:not(.is-mobile-touch) #title.desk-menu-open > #btnTitleTutorial:hover,
 html:not(.is-mobile-touch) #title.desk-menu-open > #btnTitleQuickSettings:hover,
 html:not(.is-mobile-touch) #title.desk-menu-open > #btnTitleFpsCap:hover,
 html:not(.is-mobile-touch) #title.desk-menu-open > #btnTitleQuality:hover {
-  border-color: #ffd36b !important;
-  background: rgba(34, 52, 38, 0.96) !important;
+  filter: brightness(1.16);
 }
 
-/* World Picker: Sleek Centered Glassmorphic Modal (Opened from World Card!) */
+/* Upper-Center: Floating Illustrated Hue & Seek Storybook Emblem */
+html:not(.is-mobile-touch) #title .title-head {
+  position: fixed;
+  top: 42px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 22;
+  margin: 0;
+  text-align: center;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+html:not(.is-mobile-touch) #title .crest-logo-img {
+  display: block;
+  width: clamp(220px, 23vw, 305px);
+  height: auto;
+  filter: drop-shadow(0 12px 26px rgba(16, 22, 14, 0.56));
+  animation: crestFloat 4.2s ease-in-out infinite;
+}
+html:not(.is-mobile-touch) #title #lobbyOfflineBanner {
+  pointer-events: auto;
+  margin-top: 6px;
+  font-size: 12px;
+  padding: 5px 14px;
+}
+
+/* Lower-Center HERO: Double-Beveled Gilded Brass Play Crests (Hide & Seek) */
+html:not(.is-mobile-touch) #title .modes {
+  position: fixed;
+  left: 50%;
+  bottom: 92px;
+  transform: translateX(-50%);
+  z-index: 26;
+  margin: 0 !important;
+  width: min(92vw, 640px);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+html:not(.is-mobile-touch) #title .mode {
+  position: relative;
+  overflow: visible;
+  flex: 1 1 0;
+  max-width: 310px;
+  height: 84px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 14px;
+  padding: 0 22px 0 18px;
+  border-radius: 20px;
+  border: 2.5px solid #e7c06d;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.16s cubic-bezier(.22, 1, .36, 1), box-shadow 0.16s ease, filter 0.16s ease;
+}
+html:not(.is-mobile-touch) #title .mode::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 242, 200, 0.38);
+  pointer-events: none;
+}
+html:not(.is-mobile-touch) #title .mode::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  background: linear-gradient(110deg, transparent 25%, rgba(255, 255, 255, 0.28) 50%, transparent 75%);
+  background-size: 240% 100%;
+  background-position: 140% 0;
+  pointer-events: none;
+  transition: background-position 0.55s ease;
+}
+html:not(.is-mobile-touch) #title .mode:hover::after {
+  background-position: -60% 0;
+}
+html:not(.is-mobile-touch) #title .mode-hide {
+  background: linear-gradient(180deg, #3c8c4a 0%, #245f32 58%, #1a4725 100%) !important;
+  box-shadow: 0 7px 0 #103018, 0 16px 34px rgba(8, 22, 12, 0.55), inset 0 2px 0 rgba(188, 255, 190, 0.35) !important;
+}
+html:not(.is-mobile-touch) #title .mode-seek {
+  background: linear-gradient(180deg, #2b80c9 0%, #1a5394 58%, #133c6e 100%) !important;
+  box-shadow: 0 7px 0 #0b2647, 0 16px 34px rgba(8, 18, 36, 0.55), inset 0 2px 0 rgba(176, 232, 255, 0.38) !important;
+}
+html:not(.is-mobile-touch) #title .mode:hover {
+  transform: translateY(-3px) scale(1.02);
+  filter: brightness(1.07);
+}
+html:not(.is-mobile-touch) #title .mode:active {
+  transform: translateY(3px) scale(0.99);
+}
+html:not(.is-mobile-touch) #title .crest-emblem {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  flex: 0 0 50px;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 30% 25%, rgba(255, 244, 205, 0.26), rgba(0, 0, 0, 0.24));
+  border: 1.5px solid rgba(255, 226, 152, 0.55);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.28);
+}
+html:not(.is-mobile-touch) #title .mode .m-txt {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+html:not(.is-mobile-touch) #title .mode b {
+  font: 700 23px/1.05 var(--fd, 'Fredoka', sans-serif);
+  color: #fffaf0;
+  text-shadow: 0 2px 0 rgba(10, 20, 14, 0.55);
+  margin: 0;
+}
+html:not(.is-mobile-touch) #title .mode small {
+  font: 800 12px/1.15 var(--fb, 'Nunito', sans-serif);
+  color: #f6e7c1;
+  margin: 0;
+}
+html:not(.is-mobile-touch) #title .crest-5v5 {
+  display: inline-block;
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(18, 14, 8, 0.45);
+  border: 1px solid rgba(255, 224, 148, 0.48);
+  font: 900 9.5px/1.1 var(--fb, 'Nunito', sans-serif);
+  letter-spacing: 0.08em;
+  color: #ffdf8a;
+}
+html:not(.is-mobile-touch) #title .mode .tut-first-pill {
+  position: absolute !important;
+  top: -13px !important;
+  left: 16px !important;
+  right: auto !important;
+  margin: 0 !important;
+  padding: 3px 10px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(180deg, #ffe79e, #f2b43b) !important;
+  border: 1.5px solid #472c08 !important;
+  color: #3d2104 !important;
+  font: 900 10px/1.1 var(--fb, 'Nunito', sans-serif) !important;
+  white-space: nowrap;
+  box-shadow: 0 3px 8px rgba(10, 14, 8, 0.36) !important;
+}
+
+/* Bottom-Center Slim Carved Oak & Brass Sub-Bar (World | Champions | Journey) */
+html:not(.is-mobile-touch) #title .c1-sub-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%);
+  z-index: 26;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: rgba(34, 24, 16, 0.84);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(212, 167, 86, 0.65);
+  box-shadow: 0 10px 26px rgba(10, 8, 4, 0.48);
+  white-space: nowrap;
+}
+html:not(.is-mobile-touch) #title .c1-sub-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  color: #fff6e0;
+  font: 700 13.5px/1 var(--fd, 'Fredoka', sans-serif);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+html:not(.is-mobile-touch) #title .c1-sub-item:hover {
+  background: rgba(255, 214, 118, 0.18);
+  color: #ffdf88;
+}
+html:not(.is-mobile-touch) #title .c1-sub-div {
+  width: 1px;
+  height: 18px;
+  background: rgba(212, 167, 86, 0.34);
+}
+html:not(.is-mobile-touch) #title .c1-sub-val {
+  font-style: normal;
+  font: 800 11.5px/1 var(--fb, 'Nunito', sans-serif);
+  color: #e8c77b;
+}
+
+/* World Picker: Sleek Centered Modal (Opened from World Button in Sub-Bar!) */
 html:not(.is-mobile-touch) #title .world-picker-backdrop {
   display: block;
   position: fixed;
   inset: 0;
   z-index: 44;
-  background: rgba(10, 18, 12, 0.56);
+  background: rgba(14, 10, 6, 0.58);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   opacity: 0;
@@ -1471,8 +1547,8 @@ html:not(.is-mobile-touch) #title .world-picker {
   padding: 20px 22px 22px !important;
   border-radius: 26px !important;
   background: rgba(255, 251, 240, 0.97) !important;
-  border: 2.5px solid rgba(255, 224, 152, 0.85) !important;
-  box-shadow: 0 24px 64px rgba(8, 16, 10, 0.55) !important;
+  border: 2.5px solid #d4a756 !important;
+  box-shadow: 0 24px 64px rgba(10, 8, 4, 0.58) !important;
   opacity: 0;
   pointer-events: none;
   transform: translate(-50%, -46%) scale(0.95);
@@ -1483,9 +1559,7 @@ html:not(.is-mobile-touch) #title.world-modal-open .world-picker {
   pointer-events: auto;
   transform: translate(-50%, -50%) scale(1);
 }
-html:not(.is-mobile-touch) #title .picker-hdr {
-  margin-bottom: 12px;
-}
+html:not(.is-mobile-touch) #title .picker-hdr { margin-bottom: 12px; }
 html:not(.is-mobile-touch) #title .picker-hdr-right {
   display: inline-flex;
   align-items: center;
@@ -1504,9 +1578,7 @@ html:not(.is-mobile-touch) #title .picker-close-btn {
   font: 900 14px/1 var(--fb, 'Nunito', sans-serif);
   cursor: pointer;
 }
-html:not(.is-mobile-touch) #title .picker-close-btn:hover {
-  background: #ffd97a;
-}
+html:not(.is-mobile-touch) #title .picker-close-btn:hover { background: #ffd97a; }
 html:not(.is-mobile-touch) #title .map-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   gap: 12px !important;
@@ -1524,111 +1596,27 @@ html:not(.is-mobile-touch) #title .map-card.quick-play-card .map-thumb {
   flex: 0 0 112px !important;
 }
 
-/* Bottom-Right: Sculptural AAA Play Buttons (Hide & Seek) */
-html:not(.is-mobile-touch) #title .modes {
-  position: fixed;
-  right: 26px;
-  bottom: 26px;
-  z-index: 26;
-  margin: 0 !important;
-  display: flex;
-  flex-direction: row;
-  gap: 14px;
-}
-html:not(.is-mobile-touch) #title .mode {
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 13px;
-  width: auto;
-  min-width: 224px;
-  padding: 15px 22px 15px 18px;
-  border-radius: 22px;
-  text-align: left;
-  border: 2px solid rgba(255, 255, 255, 0.34);
-  cursor: pointer;
-  transition: transform 0.16s cubic-bezier(.22, 1, .36, 1), filter 0.16s ease, box-shadow 0.16s ease;
-}
-html:not(.is-mobile-touch) #title .mode .tut-first-pill,
-html:not(.is-mobile-touch) #title .mode .tut-mode-badge {
-  position: absolute !important;
-  top: -12px !important;
-  right: 14px !important;
-  margin: 0 !important;
-  padding: 3px 10px !important;
-  font-size: 10px !important;
-  white-space: nowrap;
-  box-shadow: 0 3px 8px rgba(15, 24, 12, 0.34) !important;
-}
-html:not(.is-mobile-touch) #title .mode .mi {
-  font-size: 32px;
-  line-height: 1;
-  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.22));
-  margin: 0;
-}
-html:not(.is-mobile-touch) #title .mode .m-txt {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-html:not(.is-mobile-touch) #title .mode b {
-  font: 700 21px/1.05 var(--fd, 'Fredoka', sans-serif);
-  color: #ffffff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.24);
-  margin: 0;
-}
-html:not(.is-mobile-touch) #title .mode small {
-  font: 800 12px/1.2 var(--fb, 'Nunito', sans-serif);
-  color: rgba(255, 255, 255, 0.90);
-  margin: 0;
-}
-html:not(.is-mobile-touch) #title .mode-hide {
-  background: linear-gradient(155deg, #5cc74e 0%, #2f8a36 100%) !important;
-  box-shadow: 0 6px 0 #1e5c24, 0 16px 36px rgba(10, 26, 14, 0.44), inset 0 2px 0 rgba(255, 255, 255, 0.35) !important;
-}
-html:not(.is-mobile-touch) #title .mode-seek {
-  background: linear-gradient(155deg, #43b0fa 0%, #1d6fc4 100%) !important;
-  box-shadow: 0 6px 0 #134a87, 0 16px 36px rgba(10, 22, 40, 0.44), inset 0 2px 0 rgba(255, 255, 255, 0.35) !important;
-}
-html:not(.is-mobile-touch) #title .mode:hover {
-  transform: translateY(-3px) scale(1.02);
-  filter: brightness(1.06);
-}
-html:not(.is-mobile-touch) #title .mode:active {
-  transform: translateY(3px) scale(0.99);
-}
-
-/* Bottom-Left: Subtle Web Install CTA + Clean Micro-Note */
+/* Bottom-Left: Matching Carved Oak & Brass Google Play CTA (Web Only) */
 html:not(.is-mobile-touch) #title .web-play-cta {
   left: 26px;
-  bottom: 26px;
-  background: rgba(18, 29, 22, 0.78);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1.5px solid rgba(118, 212, 98, 0.65);
-  box-shadow: 0 8px 24px rgba(8, 16, 10, 0.34);
+  bottom: 24px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #3c2b1c 0%, #261a10 100%);
+  border: 1.5px solid #d4a756;
+  box-shadow: 0 8px 22px rgba(10, 8, 4, 0.44), inset 0 1px 0 rgba(255, 232, 174, 0.28);
+}
+html:not(.is-mobile-touch) #title .web-play-cta small {
+  color: #e8c77b;
 }
 html:not(.is-mobile-touch) #title .note {
-  position: fixed;
-  left: 26px;
-  bottom: 8px;
-  margin: 0;
-  font-size: 10.5px;
-  font-weight: 800;
-  color: rgba(255, 252, 240, 0.72);
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
-  letter-spacing: 0.02em;
   display: none;
-}
-html.is-native-cap:not(.is-mobile-touch) #title .note {
-  display: block;
-  bottom: 24px;
 }
 
 @media (max-width: 960px) {
-  html:not(.is-mobile-touch) #title .desk-nav-rail { width: 256px; top: 196px; }
-  html:not(.is-mobile-touch) #title .mode { min-width: 186px; padding: 13px 16px; }
-  html:not(.is-mobile-touch) #title .mode b { font-size: 18px; }
+  html:not(.is-mobile-touch) #title .modes { width: min(94vw, 540px); bottom: 86px; gap: 12px; }
+  html:not(.is-mobile-touch) #title .mode { height: 74px; padding: 0 14px; }
+  html:not(.is-mobile-touch) #title .mode b { font-size: 19px; }
+  html:not(.is-mobile-touch) #title .c1-sub-item { padding: 7px 11px; font-size: 12.5px; }
+  html:not(.is-mobile-touch) #title .web-play-cta { display: none; }
 }
