@@ -1128,7 +1128,10 @@ html.is-mobile-touch #title > #btnDesktopChars { display: none !important; }
   100% { transform: translateX(270%) skewX(-24deg); }
 }
 
-html:not(.is-mobile-touch) #title {
+html:not(.is-mobile-touch) #title:not(.on) {
+  display: none !important;
+}
+html:not(.is-mobile-touch) #title.on {
   display: block;
   padding: 0;
   background:

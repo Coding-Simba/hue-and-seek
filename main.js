@@ -5054,13 +5054,13 @@ function playVsIntro(roster, durOverride = null) {
 // away (matchmaking itself starts once READY), instead of leaving the lobby looking frozen.
 function showQueueWhileLoading(mode, opts) {
   try {
+    $('title')?.classList.remove('on', 'world-modal-open', 'desk-menu-open');
     const urlNoTut = new URLSearchParams(location.search).get('notut') === '1';
     if (!opts.skipTutorialCheck && !urlNoTut && tutorial && tutorial.shouldRunFirstTime(mode)) return;
     if ($('queueScreen') && $('queueScreen').classList.contains('on')) return;
     const def = MAP_REGISTRY[activeMapId] || MEADOW_DEF;
     if ($('qWorldTitle')) $('qWorldTitle').textContent = def.title;
     if ($('qRoleBadge')) $('qRoleBadge').textContent = mode === 'seek' ? '💦 Queueing as Seeker · Seek 5v5' : '🎭 Queueing as Spirit · Hide 5v5';
-    $('title').classList.remove('on');
     $('hud').classList.add('hidden');
     initQueueSlotsDOM();
     if ($('queueScreen')) $('queueScreen').classList.add('on');
