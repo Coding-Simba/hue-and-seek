@@ -1,0 +1,70 @@
+/* ============================================================================
+ * Hue & Seek — Status FX: what the affected player sees on their own screen
+ * (frost creeping in, a frozen flash, fire at the edges, a heavy pull, wind)
+ * ========================================================================== */
+#statusFxOverlay { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+#statusFxOverlay i { position: absolute; inset: 0; opacity: 0; transition: opacity 0.22s ease; }
+
+/* ❄️ frost creeps in from the edges with each chill stack, then the whole screen ices over */
+#statusFxOverlay .sfx-frost {
+  background:
+    radial-gradient(ellipse at center, rgba(205, 240, 255, 0) 46%, rgba(190, 233, 255, 0.5) 82%, rgba(235, 250, 255, 0.85) 100%),
+    repeating-conic-gradient(from 8deg at 50% 50%, rgba(255, 255, 255, 0) 0deg 9deg, rgba(255, 255, 255, 0.16) 9deg 10deg);
+  box-shadow: inset 0 0 110px 34px rgba(170, 228, 255, 0.65);
+}
+#statusFxOverlay.is-chill-1 .sfx-frost { opacity: 0.32; }
+#statusFxOverlay.is-chill-2 .sfx-frost { opacity: 0.55; }
+#statusFxOverlay.is-chill-3 .sfx-frost { opacity: 0.8; }
+#statusFxOverlay.is-frozen .sfx-frost {
+  opacity: 1;
+  background:
+    radial-gradient(ellipse at center, rgba(205, 240, 255, 0) 30%, rgba(190, 233, 255, 0.5) 74%, rgba(240, 252, 255, 0.9) 100%),
+    repeating-conic-gradient(from 8deg at 50% 50%, rgba(255, 255, 255, 0) 0deg 8deg, rgba(255, 255, 255, 0.2) 8deg 9deg);
+  animation: sfxFrozenFlash 0.28s ease-out;
+}
+@keyframes sfxFrozenFlash { 0% { filter: brightness(2.2); transform: scale(1.06); } 100% { filter: brightness(1); transform: scale(1); } }
+
+#statusFxOverlay .sfx-frozen-label {
+  position: absolute; left: 50%; top: 34%;
+  transform: translate(-50%, -50%) scale(0.6);
+  padding: 8px 22px; border-radius: 18px;
+  background: linear-gradient(180deg, #f3fcff, #c9ecfb);
+  box-shadow: 0 0 0 3px #7fd0f2, 0 6px 0 rgba(40, 90, 130, 0.25), 0 0 34px rgba(150, 220, 255, 0.9);
+  color: #1f5f86; font: 700 30px/1 var(--fd, 'Fredoka', sans-serif); letter-spacing: 0.04em; white-space: nowrap;
+  opacity: 0; transition: opacity 0.12s ease, transform 0.18s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+#statusFxOverlay.is-frozen .sfx-frozen-label { opacity: 1; transform: translate(-50%, -50%) scale(1); animation: sfxShiver 0.09s linear infinite; }
+@keyframes sfxShiver { 0% { margin-left: -1.5px; } 50% { margin-left: 1.5px; } 100% { margin-left: -1.5px; } }
+
+/* 🔥 fire licks the edges of the screen */
+#statusFxOverlay .sfx-burn {
+  background:
+    radial-gradient(ellipse at 50% 120%, rgba(255, 150, 40, 0.75) 0%, rgba(255, 110, 20, 0.35) 32%, rgba(255, 110, 20, 0) 58%),
+    radial-gradient(ellipse at center, rgba(255, 120, 30, 0) 55%, rgba(255, 96, 16, 0.5) 100%);
+}
+#statusFxOverlay.is-burning .sfx-burn { opacity: 1; animation: sfxFlicker 0.42s ease-in-out infinite; }
+@keyframes sfxFlicker { 0%, 100% { opacity: 0.78; transform: scaleY(1); } 35% { opacity: 1; transform: scaleY(1.05); } 70% { opacity: 0.66; transform: scaleY(0.98); } }
+
+/* 🪨 a heavy, dusty pull from below */
+#statusFxOverlay .sfx-heavy {
+  background:
+    linear-gradient(to top, rgba(96, 66, 36, 0.62) 0%, rgba(96, 66, 36, 0.22) 26%, rgba(96, 66, 36, 0) 48%),
+    radial-gradient(ellipse at center, rgba(70, 50, 30, 0) 58%, rgba(70, 50, 30, 0.36) 100%);
+}
+#statusFxOverlay.is-heavy .sfx-heavy { opacity: 1; animation: sfxThud 0.7s ease-in-out infinite; }
+@keyframes sfxThud { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+
+/* 🌪️ wind streaks sweeping across */
+#statusFxOverlay .sfx-wind {
+  inset: -20%;
+  background: repeating-linear-gradient(100deg, rgba(210, 255, 240, 0) 0 46px, rgba(210, 255, 240, 0.2) 46px 50px, rgba(210, 255, 240, 0) 50px 110px);
+  -webkit-mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, 1) 78%);
+          mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, 1) 78%);
+}
+#statusFxOverlay.is-wind .sfx-wind { opacity: 1; animation: sfxGust 0.5s linear infinite; }
+@keyframes sfxGust { 0% { transform: translateX(-110px); } 100% { transform: translateX(0); } }
+
+html.is-mobile-touch #statusFxOverlay .sfx-frozen-label { font-size: 22px; padding: 6px 16px; top: 30%; }
+@media (prefers-reduced-motion: reduce) {
+  #statusFxOverlay i, #statusFxOverlay .sfx-frozen-label { animation: none !important; }
+}

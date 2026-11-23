@@ -1,0 +1,1718 @@
+/* ==========================================================================
+ * Hue & Seek — Native Phone Gameplay HUD & Twin-Thumb Ergonomics (mobile_ui.css)
+ * Storybook Warm Cream (#fff8ea) Aesthetic · Landscape Twin-Thumb Controls
+ * (Note: Lobby/Title/Queue/VS/Halftime/Result/Wardrobe live in mobile_lobby.css)
+ * ========================================================================== */
+
+/* --------------------------------------------------------------------------
+ * 0. Viewport Stability & Gameplay HUD Touch-Action Lock
+ * -------------------------------------------------------------------------- */
+#app {
+  height: 100%;
+  height: 100dvh;
+}
+
+#hud,
+#hud .act,
+#btnFire,
+#joyBase,
+#mobileMovePad,
+#hiderTricksBar,
+#seekerGadgetsBar,
+#chips {
+  touch-action: none;
+}
+
+/* --------------------------------------------------------------------------
+ * 1. iOS Safari / WKWebView Input Auto-Zoom Prevention (>= 16px Mandatory)
+ * -------------------------------------------------------------------------- */
+html.is-mobile-touch #playerNameInput,
+html.is-mobile-touch .gt-input,
+html.is-mobile-touch input,
+html.is-mobile-touch select,
+html.is-mobile-touch textarea {
+  font-size: 16px !important;
+}
+
+@media (pointer: coarse), (max-width: 920px) {
+  #playerNameInput,
+  .gt-input,
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * 2. Hide Keyboard <kbd> Badges & Desktop Help Prompt on Touch Devices
+ * -------------------------------------------------------------------------- */
+html.is-mobile-touch kbd,
+html.is-mobile-touch #help,
+html.is-mobile-touch .ht-key,
+html.is-mobile-touch .sg-key {
+  display: none !important;
+}
+
+@media (pointer: coarse) {
+  kbd,
+  #help,
+  .ht-key,
+  .sg-key {
+    display: none !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * 3. Floating HUD Reward Toasts (#progToastHost) Safe-Area & Modal Suppression
+ * -------------------------------------------------------------------------- */
+#progToastHost {
+  right: calc(env(safe-area-inset-right, 0px) + 14px);
+  transition: opacity 0.2s ease;
+}
+
+#app:has(#result.on) #progToastHost,
+#app:has(#halftimeScreen.on) #progToastHost {
+  opacity: 0;
+  pointer-events: none;
+}
+
+html.is-mobile-touch #progToastHost {
+  right: calc(env(safe-area-inset-right, 0px) + 16px);
+  top: calc(env(safe-area-inset-top, 0px) + 96px);
+  gap: 5px;
+  max-width: min(46vw, 240px);
+}
+
+html.is-mobile-touch .prog-toast {
+  padding: 5px 10px 5px 8px;
+  border-radius: 13px;
+  gap: 6px;
+  font-size: 11.5px;
+}
+
+html.is-mobile-touch .prog-toast-ic {
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+}
+
+html.is-mobile-touch .prog-toast-txt {
+  font-size: 12px;
+}
+
+html.is-mobile-touch .prog-toast:nth-child(n + 3) {
+  display: none !important;
+}
+
+/* --------------------------------------------------------------------------
+ * 4. LEFT SIDE = 100% Dedicated Virtual Movement Stick ONLY
+ *    (#mobileMovePad resting stick + #joyBase floating stick with sprint glow)
+ * -------------------------------------------------------------------------- */
+#mobileMovePad,
+.mobile-move-pad {
+  display: none;
+  position: absolute;
+  left: calc(env(safe-area-inset-left, 0px) + 36px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 30px);
+  width: 108px;
+  height: 108px;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  z-index: 2;
+  opacity: 0.90;
+  transform: scale(1);
+  transition: opacity 0.14s ease, transform 0.16s ease;
+}
+
+html.is-mobile-touch #mobileMovePad:not(.hidden) {
+  display: flex;
+}
+
+/* Smoothly hide resting ring to opacity 0 whenever active #joyBase appears */
+#mobileMovePad.is-dragging,
+html.is-mobile-touch #mobileMovePad.is-dragging,
+html.is-mobile-touch #hud:has(#joyBase:not(.hidden)) #mobileMovePad {
+  opacity: 0 !important;
+  transform: scale(0.92);
+}
+
+.mmp-ring {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(
+    circle,
+    rgba(255, 248, 234, 0.14) 0%,
+    rgba(143, 181, 122, 0.22) 66%,
+    rgba(255, 248, 234, 0.48) 100%
+  );
+  border: 2.5px solid rgba(255, 248, 234, 0.78);
+  box-shadow:
+    0 6px 18px rgba(30, 44, 26, 0.20),
+    inset 0 0 0 1.5px rgba(143, 181, 122, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.mmp-nub {
+  position: absolute;
+  font-style: normal;
+  font-size: 9px;
+  line-height: 1;
+  color: rgba(255, 248, 234, 0.90);
+  text-shadow: 0 1px 2px rgba(34, 46, 28, 0.48);
+}
+
+.mmp-nub.up {
+  top: 7px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.mmp-nub.right {
+  right: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.mmp-nub.down {
+  bottom: 7px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.mmp-nub.left {
+  left: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.mmp-knob {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 36% 32%, #fffdf8 0%, #fff4dc 68%, #ede0c0 100%);
+  border: 2px solid rgba(143, 181, 122, 0.58);
+  box-shadow:
+    0 3px 0 rgba(51, 64, 47, 0.24),
+    0 5px 12px rgba(28, 40, 24, 0.18),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.9);
+}
+
+.mmp-lbl {
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 900;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #44553b;
+}
+
+/* Active Floating Joystick (#joyBase) — Storybook Cream/Sage Ring + Sprint Golden Glow */
+html.is-mobile-touch #joyBase {
+  width: 114px;
+  height: 114px;
+  margin: -57px 0 0 -57px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 3;
+  background: radial-gradient(
+    circle,
+    rgba(255, 248, 234, 0.16) 0%,
+    rgba(143, 181, 122, 0.24) 68%,
+    rgba(255, 248, 234, 0.46) 100%
+  );
+  border: 2.5px solid rgba(255, 248, 234, 0.88);
+  box-shadow:
+    0 6px 18px rgba(28, 42, 24, 0.24),
+    inset 0 0 0 2px rgba(143, 181, 122, 0.45);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+html.is-mobile-touch #joyBase #joyKnob {
+  width: 50px;
+  height: 50px;
+  margin: -25px 0 0 -25px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fffef9 0%, #fff4dc 68%, #ebd9b4 100%);
+  border: 2px solid rgba(143, 181, 122, 0.68);
+  box-shadow:
+    0 4px 0 rgba(51, 64, 47, 0.28),
+    0 6px 14px rgba(24, 36, 20, 0.24),
+    inset 0 2px 2px rgba(255, 255, 255, 0.92);
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+html.is-mobile-touch #joyBase.sprint {
+  border-color: #ffd36b;
+  background: radial-gradient(
+    circle,
+    rgba(255, 236, 168, 0.22) 0%,
+    rgba(255, 197, 107, 0.34) 70%,
+    rgba(255, 244, 204, 0.54) 100%
+  );
+  box-shadow:
+    0 0 0 4px rgba(255, 211, 107, 0.44),
+    0 0 22px rgba(255, 190, 68, 0.58),
+    inset 0 0 12px rgba(255, 220, 120, 0.40);
+}
+
+html.is-mobile-touch #joyBase.sprint #joyKnob {
+  background: radial-gradient(circle at 35% 30%, #fffef6 0%, #ffe69e 68%, #ffc14d 100%);
+  border-color: #f2a324;
+  box-shadow:
+    0 4px 0 rgba(140, 88, 12, 0.32),
+    0 0 14px rgba(255, 200, 76, 0.68),
+    inset 0 2px 2px rgba(255, 255, 255, 0.95);
+}
+
+/* --------------------------------------------------------------------------
+ * 5. TOP HUD BAR & UNOBSTRUCTED CENTER CROSSHAIR (#hud .top, #hint, .feed)
+ * -------------------------------------------------------------------------- */
+html.is-mobile-touch #hud .top {
+  padding-top: calc(env(safe-area-inset-top, 0px) + 6px);
+  padding-left: calc(env(safe-area-inset-left, 0px) + 12px);
+  padding-right: calc(env(safe-area-inset-right, 0px) + 14px);
+  gap: 8px;
+}
+
+/* Single Horizontal Top-Left Row: [✕ Quit] [🔊 Mute] [💧 HP 100] */
+html.is-mobile-touch #hud .round {
+  width: 34px;
+  height: 34px;
+  font-size: 14px;
+}
+
+html.is-mobile-touch #hud .mute,
+html.is-mobile-touch #btnMute {
+  left: calc(env(safe-area-inset-left, 0px) + 54px);
+  top: calc(env(safe-area-inset-top, 0px) + 7px);
+  width: 34px;
+  height: 34px;
+  font-size: 14px;
+}
+
+html.is-mobile-touch #hud .hp,
+html.is-mobile-touch #hpBox {
+  left: calc(env(safe-area-inset-left, 0px) + 96px);
+  top: calc(env(safe-area-inset-top, 0px) + 7px);
+  height: 34px;
+  padding: 4px 9px 4px 7px;
+  gap: 5px;
+  border-radius: 14px;
+}
+
+html.is-mobile-touch #hud .hp .hp-ic {
+  font-size: 14px;
+}
+
+html.is-mobile-touch #hud .hpbar {
+  width: 66px;
+  height: 9px;
+}
+
+html.is-mobile-touch #hud .hp b {
+  font-size: 13.5px;
+  min-width: 24px;
+}
+
+/* Compact Center Timer & Score Pills */
+html.is-mobile-touch #hud .phase {
+  padding: 3px 14px 4px;
+  border-radius: 14px;
+}
+
+html.is-mobile-touch #hud .phase span {
+  font-size: 9.5px;
+}
+
+html.is-mobile-touch #hud .phase b {
+  font-size: 20px;
+}
+
+html.is-mobile-touch #hud .hud-world {
+  display: none !important;
+}
+
+html.is-mobile-touch #roundSeriesBadge {
+  left: calc(50% + 58px);
+  right: auto;
+  top: calc(env(safe-area-inset-top, 0px) + 8px);
+  padding: 4px 9px;
+  font-size: 10.5px;
+}
+
+html.is-mobile-touch #hud .stat {
+  min-width: 82px;
+  padding: 4px 10px;
+  border-radius: 13px;
+  font-size: 12.5px;
+}
+
+html.is-mobile-touch #hud .stat .team-row {
+  gap: 5px;
+  font-size: 12.5px;
+}
+
+html.is-mobile-touch #hud .stat small {
+  font-size: 8.5px;
+}
+
+/* Compact Hider Disguise & Suspicion Pill (#matchBox) */
+html.is-mobile-touch #hud .match,
+html.is-mobile-touch #matchBox {
+  top: calc(env(safe-area-inset-top, 0px) + 46px);
+  padding: 3px 11px;
+  gap: 8px;
+  border-radius: 14px;
+}
+
+html.is-mobile-touch #hud .match .dis {
+  min-width: 82px;
+}
+
+html.is-mobile-touch #hud .match .dis small,
+html.is-mobile-touch #hud .match .sus small {
+  font-size: 8.5px;
+}
+
+html.is-mobile-touch #hud .match .dis b {
+  font-size: 13.5px;
+  max-width: 136px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.is-mobile-touch #hud .susbar {
+  width: 62px;
+  height: 7px;
+}
+
+/* Top-Center #hint Pill — NEVER blocks the center aiming reticle (#cross)! */
+html.is-mobile-touch #hint {
+  top: calc(env(safe-area-inset-top, 0px) + 50px);
+  bottom: auto !important;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: min(50vw, 310px);
+  padding: 4px 12px;
+  font-size: 11.5px;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: 999px;
+  pointer-events: none;
+  z-index: 6;
+  transition: opacity 0.25s ease;
+}
+
+html.is-mobile-touch #matchBox:not(.hidden) ~ #hint,
+html.is-mobile-touch #hud:has(#matchBox:not(.hidden)) #hint,
+html.is-mobile-touch #hud:has(#dowsingBanner:not(.hidden)) #hint {
+  top: calc(env(safe-area-inset-top, 0px) + 82px);
+}
+
+/* Slim 28px Single-Line Dowsing Compass Pill (#dowsingBanner) */
+html.is-mobile-touch #dowsingBanner {
+  top: calc(env(safe-area-inset-top, 0px) + 48px);
+  height: 28px;
+  width: auto;
+  max-width: 280px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border-width: 1.5px;
+  font-size: 12px;
+  line-height: 1;
+}
+
+html.is-mobile-touch #dowsingBanner .sg-dowsing-timer {
+  left: 11px;
+  right: 11px;
+  bottom: 2px;
+  height: 2px;
+}
+
+/* World Event & Overtime Stack — Docked Top-Left Below [✕] [🔊] [💧 100]
+ * Zero center viewport blockage & zero overlap with #matchBox, #hint, #cross, or #feed! */
+html.is-mobile-touch #hud .we-banner-stack,
+html.is-mobile-touch #hud:has(#matchBox:not(.hidden)) .we-banner-stack,
+html.is-mobile-touch #hud .we-banner-stack.below-match {
+  left: calc(env(safe-area-inset-left, 0px) + 12px) !important;
+  right: auto !important;
+  top: calc(env(safe-area-inset-top, 0px) + 52px) !important;
+  transform: none !important;
+  align-items: flex-start !important;
+  width: auto !important;
+  max-width: min(36vw, 265px) !important;
+  gap: 4px;
+  transition: none;
+}
+
+html.is-mobile-touch .we-kicker,
+html.is-mobile-touch .we-bonus-pill {
+  display: none !important;
+}
+
+/* Initial 3.2s Toast: Compact 34px-tall pill */
+html.is-mobile-touch #worldEventBanner {
+  height: 34px;
+  width: auto;
+  max-width: 100%;
+  padding: 4px 10px;
+  border-radius: 14px;
+  border-width: 1.5px;
+}
+
+html.is-mobile-touch .we-row {
+  gap: 7px;
+}
+
+html.is-mobile-touch .we-icon-wrap {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  font-size: 13px;
+}
+
+html.is-mobile-touch #worldEventTitle {
+  font-size: 12px;
+  line-height: 1.08;
+}
+
+html.is-mobile-touch #worldEventTimer {
+  font-size: 10.5px;
+  padding: 1px 5px;
+}
+
+html.is-mobile-touch #worldEventSub,
+html.is-mobile-touch .we-desc {
+  font-size: 10.5px;
+  line-height: 1.08;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+html.is-mobile-touch .we-progress-track {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 1.5px;
+  height: 2px;
+  margin-top: 0;
+}
+
+/* Auto-Compact Mini Status Chip after 3.2s: Tiny 24px-tall pill (~145px wide) */
+html.is-mobile-touch #worldEventBanner.is-compact {
+  display: inline-flex;
+  align-items: center;
+  height: 24px !important;
+  min-height: 24px !important;
+  width: auto !important;
+  max-width: 220px !important;
+  padding: 0 9px !important;
+  border-radius: 999px !important;
+  border-width: 1.5px !important;
+}
+
+html.is-mobile-touch #worldEventBanner.is-compact .we-icon-wrap {
+  width: auto !important;
+  height: auto !important;
+  border-radius: 0;
+  background: none !important;
+  box-shadow: none !important;
+  font-size: 12.5px !important;
+  line-height: 1 !important;
+}
+
+html.is-mobile-touch #worldEventBanner.is-compact #worldEventTitle {
+  font-size: 11px !important;
+  line-height: 1 !important;
+}
+
+html.is-mobile-touch #worldEventBanner.is-compact #worldEventTimer {
+  font-size: 10.5px !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.is-mobile-touch #worldEventBanner.is-compact #worldEventSub,
+html.is-mobile-touch #worldEventBanner.is-compact .we-desc,
+html.is-mobile-touch #worldEventBanner.is-compact .we-progress-track {
+  display: none !important;
+}
+
+/* 0:30 Overtime Frenzy: Tiny 24px-tall pill (🔥 2× FRENZY!, max-width: 165px) */
+html.is-mobile-touch .we-ot-desktop {
+  display: none !important;
+}
+
+html.is-mobile-touch .we-ot-mobile {
+  display: inline !important;
+}
+
+html.is-mobile-touch #overtimeBanner,
+html.is-mobile-touch #overtimeFrenzyPill {
+  height: 24px;
+  min-height: 24px;
+  width: auto;
+  max-width: 165px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border-width: 1.5px;
+  font-size: 11px;
+  line-height: 1;
+}
+
+/* Compact Top-Right Feed — Capped at 2 Visible Items so it NEVER hits right buttons */
+html.is-mobile-touch #hud .feed,
+html.is-mobile-touch #feed {
+  right: calc(env(safe-area-inset-right, 0px) + 14px);
+  top: calc(env(safe-area-inset-top, 0px) + 48px);
+  gap: 4px;
+  max-width: min(42vw, 240px);
+}
+
+html.is-mobile-touch #hud .feed-item {
+  padding: 3px 9px;
+  font-size: 11px;
+  border-radius: 11px;
+}
+
+html.is-mobile-touch #hud .feed-item:nth-child(n + 3),
+html.is-mobile-touch .feed-item:nth-child(n + 3) {
+  display: none !important;
+}
+
+/* Compact Spectator Bar */
+html.is-mobile-touch #specBar {
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+  padding: 7px 12px;
+  border-radius: 18px;
+  gap: 8px;
+}
+
+html.is-mobile-touch #specBar span {
+  font-size: 12px;
+}
+
+html.is-mobile-touch #specBar .spec-btn {
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+/* --------------------------------------------------------------------------
+ * 6. RIGHT SIDE = True Ergonomic Right-Thumb Action Fan
+ *    Zero Text Overflow + Zero Bounding-Box Overlap in Seek & Hide Modes!
+ * -------------------------------------------------------------------------- */
+.mobile-only-act {
+  display: none;
+}
+
+html.is-mobile-touch .mobile-only-act:not(.hidden) {
+  display: flex;
+}
+
+#btnJump {
+  background: linear-gradient(180deg, #fffdf6 0%, #f4ead2 100%);
+  border: 2px solid rgba(143, 181, 122, 0.58);
+  color: var(--ink, #33402f);
+}
+
+#btnUndisguise.small-act {
+  background: linear-gradient(180deg, #fff9e6 0%, #ffe6ad 100%);
+  border: 2px solid rgba(245, 179, 64, 0.68);
+  color: #4f3206;
+  box-shadow: 0 4px 0 rgba(120, 82, 18, 0.26);
+}
+
+#btnFire.is-firing {
+  transform: translateY(2px) scale(0.97);
+  box-shadow:
+    0 2px 0 rgba(40, 88, 130, 0.32),
+    0 0 0 4px rgba(124, 196, 242, 0.55),
+    0 8px 20px rgba(56, 148, 220, 0.36);
+}
+
+/* Base Right-Side .actions Container (Hider 2-Column Compact Cluster Default) */
+html.is-mobile-touch #hud .actions {
+  right: calc(env(safe-area-inset-right, 0px) + 18px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap-reverse;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 142px;
+}
+
+/* Seeker Mode .actions Override: Clean Vertical Stack (#btnJump 58px above #btnFire 86px) */
+html.is-mobile-touch #hud[data-mobile-mode="seek"] .actions,
+html.is-mobile-touch #hud .actions:has(#btnFire:not(.hidden)) {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 10px;
+  max-width: 86px;
+}
+
+/* Universal Mobile .act Button Typography & Overflow Protection */
+html.is-mobile-touch #hud .act {
+  overflow: hidden;
+  padding: 2px 3px;
+  border-radius: 50%;
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 900;
+  font-size: 10.5px;
+  line-height: 1.05;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  gap: 1px;
+  flex-shrink: 0;
+}
+
+html.is-mobile-touch #hud .act .ic {
+  line-height: 1.05;
+  flex-shrink: 0;
+}
+
+html.is-mobile-touch #hud .act > span:not(.ic) {
+  display: block;
+  max-width: calc(100% - 6px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 900;
+  font-size: 10.5px;
+  line-height: 1.08;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* Hider Mode Button Sizes & Ergonomic Order (Total width <= 138px) */
+html.is-mobile-touch #hud #btnJump {
+  order: 1;
+  width: 62px;
+  height: 62px;
+}
+
+html.is-mobile-touch #hud #btnJump .ic {
+  font-size: 22px;
+}
+
+html.is-mobile-touch #hud #btnSample {
+  order: 2;
+  width: 68px;
+  height: 68px;
+  background: linear-gradient(180deg, #fffef8 0%, #f7edd4 100%);
+  border: 2px solid rgba(245, 182, 66, 0.58);
+}
+
+html.is-mobile-touch #hud #btnSample .ic {
+  font-size: 24px;
+}
+
+html.is-mobile-touch #hud #btnUndisguise,
+html.is-mobile-touch #hud #btnUndisguise.small-act {
+  order: 3;
+  width: 54px;
+  height: 54px;
+}
+
+html.is-mobile-touch #hud #btnFreeze {
+  order: 4;
+  width: 54px;
+  height: 54px;
+}
+
+html.is-mobile-touch #hud #btnInteract,
+html.is-mobile-touch #hud .act.interact {
+  order: 5;
+  width: 54px;
+  height: 54px;
+  min-width: 54px;
+  max-width: 54px;
+  padding: 2px 3px;
+  border-radius: 50%;
+}
+
+html.is-mobile-touch #hud #btnUndisguise .ic,
+html.is-mobile-touch #hud #btnFreeze .ic,
+html.is-mobile-touch #hud #btnInteract .ic {
+  font-size: 18px;
+}
+
+html.is-mobile-touch #hud #btnUndisguise > span:not(.ic),
+html.is-mobile-touch #hud #btnFreeze > span:not(.ic) {
+  font-size: 9px;
+  letter-spacing: 0.02em;
+}
+
+/* Keep #btnInteract label concise regardless of long desktop map prompt strings */
+html.is-mobile-touch #hud #intLbl {
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+
+html.is-mobile-touch #hud #intLbl::after {
+  content: attr(data-mobile-lbl);
+  display: block;
+  max-width: 46px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 900;
+  font-size: 9px;
+  line-height: 1.08;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* Seeker Mode Button Sizes & Stack Order (#btnInteract -> #btnJump 58px -> #btnFire 86px) */
+html.is-mobile-touch #hud[data-mobile-mode="seek"] #btnInteract,
+html.is-mobile-touch #hud .actions:has(#btnFire:not(.hidden)) #btnInteract {
+  order: 1;
+}
+
+html.is-mobile-touch #hud[data-mobile-mode="seek"] #btnJump,
+html.is-mobile-touch #hud .actions:has(#btnFire:not(.hidden)) #btnJump {
+  order: 2;
+  width: 58px;
+  height: 58px;
+}
+
+html.is-mobile-touch #hud[data-mobile-mode="seek"] #btnJump .ic,
+html.is-mobile-touch #hud .actions:has(#btnFire:not(.hidden)) #btnJump .ic {
+  font-size: 21px;
+}
+
+html.is-mobile-touch #hud #btnFire,
+html.is-mobile-touch #hud .act.big {
+  order: 3;
+  width: 86px;
+  height: 86px;
+  background: linear-gradient(180deg, #c6ecff 0%, #74c0f2 100%);
+  border: 2.5px solid rgba(255, 252, 244, 0.9);
+  box-shadow:
+    0 5px 0 rgba(38, 86, 128, 0.30),
+    0 10px 22px rgba(26, 68, 108, 0.24);
+}
+
+html.is-mobile-touch #hud #btnFire .ic,
+html.is-mobile-touch #hud .act.big .ic {
+  font-size: 30px;
+}
+
+html.is-mobile-touch #hud #btnFire > span:not(.ic) {
+  font-size: 11px;
+}
+
+/* --------------------------------------------------------------------------
+ * 7. SEEKER GADGETS BAR — Right-Thumb Inner Arc (0px Overlap with .actions!)
+ *    Anchored at right: 118px, bottom: 18px -> 2x 64x64px squircles (gap 10px)
+ * -------------------------------------------------------------------------- */
+html.is-mobile-touch #seekerGadgetsBar {
+  left: auto !important;
+  right: calc(env(safe-area-inset-right, 0px) + 118px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
+  max-width: none;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+html.is-mobile-touch #seekerGadgetsBar .sg-card {
+  width: 64px;
+  height: 64px;
+  min-width: 64px;
+  max-width: 64px;
+  flex: 0 0 64px;
+  padding: 5px 4px 9px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-align: center;
+}
+
+html.is-mobile-touch #seekerGadgetsBar .sg-icon-wrap {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+}
+
+html.is-mobile-touch #seekerGadgetsBar .sg-icon {
+  font-size: 18px;
+}
+
+html.is-mobile-touch #seekerGadgetsBar .sg-meta {
+  padding-right: 0;
+  width: 100%;
+  align-items: center;
+  text-align: center;
+}
+
+html.is-mobile-touch #seekerGadgetsBar .sg-title {
+  display: block;
+  max-width: 56px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 900;
+  font-size: 10.5px;
+  line-height: 1.08;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+html.is-mobile-touch #seekerGadgetsBar .sg-card.is-ready .sg-sub {
+  display: none;
+}
+
+html.is-mobile-touch #seekerGadgetsBar .sg-card.is-cooling .sg-sub {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  margin-top: 0;
+  padding: 1px 4px;
+  border-radius: 6px;
+  background: rgba(33, 77, 115, 0.88);
+  color: #fff8ea;
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 1.15;
+  z-index: 3;
+}
+
+html.is-mobile-touch #seekerGadgetsBar .sg-cd-track {
+  left: 7px;
+  right: 7px;
+  bottom: 4px;
+  height: 4px;
+}
+
+/* Declutter top-left utility pills on mobile touch (FPS & Quality live inside Quick Settings) */
+html.is-mobile-touch #hud #btnQuality,
+html.is-mobile-touch #hud #btnFpsCap {
+  display: none !important;
+}
+
+/* --------------------------------------------------------------------------
+ * 8. HIDER TRICKS BAR & QUICK-MORPH CHIPS — Right-Thumb Inner Arc
+ *    Compact 48x48px squircles so all 4 tricks (incl. Repaint) stay clear of left joystick
+ * -------------------------------------------------------------------------- */
+html.is-mobile-touch #hiderTricksBar,
+html.is-mobile-touch #help:not(:empty) ~ #hiderTricksBar {
+  left: auto !important;
+  right: calc(env(safe-area-inset-right, 0px) + 156px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 16px) !important;
+  max-width: none;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+html.is-mobile-touch #hiderTricksBar .ht-pill {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  max-width: 48px;
+  flex: 0 0 48px;
+  padding: 3px 2px 4px;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-align: center;
+}
+
+html.is-mobile-touch #hiderTricksBar .ht-ic {
+  font-size: 18px;
+}
+
+html.is-mobile-touch #hiderTricksBar .ht-ring-wrap {
+  width: 24px;
+  height: 24px;
+}
+
+html.is-mobile-touch #hiderTricksBar .ht-giggle-svg {
+  width: 28px;
+  height: 28px;
+}
+
+html.is-mobile-touch #hiderTricksBar .ht-ring-wrap .ht-ic {
+  font-size: 17px;
+}
+
+html.is-mobile-touch #hiderTricksBar .ht-txt {
+  position: static;
+  width: 100%;
+  align-items: center;
+  text-align: center;
+}
+
+html.is-mobile-touch #hiderTricksBar .ht-txt b {
+  display: block;
+  max-width: 52px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 900;
+  font-size: 10px;
+  line-height: 1.08;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+html.is-mobile-touch #hiderTricksBar .ht-txt small {
+  display: none !important;
+}
+
+/* Tiny golden 3x Daredevil corner badge on Whistle squircle */
+html.is-mobile-touch #hiderTricksBar .ht-3x {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  padding: 1px 4px;
+  border-radius: 99px;
+  font-size: 8.5px;
+  line-height: 1.1;
+  z-index: 4;
+}
+
+/* Live Cooldown Seconds Badge cleanly overlaid inside 58x58 squircle */
+html.is-mobile-touch #hiderTricksBar .ht-pill.is-cooling .ht-cd {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: inline-block;
+  min-width: 26px;
+  padding: 1px 4px;
+  border-radius: 7px;
+  font-size: 10.5px;
+  line-height: 1.15;
+  z-index: 5;
+}
+
+/* Nearby Prop Quick-Morph #chips — Single Horizontal Row Above #hiderTricksBar */
+html.is-mobile-touch #hud .chips,
+html.is-mobile-touch #chips {
+  left: auto;
+  right: calc(env(safe-area-inset-right, 0px) + 172px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 86px);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  max-width: calc(100vw - 340px);
+}
+
+html.is-mobile-touch #chips .chip {
+  height: 34px;
+  max-width: 108px;
+  padding: 4px 10px 4px 8px;
+  border-radius: 999px;
+  gap: 5px;
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+html.is-mobile-touch #chips .chip span {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+html.is-mobile-touch #chips .chip b {
+  font-size: 11.5px;
+  max-width: 72px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Compact Mobile HUD Graphics Quality Pill (top-left under Quit & Mute) */
+html.is-mobile-touch #hud #btnQuality {
+  left: calc(env(safe-area-inset-left, 0px) + 12px);
+  top: calc(env(safe-area-inset-top, 0px) + 47px);
+  height: 27px;
+  padding: 0 9px;
+  font-size: 11px;
+  border-radius: 999px;
+}
+
+/* --------------------------------------------------------------------------
+ * 9. HEARTBEAT TENSION VIGNETTE (#dangerVignette), NERVES OF STEEL TOAST
+ *    (#nervesToast) & FEVER TIME CELEBRATORY BANNER (#feverBanner)
+ * -------------------------------------------------------------------------- */
+#dangerVignette,
+.danger-vignette {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  opacity: 0;
+  will-change: opacity;
+  background: radial-gradient(
+    ellipse 74% 68% at 50% 50%,
+    rgba(255, 174, 82, 0) 44%,
+    rgba(238, 114, 42, 0.34) 76%,
+    rgba(186, 32, 42, 0.74) 100%
+  );
+  box-shadow: inset 0 0 88px rgba(172, 26, 34, 0.46);
+  transition: opacity 0.13s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#dangerVignette.hidden,
+.danger-vignette.hidden {
+  display: none !important;
+}
+
+#dangerVignette.pulse,
+#dangerVignette.is-beating {
+  animation: hsDangerLubDub 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes hsDangerLubDub {
+  0% {
+    transform: scale(1);
+  }
+  22% {
+    transform: scale(1.012);
+  }
+  44% {
+    transform: scale(1.002);
+  }
+  66% {
+    transform: scale(1.009);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+#app:has(#title.on) #dangerVignette,
+#app:has(#queueScreen.on) #dangerVignette,
+#app:has(#vsScreen.on) #dangerVignette,
+#app:has(#halftimeScreen.on) #dangerVignette,
+#app:has(#result.on) #dangerVignette {
+  opacity: 0 !important;
+}
+
+/* Golden "🔥 +25 XP · Nerves of Steel!" Survival Courage Badge (#nervesToast) */
+#nervesToast,
+.nerves-toast {
+  pointer-events: none;
+  position: fixed;
+  left: 50%;
+  top: calc(env(safe-area-inset-top, 0px) + 92px);
+  transform: translate3d(-50%, -10px, 0) scale(0.94);
+  z-index: 88;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fffef4 0%, #ffe699 54%, #ffc84a 100%);
+  border: 2px solid #ed9b16;
+  color: #4a2c04;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 13.5px;
+  line-height: 1.1;
+  letter-spacing: 0.015em;
+  white-space: nowrap;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.72);
+  box-shadow:
+    0 3px 0 rgba(128, 76, 8, 0.30),
+    0 8px 22px rgba(235, 148, 20, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.90);
+  opacity: 0;
+  will-change: opacity, transform;
+  transition:
+    opacity 0.22s ease,
+    transform 0.26s cubic-bezier(0.22, 1.32, 0.36, 1);
+}
+
+#nervesToast.hidden,
+.nerves-toast.hidden {
+  display: none !important;
+}
+
+#nervesToast.on,
+#nervesToast.show,
+#nervesToast.active,
+#nervesToast.is-visible,
+.nerves-toast.on,
+.nerves-toast.show {
+  opacity: 1;
+  transform: translate3d(-50%, 0, 0) scale(1);
+}
+
+html.is-mobile-touch #nervesToast,
+html.is-mobile-touch .nerves-toast {
+  top: calc(env(safe-area-inset-top, 0px) + 78px);
+  padding: 5px 13px;
+  font-size: 12px;
+}
+
+#app:has(#title.on) #nervesToast,
+#app:has(#result.on) #nervesToast {
+  opacity: 0 !important;
+}
+
+/* Celebratory "🔥 FEVER TIME! Final 25s!" Top Pill (#feverBanner) */
+#feverBanner,
+.fever-banner {
+  pointer-events: none;
+  position: fixed;
+  left: 50%;
+  top: calc(env(safe-area-inset-top, 0px) + 64px);
+  transform: translate3d(-50%, 0, 0);
+  z-index: 16;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 30px;
+  padding: 4px 15px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fff9e6 0%, #ffd56b 52%, #ff9d3b 100%);
+  border: 2px solid #ea6c1c;
+  color: #462104;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 12.5px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.68);
+  box-shadow:
+    0 3px 0 rgba(132, 56, 10, 0.28),
+    0 6px 18px rgba(242, 118, 24, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.86);
+  will-change: transform, opacity;
+  animation:
+    hsFeverBannerIn 0.32s cubic-bezier(0.22, 1.32, 0.36, 1) both,
+    hsFeverGlowPulse 1.15s ease-in-out 0.32s infinite;
+}
+
+#feverBanner.hidden,
+.fever-banner.hidden,
+#feverBanner:empty {
+  display: none !important;
+}
+
+@keyframes hsFeverBannerIn {
+  from {
+    opacity: 0;
+    transform: translate3d(-50%, -10px, 0) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(-50%, 0, 0) scale(1);
+  }
+}
+
+@keyframes hsFeverGlowPulse {
+  0%, 100% {
+    transform: translate3d(-50%, 0, 0) scale(1);
+    box-shadow:
+      0 3px 0 rgba(132, 56, 10, 0.28),
+      0 6px 18px rgba(242, 118, 24, 0.34),
+      inset 0 1px 0 rgba(255, 255, 255, 0.86);
+  }
+  50% {
+    transform: translate3d(-50%, 0, 0) scale(1.035);
+    box-shadow:
+      0 3px 0 rgba(132, 56, 10, 0.32),
+      0 0 22px rgba(255, 148, 36, 0.62),
+      inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  }
+}
+
+html.is-mobile-touch #feverBanner,
+html.is-mobile-touch .fever-banner {
+  top: calc(env(safe-area-inset-top, 0px) + 46px);
+  height: 25px;
+  padding: 0 11px;
+  font-size: 11px;
+  border-width: 1.5px;
+}
+
+html.is-mobile-touch #hud:has(#dowsingBanner:not(.hidden)) #feverBanner,
+html.is-mobile-touch #app:has(#dowsingBanner:not(.hidden)) #feverBanner {
+  top: calc(env(safe-area-inset-top, 0px) + 77px);
+}
+
+#app:has(#title.on) #feverBanner,
+#app:has(#queueScreen.on) #feverBanner,
+#app:has(#vsScreen.on) #feverBanner,
+#app:has(#halftimeScreen.on) #feverBanner,
+#app:has(#result.on) #feverBanner {
+  display: none !important;
+}
+
+/* --------------------------------------------------------------------------
+ * 10. 30 / 60 FPS BATTERY-SAVER PILL (#btnFpsCap) & COMPACT QUICK-SETTINGS
+ *     POPOVER (#mobQuickSettings — 1-Tap FPS, Gyro Aim & Haptics!)
+ * -------------------------------------------------------------------------- */
+#btnFpsCap,
+#btnTitleFpsCap {
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#btnFpsCap[data-fps="60"],
+#btnTitleFpsCap[data-fps="60"] {
+  background: linear-gradient(180deg, #f5fced 0%, #dcf3c6 100%);
+  color: #294e1c;
+  box-shadow:
+    0 3px 0 rgba(48, 86, 34, 0.25),
+    inset 0 0 0 1.5px #98d074,
+    0 6px 14px rgba(20, 30, 20, 0.15);
+}
+
+#btnFpsCap[data-fps="30"],
+#btnTitleFpsCap[data-fps="30"] {
+  background: linear-gradient(180deg, #fff8e4 0%, #ffe19c 100%);
+  color: #543506;
+  box-shadow:
+    0 3px 0 rgba(122, 78, 12, 0.26),
+    inset 0 0 0 1.5px #efb43f,
+    0 6px 14px rgba(20, 30, 20, 0.16);
+}
+
+.hud-fps-pill,
+#hud #btnFpsCap {
+  position: absolute;
+  left: 98px;
+  top: calc(env(safe-area-inset-top, 0px) + 108px);
+  z-index: 3;
+}
+
+.hud-qs-btn,
+#hud #btnHudQuickSettings {
+  position: absolute;
+  left: 194px;
+  top: calc(env(safe-area-inset-top, 0px) + 108px);
+  z-index: 3;
+  width: 34px;
+  min-width: 34px;
+  padding: 0;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.title-fps-pill,
+#title > #btnTitleFpsCap {
+  position: absolute;
+  right: max(102px, calc(env(safe-area-inset-right, 0px) + 102px));
+  top: max(12px, calc(env(safe-area-inset-top, 0px) + 12px));
+  z-index: 4;
+}
+
+.title-qs-btn,
+#title > #btnTitleQuickSettings {
+  position: absolute;
+  right: max(198px, calc(env(safe-area-inset-right, 0px) + 198px));
+  top: max(12px, calc(env(safe-area-inset-top, 0px) + 12px));
+  z-index: 4;
+  cursor: pointer;
+}
+
+/* Hide desktop title pills on touch phones where #mobTopBar is active */
+html.is-mobile-touch #title > #btnTitleFpsCap,
+html.is-mobile-touch #title > #btnTitleQuickSettings {
+  display: none !important;
+}
+
+/* Mobile Landscape Lobby Quick-Settings Trigger right beside #mobLobbyQualityBtn */
+#mobLobbyQuickSettingsBtn {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1.5px solid rgba(143, 181, 122, 0.56);
+  border-radius: 50%;
+  background: rgba(255, 248, 234, 0.94);
+  color: #33402f;
+  font-size: 15px;
+  line-height: 1;
+  box-shadow:
+    0 3px 0 rgba(52, 68, 44, 0.22),
+    0 5px 12px rgba(20, 32, 18, 0.16);
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.15s ease;
+}
+
+#mobLobbyQuickSettingsBtn:active,
+.qs-trigger-btn:active {
+  transform: translateY(2px) scale(0.96);
+}
+
+.qs-trigger-btn.is-open,
+#mobLobbyQuickSettingsBtn.is-open {
+  background: linear-gradient(180deg, #fff9e6 0%, #ffe59e 100%);
+  border-color: #eea825;
+}
+
+/* Compact Mobile HUD Row: [✨ Ultra] [⚡ 60] [🎛️] at top: +47px */
+html.is-mobile-touch #hud #btnFpsCap {
+  left: calc(env(safe-area-inset-left, 0px) + 84px);
+  top: calc(env(safe-area-inset-top, 0px) + 47px);
+  height: 27px;
+  padding: 0 8px;
+  font-size: 0 !important;
+  border-radius: 999px;
+}
+
+html.is-mobile-touch #hud #btnFpsCap::after {
+  content: attr(data-compact-label);
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 1;
+}
+
+html.is-mobile-touch #hud #btnHudQuickSettings {
+  left: calc(env(safe-area-inset-left, 0px) + 144px);
+  top: calc(env(safe-area-inset-top, 0px) + 47px);
+  width: 27px;
+  min-width: 27px;
+  height: 27px;
+  padding: 0;
+  font-size: 13px;
+  border-radius: 50%;
+}
+
+/* Keep mid-round event stack cleanly below the compact top-left pill row on mobile */
+html.is-mobile-touch #hud .we-banner-stack,
+html.is-mobile-touch #hud:has(#matchBox:not(.hidden)) .we-banner-stack,
+html.is-mobile-touch #hud .we-banner-stack.below-match {
+  top: calc(env(safe-area-inset-top, 0px) + 79px) !important;
+}
+
+/* Floating Quick-Settings Drawer/Popover (#mobQuickSettings) */
+#mobQuickSettings,
+.mob-quick-settings {
+  position: fixed;
+  left: 12px;
+  top: 82px;
+  width: 224px;
+  padding: 10px;
+  border-radius: 18px;
+  background: rgba(255, 249, 236, 0.97);
+  border: 2px solid rgba(143, 181, 122, 0.68);
+  box-shadow:
+    0 6px 0 rgba(52, 68, 44, 0.24),
+    0 14px 32px rgba(18, 28, 16, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 96;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(0, -6px, 0) scale(0.96);
+  transform-origin: top left;
+  will-change: opacity, transform;
+  transition:
+    opacity 0.15s ease,
+    transform 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+  touch-action: manipulation;
+}
+
+#mobQuickSettings.is-open,
+.mob-quick-settings.is-open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.qs-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px 7px;
+  margin-bottom: 7px;
+  border-bottom: 1.5px dashed rgba(143, 181, 122, 0.42);
+}
+
+.qs-hdr-title {
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 12.5px;
+  color: #364730;
+  letter-spacing: 0.01em;
+}
+
+.qs-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(143, 181, 122, 0.22);
+  color: #3d4f36;
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.qs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.qs-pill-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 36px;
+  padding: 0 11px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(143, 181, 122, 0.45);
+  background: linear-gradient(180deg, #fffdf8 0%, #f4ebd4 100%);
+  color: #3a4934;
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 800;
+  font-size: 12.5px;
+  cursor: pointer;
+  box-shadow: 0 2px 0 rgba(60, 72, 52, 0.16);
+  transition: transform 0.1s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.qs-pill-row:active {
+  transform: translateY(1.5px) scale(0.985);
+}
+
+.qs-pill-row[data-active="1"] {
+  background: linear-gradient(180deg, #f3fceb 0%, #d8f1bf 100%);
+  border-color: #88c663;
+  color: #264a1a;
+}
+
+#qsBtnFps[data-fps="30"] {
+  background: linear-gradient(180deg, #fff9e6 0%, #ffe39f 100%);
+  border-color: #eca92c;
+  color: #4f3105;
+}
+
+.qs-pill-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.qs-pill-ic {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.qs-pill-state {
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.68);
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
+
+/* Adaptive Lite quality (phones that keep dropping frames): no live blur behind in-match HUD/controls.
+   A backdrop blur over the WebGL canvas costs an extra full-screen pass every frame on mobile GPUs. */
+html.hs-lite #hud,
+html.hs-lite #hud *,
+html.hs-lite .mmp-ring,
+html.hs-lite #joyBase {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Mobile 1-tap Emote Trigger + Compact Popover Bar (zero overlap with joystick/action cluster) */
+html.is-mobile-touch #btnEmoteToggle {
+  top: calc(env(safe-area-inset-top, 0px) + 56px);
+  right: max(12px, calc(env(safe-area-inset-right, 0px) + 12px));
+  width: 38px;
+  height: 38px;
+  font-size: 16px;
+}
+html.is-mobile-touch #hsEmoteBar {
+  top: calc(env(safe-area-inset-top, 0px) + 100px);
+  right: max(12px, calc(env(safe-area-inset-right, 0px) + 12px));
+  bottom: auto;
+  left: auto;
+  transform: none;
+  padding: 5px 7px;
+  gap: 5px;
+}
+html.is-mobile-touch #killBanner {
+  top: calc(env(safe-area-inset-top, 0px) + 66px);
+  font-size: 15px;
+  padding: 7px 16px;
+}
+html.is-mobile-touch .wb-pin {
+  font-size: 10px;
+  padding: 3px 7px 3px 6px;
+}
+/* Mobile already has its native Quick Settings drawer in mobile_controls.js */
+html.is-mobile-touch #btnHudSettings,
+html.is-mobile-touch #hudSettingsPopover {
+  display: none !important;
+}
+html.is-mobile-touch #hud #matchBox {
+  transform: scale(0.84);
+}
+
+/* ==========================================================================
+ * v4.1 AAA Mobile HUD Declutter (Spotless Landscape Viewport!)
+ * ========================================================================== */
+/* 1. Single clean top-left row: Quit (✕) + Quick Settings (🎛️) + Slim HP Pill */
+html.is-mobile-touch #hud #btnHudQuickSettings {
+  position: fixed !important;
+  left: max(54px, calc(env(safe-area-inset-left, 0px) + 54px)) !important;
+  top: max(10px, calc(env(safe-area-inset-top, 0px) + 10px)) !important;
+  width: 36px !important;
+  height: 36px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  z-index: 44 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+html.is-mobile-touch #hud #hpBox {
+  position: fixed !important;
+  left: max(96px, calc(env(safe-area-inset-left, 0px) + 96px)) !important;
+  top: max(13px, calc(env(safe-area-inset-top, 0px) + 13px)) !important;
+  height: 30px !important;
+  padding: 3px 9px !important;
+  transform: none !important;
+}
+html.is-mobile-touch #hud #hpBox .hpbar {
+  width: 66px !important;
+  height: 8px !important;
+}
+
+/* 2. Top-right spotless: 1-tap Emote (💬) right beside 5v5 badge, max 1 compact feed line */
+html.is-mobile-touch #btnEmoteToggle {
+  top: max(10px, calc(env(safe-area-inset-top, 0px) + 10px)) !important;
+  right: max(126px, calc(env(safe-area-inset-right, 0px) + 126px)) !important;
+  width: 36px !important;
+  height: 36px !important;
+  font-size: 16px !important;
+}
+html.is-mobile-touch #hsEmoteBar {
+  top: calc(env(safe-area-inset-top, 0px) + 52px) !important;
+  right: max(12px, calc(env(safe-area-inset-right, 0px) + 12px)) !important;
+}
+html.is-mobile-touch #hud #feed {
+  top: calc(env(safe-area-inset-top, 0px) + 52px) !important;
+  right: max(10px, calc(env(safe-area-inset-right, 0px) + 10px)) !important;
+  max-width: 185px !important;
+}
+html.is-mobile-touch #hud #feed > :nth-child(n + 2) {
+  display: none !important;
+}
+html.is-mobile-touch #hud #feed > * {
+  font-size: 10px !important;
+  padding: 3px 8px !important;
+  line-height: 1.2 !important;
+}
+
+/* 3. Slim #matchBox neatly tucked directly under timer (never colliding with feed/hint) */
+html.is-mobile-touch #hud #matchBox {
+  top: calc(env(safe-area-inset-top, 0px) + 54px) !important;
+  left: 50% !important;
+  transform: translateX(-50%) scale(0.78) !important;
+  transform-origin: top center !important;
+  padding: 3px 9px !important;
+  gap: 8px !important;
+  opacity: 0.90 !important;
+}
+
+/* 4. Move #hint out of the center of the camera so the 3D viewport is 100% open! */
+html.is-mobile-touch #hud #hint {
+  top: auto !important;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 74px) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  max-width: 56vw !important;
+  font-size: 11px !important;
+  padding: 4px 11px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* 5. Compact right-side action buttons with zero overlap against #hiderTricksBar */
+html.is-mobile-touch #hud #btnBoop {
+  width: 50px !important;
+  height: 50px !important;
+  font-size: 10px !important;
+}
+
+/* 6. v5.0 Mobile GTA Wanted Stars Pill & 1-Tap Squad Ping (Zero Overlap!) */
+html.is-mobile-touch #hud #wantedStarsHud {
+  left: max(12px, calc(env(safe-area-inset-left, 0px) + 12px)) !important;
+  top: calc(env(safe-area-inset-top, 0px) + 52px) !important;
+  padding: 2px 8px !important;
+  gap: 5px !important;
+}
+html.is-mobile-touch #hud #wantedStarsHud .ws-stars { font-size: 11.5px !important; }
+html.is-mobile-touch #hud #wantedStarsHud .ws-mul { font-size: 10px !important; }
+
+html.is-mobile-touch #btnSquadPing {
+  top: max(10px, calc(env(safe-area-inset-top, 0px) + 10px)) !important;
+  right: max(168px, calc(env(safe-area-inset-right, 0px) + 168px)) !important;
+  width: 36px !important;
+  height: 36px !important;
+  font-size: 16px !important;
+}
+html.is-mobile-touch #hud:has(#matchBox:not(.hidden)) #feverBanner {
+  top: calc(env(safe-area-inset-top, 0px) + 88px) !important;
+  height: 23px !important;
+  font-size: 10.5px !important;
+}

@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#bfe0f2">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Hue &amp; Seek">
+<title>Hue &amp; Seek — 5v5 Storybook Prop Hunt Online</title>
+<meta name="description" content="Play Hue &amp; Seek: Prop Hunt Online — free 5v5 storybook 3D hide-and-seek with 6 handcrafted worlds, 11 sculpted champions, paint camouflage, and zero ads. Play in browser or on Android!">
+<meta property="og:title" content="Hue &amp; Seek — 5v5 Storybook Prop Hunt Online">
+<meta property="og:description" content="Morph into props, paint yourself to blend in, or hunt with 5 elemental blasters across 6 handcrafted 3D worlds. 100% free, zero ads — playable in browser &amp; Android!">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://coding-simba.github.io/hue-and-seek/">
+<meta property="og:image" content="https://coding-simba.github.io/hue-and-seek/assets/promo_cover.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Hue &amp; Seek — 5v5 Storybook Prop Hunt Online">
+<meta name="twitter:description" content="Free 5v5 3D Prop Hunt with paint camouflage, 6 storybook worlds &amp; 11 distinct champions — zero ads!">
+<meta name="twitter:image" content="https://coding-simba.github.io/hue-and-seek/assets/promo_cover.jpg">
+<link rel="icon" type="image/png" sizes="64x64" href="assets/app_icons/favicon-64.png">
+<link rel="apple-touch-icon" href="assets/app_icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<link rel="stylesheet" href="style.css?v=33">
+<link rel="stylesheet" href="hider_tricks.css?v=2">
+<link rel="stylesheet" href="seeker_gadgets.css?v=4">
+<link rel="stylesheet" href="world_events.css?v=4">
+<link rel="stylesheet" href="match_flow.css?v=3">
+<link rel="stylesheet" href="viral_highlights.css?v=5">
+<link rel="stylesheet" href="progression.css?v=6">
+<link rel="stylesheet" href="elemental_guns.css?v=5">
+<link rel="stylesheet" href="mobile_ui.css?v=11">
+<link rel="stylesheet" href="mobile_lobby.css?v=12">
+<link rel="stylesheet" href="tutorial.css?v=3">
+<link rel="stylesheet" href="hue_layer.css?v=3">
+<link rel="stylesheet" href="status_fx.css?v=1">
+<link rel="stylesheet" href="cloud_save.css?v=2">
+<link rel="stylesheet" href="end_cinematic.css?v=1">
+<script type="importmap">{ "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/addons/", "three-mesh-bvh": "./vendor/three-mesh-bvh/index.module.js" } }</script>
+</head>
+<body>
+<div id="app">
+  <div class="vignette"></div>
+  <div id="worldLoadingBg" aria-hidden="true"></div>
+  <div id="gfxToast" class="gfx-toast" aria-live="polite"></div>
+  <!-- HUD -->
+  <div id="hud" class="hidden">
+    <div id="speedLines" aria-hidden="true"></div>
+    <div id="worldBeaconsLayer" aria-hidden="true"></div>
+    <div id="killBanner" class="hidden" aria-live="polite"></div>
+    <button id="btnHudSettings" class="round hud-gear" type="button" aria-label="In-Match Settings">⚙️</button>
+    <button id="btnMute" class="round mute" aria-label="Sound on/off">🔊</button>
+    <button id="btnQuality" class="gfx-pill hud-gfx" type="button" data-tier="ultra" aria-label="Graphics quality">✨ Ultra</button>
+    <button id="btnEmoteToggle" class="round emote-trig" type="button" aria-label="Quick Emotes">💬</button>
+    <button id="btnSquadPing" class="round ping-trig" type="button" aria-label="Squad Ping (Z)">📍</button>
+    <div class="top">
+      <button id="btnQuit" class="round" aria-label="Quit">✕</button>
+      <div class="phase"><span id="phaseLbl">Hide!</span><b id="timer">20</b><small id="hudWorld" class="hud-world">Meadowbrook Village</small></div>
+      <div class="stat" id="statBox"></div>
+    </div>
+    <div id="hpBox" class="hp hidden"><span class="hp-ic">💧</span><div class="hpbar"><i id="hpFill"></i></div><b id="hpTxt">100</b></div>
+    <div id="wantedStarsHud" class="wanted-hud hidden" aria-live="polite"></div>
+    <div id="feed" class="feed"></div>
+    <div id="hurt" class="hurt"></div>
+    <div id="dangerVignette" aria-hidden="true"></div>
+    <div id="feverBanner" class="hidden" aria-live="polite">⚡ HUE OVERDRIVE! Final 25s — Supercharged!</div>
+    <div id="nervesToast" class="hidden" aria-live="polite">🔥 +25 XP · +4 🪙 · Nerves of Steel!</div>
+    <div id="specBar" class="spec-bar hidden">
+      <span id="specTxt">💧 Soaked! Spectating ally…</span>
+      <div class="spec-btns">
+        <button id="btnSpecNext" class="spec-btn">Next Spirit ⏭</button>
+        <button id="btnSpecEnd" class="spec-btn primary">Results</button>
+      </div>
+    </div>
+    <div id="matchBox" class="match hidden">
+      <div class="sw"><i id="swYou"></i><span>you</span></div>
+      <div class="pct"><b id="matchPct">0%</b><span>blend</span></div>
+      <div class="sw"><i id="swBack"></i><span>behind</span></div>
+    </div>
+    <div id="hint" class="hint"></div>
+    <div id="help" class="help"></div>
+    <div id="crossHeatArc" class="cross-heat hidden" data-temp="none" aria-hidden="true">
+      <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20"/></svg>
+    </div>
+    <div id="cross" class="cross hidden"></div>
+    <div id="joyBase" class="joy hidden"><div id="joyKnob"></div></div>
+    <div id="chips" class="chips"></div>
+    <div class="actions">
+      <button id="btnInteract" class="act interact hidden"><span class="ic" id="intIcon">♨️</span><span id="intLbl">Spot</span></button>
+      <button id="btnBoop" class="act boop-act hidden" aria-label="Boop Stun or Bait Prop"><span class="ic">💫</span><span class="boop-lbl">Boop</span></button>
+      <button id="btnPosLock" class="act hidden" aria-label="Lock Position"><span class="ic">🔓</span><span>Lock</span></button>
+      <button id="btnSample" class="act hidden"><span class="ic">🎨</span><span>Sample</span></button>
+      <button id="btnFreeze" class="act hidden"><span class="ic">🧊</span><span>Freeze</span></button>
+      <button id="btnFire" class="act big hidden"><span class="ic">💦</span><span>Splash</span></button>
+    </div>
+    <div id="hsEmoteBar" class="hs-emote-bar hidden" role="toolbar" aria-label="Quick Emotes">
+      <button type="button" class="hs-emote-btn" data-emote="😂" aria-label="Laugh emote">😂</button>
+      <button type="button" class="hs-emote-btn" data-emote="😱" aria-label="Shocked emote">😱</button>
+      <button type="button" class="hs-emote-btn" data-emote="👀" aria-label="Watching emote">👀</button>
+      <button type="button" class="hs-emote-btn" data-emote="🔥" aria-label="Fire emote">🔥</button>
+      <button type="button" class="hs-emote-btn" data-emote="👏" aria-label="Clap emote">👏</button>
+      <button type="button" class="hs-emote-btn" data-emote="GG" aria-label="GG emote" style="font-size:12px;font-weight:900;color:#33402f;">GG</button>
+    </div>
+  </div>
+
+  <!-- TITLE -->
+  <div id="title" class="screen on">
+    <button id="btnDesktopParty" class="party-title-btn" type="button" aria-label="Friends Party">🎉 Friends Party</button>
+    <button id="btnDesktopChars" class="chars-title-btn" type="button" aria-label="3D Character Selection">🎭 Characters</button>
+    <button id="btnTitleTutorial" class="tut-title-btn" type="button" aria-label="How to Play Tutorial">🎓 How to Play</button>
+    <button id="btnTitleQuality" class="gfx-pill title-gfx" type="button" data-tier="ultra" aria-label="Graphics quality">✨ Ultra</button>
+    <div class="title-head">
+      <div class="logo">Hue <em>&amp;</em> Seek</div>
+      <p class="tag" id="mapSubtitle">Become a barrel, a kitsune statue, or a teacup. Just don't get splashed.</p>
+      <div id="lobbyOfflineBanner" class="offline-notice hidden" role="status" aria-live="polite">📡 Offline Mode — No internet connection detected. Playing solo 5v5 with smart AI!</div>
+    </div>
+
+    <div class="world-picker">
+      <div class="picker-hdr"><span>🗺️ Choose a Storybook World</span><em id="activeWorldBadge">Cosy Village</em></div>
+      <div class="map-grid" id="mapGrid" role="listbox" aria-label="Select world"></div>
+    </div>
+
+    <div class="player-row">
+      <div class="gamertag-box">
+        <span class="online-dot" id="lobbyOnlineDot" title="Global 5v5 Matchmaking"></span>
+        <label class="gt-lbl" for="playerNameInput">Gamertag</label>
+        <input id="playerNameInput" class="gt-input" type="text" maxlength="16" spellcheck="false" autocomplete="off" aria-label="Your gamertag">
+        <button id="btnRollName" class="gt-dice" type="button" title="Randomize gamertag" aria-label="Randomize gamertag">🎲</button>
+        <button id="btnCloudSave" class="gt-dice gt-cloud" type="button" title="Cloud save, privacy &amp; data" aria-label="Cloud save, privacy and data">☁️</button>
+      </div>
+      <div class="spirit-picker">
+        <span class="sp-lbl">✨ Spirit:</span>
+        <div class="spirit-bar" id="spiritBar" role="listbox" aria-label="Select hider spirit"></div>
+      </div>
+      <div class="spirit-picker seeker-picker">
+        <span class="sp-lbl">💦 Seeker:</span>
+        <div class="spirit-bar" id="seekerBar" role="listbox" aria-label="Select explorer seeker"></div>
+      </div>
+    </div>
+
+    <div class="modes">
+      <button class="mode" id="btnHide"><span class="mi">🎭</span><b>Hide · 5v5</b><small>5 Spirits vs 5 Seekers.<br>Morph, parkour &amp; survive!</small></button>
+      <button class="mode" id="btnSeek"><span class="mi">💦</span><b>Seek · 5v5</b><small>5 Seekers vs 5 Spirits.<br>Team up &amp; spray the fakes!</small></button>
+    </div>
+    <p class="note">6 Handcrafted 3D Storybook Worlds · 5v5 Online &amp; Offline Prop Hunt · <a class="note-link" href="./privacy.html" target="_blank" rel="noopener">Privacy</a></p>
+    <a id="webPlayStoreCta" class="web-play-cta" href="https://play.google.com/store/apps/details?id=com.hueseek.game&amp;utm_source=web_play&amp;utm_medium=lobby_cta&amp;utm_campaign=v84_launch" target="_blank" rel="noopener" aria-label="Download Hue and Seek on Google Play">
+      <span class="wpc-ic">▶</span>
+      <span><b>Get on Google Play</b> <small>Android · Free · Zero Ads</small></span>
+    </a>
+  </div>
+
+  <!-- INTERACTIVE 3D CHARACTER SELECTION SHOWCASE (v8.3.1 — Desktop & Mobile!) -->
+  <div id="charSelectScreen" class="screen char-select-screen" aria-label="3D Character Selection">
+    <div class="cs-panel">
+      <div class="cs-head">
+        <h2>🎭 Characters</h2>
+        <button id="btnCloseCharSelect" class="cs-close-btn" type="button" aria-label="Back to Lobby">✕</button>
+      </div>
+      <div class="cs-tabs" role="tablist">
+        <button id="csTabHider" class="cs-tab active" data-role="spirit" type="button" role="tab">🎭 Hider Spirits (6)</button>
+        <button id="csTabSeeker" class="cs-tab" data-role="seeker" type="button" role="tab">💦 Seekers (5)</button>
+      </div>
+      <div id="csGrid" class="cs-grid" role="listbox" aria-label="Choose champion"></div>
+      <div class="cs-bio">
+        <div class="cs-bio-top">
+          <b id="csCharName">Sprout</b>
+          <span id="csCharRole" class="cs-role-badge">Acorn Druid</span>
+        </div>
+        <p id="csCharDesc">Layered oak-leaf cloak, ribbed acorn cap &amp; glowing woodland dew vial.</p>
+      </div>
+      <button id="btnEquipCharDone" class="cs-done-btn" type="button">✓ Equip &amp; Back to Lobby</button>
+    </div>
+    <div id="csDragStage" class="cs-drag-stage" aria-label="Drag to rotate 3D character">
+      <span class="cs-drag-hint">↔ Drag to rotate 360°</span>
+    </div>
+  </div>
+
+  <!-- MATCHMAKING QUEUE (short: a match starts within a few seconds) -->
+  <div id="queueScreen" class="screen">
+    <div class="q-card" id="qCard">
+      <div class="q-top-pill" id="qTopPill"><span class="online-dot" id="qOnlineDot"></span><span id="qMatchPillText">ONLINE MATCHMAKING</span></div>
+      <div id="qOfflineNotice" class="offline-notice hidden" role="status" aria-live="polite">📡 Offline Mode — No internet connection. Playing solo 5v5 with smart AI squad!</div>
+      <h2 id="qWorldTitle">Meadowbrook Village</h2>
+      <div class="q-role" id="qRoleBadge">🎭 Queueing as Spirit · Hide 5v5</div>
+
+      <div class="q-clock-wrap">
+        <div class="q-dial" aria-hidden="true">
+          <svg class="q-dial-svg" viewBox="0 0 56 56">
+            <defs>
+              <linearGradient id="qGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ffb842"/>
+                <stop offset="100%" stop-color="#69b857"/>
+              </linearGradient>
+            </defs>
+            <circle class="q-dial-track" cx="28" cy="28" r="23"/>
+            <circle class="q-dial-arc" id="qDialArc" cx="28" cy="28" r="23"/>
+          </svg>
+          <span class="q-dial-ic" id="qDialIcon">✨</span>
+        </div>
+        <div class="q-clock">
+          <b id="qTimer">0:00</b>
+          <small id="qMaxLbl">max 0:08</small>
+        </div>
+        <div class="q-count"><b id="qFilled">1</b><span>/ 10 Players</span></div>
+      </div>
+
+      <div class="q-teams">
+        <div class="q-col">
+          <div class="q-col-hdr sage"><span>🎭 Spirits</span><em id="qHiderCount">1 / 5</em></div>
+          <div class="q-slots" id="qHiderSlots"></div>
+        </div>
+        <div class="q-col">
+          <div class="q-col-hdr sky"><span>💦 Seekers</span><em id="qSeekerCount">0 / 5</em></div>
+          <div class="q-slots" id="qSeekerSlots"></div>
+        </div>
+      </div>
+
+      <p class="q-status" id="qStatus">Connecting to global cloud relay…</p>
+      <button class="btn q-cancel" id="btnCancelQueue">Cancel Queue</button>
+    </div>
+  </div>
+
+  <!-- ANIMATED 5 VS 5 MATCH INTRO -->
+  <div id="vsScreen" class="screen">
+    <div class="vs-backdrop" aria-hidden="true"></div>
+    <div class="vs-stage">
+      <div class="vs-banner">
+        <span class="vs-kicker">✨ MATCH READY · 5 VS 5 ONLINE PROP HUNT ✨</span>
+        <h2 id="vsWorldTitle">Meadowbrook Village</h2>
+      </div>
+
+      <div class="vs-arena">
+        <div class="vs-team hiders">
+          <div class="vs-team-hdr"><span>🎭 5 SPIRITS</span><small>Hiders</small></div>
+          <div class="vs-list" id="vsHidersList"></div>
+        </div>
+
+        <div class="vs-center">
+          <div class="vs-shockwave" aria-hidden="true"></div>
+          <div class="vs-burst" aria-hidden="true"></div>
+          <div class="vs-crest">
+            <span class="vs-num">5</span>
+            <em class="vs-word">VS</em>
+            <span class="vs-num">5</span>
+          </div>
+        </div>
+
+        <div class="vs-team seekers">
+          <div class="vs-team-hdr"><span>💦 5 SEEKERS</span><small>Hunters</small></div>
+          <div class="vs-list" id="vsSeekersList"></div>
+        </div>
+      </div>
+
+      <div class="vs-foot">
+        <div class="vs-bar"><i id="vsBarFill"></i></div>
+        <span id="vsFootTxt">Entering world…</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result" class="screen">
+    <div class="card">
+      <div class="r-emoji" id="rEmoji">🎉</div>
+      <h2 id="rTitle">Unseen!</h2>
+      <div id="resultNewsTicker" class="gk-news-ticker hidden"></div>
+      <p id="rSub"></p>
+      <div id="resultAwardsSlot" class="gk-awards hidden"></div>
+      <div id="resultMapVote" class="mv-wrap hidden"></div>
+      <div class="r-row">
+        <button class="btn primary" id="btnAgain">Play again</button>
+        <button class="btn rematch-btn" id="btnRematch">🔁 Rematch Lobby</button>
+        <button class="btn" id="btnSwitch">Switch side</button>
+      </div>
+      <button class="btn world-btn" id="btnNextMap">🗺️ Next Storybook World</button>
+      <button class="link" id="btnMenu">Menu</button>
+    </div>
+  </div>
+</div>
+<script type="module" src="main.js?v=142"></script>
+<script>
+if (window.Capacitor) document.documentElement.classList.add('is-native-cap');
+if ('serviceWorker' in navigator) {
+  if (window.Capacitor || location.hostname === '127.0.0.1' || location.hostname === 'localhost') {
+    navigator.serviceWorker.getRegistrations().then((regs) => {
+      let hadActive = false;
+      regs.forEach((r) => { hadActive = true; r.unregister(); });
+      if (window.caches) caches.keys().then((ks) => ks.forEach((k) => caches.delete(k)));
+      if (hadActive && navigator.serviceWorker.controller && !sessionStorage.getItem('hs_sw_purged')) {
+        sessionStorage.setItem('hs_sw_purged', '1');
+        location.reload();
+      }
+    }).catch(() => {});
+  } else {
+    window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(() => {}); });
+  }
+}
+</script>
+</body>
+</html>

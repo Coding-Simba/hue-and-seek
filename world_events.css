@@ -1,0 +1,604 @@
+/* ==========================================================================
+ * Hue & Seek — Mid-Round World Events & 0:30 Overtime Frenzy UI
+ * Warm Storybook Cream (#fff8ea), Festival Gold (#ffbe4d) & Forest Ink (#3a4832)
+ * Compact Auto-Shrinking Announcement Pill -> Mini Status Chip (.is-compact)
+ * ========================================================================== */
+
+.we-banner-stack {
+  position: absolute;
+  left: 50%;
+  top: calc(env(safe-area-inset-top, 0px) + 76px);
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: auto;
+  max-width: min(86vw, 390px);
+  pointer-events: none;
+  z-index: 3;
+  transition: top 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#hud:has(#matchBox:not(.hidden)) .we-banner-stack,
+.we-banner-stack.below-match {
+  top: calc(env(safe-area-inset-top, 0px) + 136px);
+}
+
+/* --------------------------------------------------------------------------
+ * Storybook Mid-Round Event Banner (#worldEventBanner)
+ * Shows compact announcement for 3.2s -> auto-shrinks to .is-compact mini chip
+ * -------------------------------------------------------------------------- */
+#worldEventBanner {
+  position: relative;
+  width: auto;
+  max-width: 100%;
+  padding: 6px 12px 8px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255, 248, 234, 0.96) 0%, rgba(252, 240, 214, 0.94) 100%);
+  border: 2px solid #ffbe4d;
+  color: #3a4832;
+  box-shadow:
+    0 3px 0 rgba(58, 72, 50, 0.22),
+    0 8px 20px rgba(26, 36, 22, 0.18);
+  overflow: hidden;
+  font-family: 'Nunito', system-ui, sans-serif;
+  animation: weBannerIn 0.32s cubic-bezier(0.22, 1.3, 0.36, 1) both;
+  transition:
+    padding 0.22s ease,
+    border-radius 0.22s ease,
+    height 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+#worldEventBanner.hidden {
+  display: none !important;
+}
+
+@keyframes weBannerIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -10px, 0) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+#worldEventBanner.is-spirit_wind {
+  border-color: #6bc482;
+  box-shadow:
+    0 3px 0 rgba(52, 92, 60, 0.22),
+    0 8px 20px rgba(26, 44, 28, 0.18);
+}
+
+#worldEventBanner.is-lantern_dusk {
+  border-color: #ffbe4d;
+  box-shadow:
+    0 3px 0 rgba(42, 46, 78, 0.28),
+    0 8px 20px rgba(18, 22, 42, 0.24);
+}
+
+#worldEventBanner.is-prop_bounty {
+  border-color: #ffbe4d;
+  box-shadow:
+    0 3px 0 rgba(122, 74, 18, 0.24),
+    0 8px 20px rgba(34, 28, 18, 0.20);
+}
+
+.we-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.we-icon-wrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #ffe8ad, #ffbe4d);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), 0 1.5px 0 rgba(92, 62, 16, 0.18);
+}
+
+#worldEventBanner.is-spirit_wind .we-icon-wrap {
+  background: linear-gradient(180deg, #e2faea, #9be2b0);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75), 0 1.5px 0 rgba(45, 92, 56, 0.18);
+}
+
+#worldEventBanner.is-lantern_dusk .we-icon-wrap {
+  background: linear-gradient(180deg, #3b4675, #232c52);
+  box-shadow: inset 0 1px 0 rgba(255, 220, 150, 0.35), 0 0 8px rgba(255, 182, 77, 0.35);
+}
+
+#worldEventBanner.is-prop_bounty .we-icon-wrap {
+  background: linear-gradient(180deg, #ffeaab, #ffbe4d);
+}
+
+.we-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.we-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.we-title-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.we-kicker {
+  padding: 1px 6px;
+  border-radius: 99px;
+  background: #ebe1ca;
+  color: #556549;
+  font-size: 8.5px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+#worldEventBanner.is-lantern_dusk .we-kicker {
+  background: #333f6b;
+  color: #ffe5ad;
+}
+
+#worldEventBanner.is-spirit_wind .we-kicker {
+  background: #d8f2df;
+  color: #2d633b;
+}
+
+#worldEventBanner.is-prop_bounty .we-kicker {
+  background: #ffe6ad;
+  color: #6b4308;
+}
+
+#worldEventTitle {
+  font-family: 'Fredoka', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 14.5px;
+  line-height: 1.1;
+  color: #3a4832;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#worldEventTimer {
+  padding: 1.5px 7px;
+  border-radius: 99px;
+  background: rgba(58, 72, 50, 0.1);
+  font-family: 'Fredoka', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 11.5px;
+  line-height: 1.1;
+  color: #3a4832;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+#worldEventSub,
+.we-desc {
+  margin: 0;
+  font-size: 11.5px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: #536348;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.we-bonus-pill {
+  margin-top: 3px;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1.5px 8px;
+  border-radius: 99px;
+  background: linear-gradient(180deg, #ffeaa8, #ffbe4d);
+  color: #4f3105;
+  font-size: 10.5px;
+  font-weight: 900;
+  box-shadow: 0 1.5px 0 rgba(110, 72, 12, 0.2);
+}
+
+.we-bonus-pill.hidden {
+  display: none !important;
+}
+
+.we-progress-track {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 2.5px;
+  height: 2.5px;
+  border-radius: 99px;
+  background: rgba(58, 72, 50, 0.12);
+  overflow: hidden;
+}
+
+#worldEventBarFill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #ffbe4d, #f59331);
+  transition: width 0.1s linear;
+}
+
+#worldEventBanner.is-spirit_wind #worldEventBarFill {
+  background: linear-gradient(90deg, #5cc277, #ffbe4d);
+}
+
+#worldEventBanner.is-lantern_dusk #worldEventBarFill {
+  background: linear-gradient(90deg, #5f6fb8, #ffae4d);
+}
+
+#worldEventBanner.is-prop_bounty #worldEventBarFill {
+  background: linear-gradient(90deg, #ffbe4d, #ef7a4c);
+}
+
+/* --------------------------------------------------------------------------
+ * Auto-Compact Mini Status Chip (.is-compact — active after 3.2s)
+ * [ 🍃 Spirit Wind · 19s ] / [ 🏮 Lantern Dusk · 14s ] / [ 🏆 Bounty: ... · 18s ]
+ * -------------------------------------------------------------------------- */
+#worldEventBanner.is-compact {
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+  height: 26px;
+  min-height: 26px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  border-width: 2px;
+  box-shadow:
+    0 2px 0 rgba(58, 72, 50, 0.2),
+    0 5px 12px rgba(26, 36, 22, 0.16);
+}
+
+#worldEventBanner.is-compact .we-kicker,
+#worldEventBanner.is-compact #worldEventSub,
+#worldEventBanner.is-compact .we-desc,
+#worldEventBanner.is-compact .we-bonus-pill,
+#worldEventBanner.is-compact .we-progress-track {
+  display: none !important;
+}
+
+#worldEventBanner.is-compact .we-row {
+  gap: 6px;
+  align-items: center;
+}
+
+#worldEventBanner.is-compact .we-icon-wrap {
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: none !important;
+  box-shadow: none !important;
+  font-size: 14px;
+  line-height: 1;
+}
+
+#worldEventBanner.is-compact .we-body {
+  flex: 0 1 auto;
+  flex-direction: row;
+  align-items: center;
+  gap: 0;
+}
+
+#worldEventBanner.is-compact .we-hdr {
+  justify-content: flex-start;
+  align-items: center;
+  gap: 5px;
+}
+
+#worldEventBanner.is-compact .we-title-group {
+  gap: 0;
+}
+
+#worldEventBanner.is-compact #worldEventTitle {
+  font-size: 12.5px;
+  line-height: 1;
+}
+
+#worldEventBanner.is-compact #worldEventTimer {
+  padding: 0;
+  background: none;
+  font-size: 12px;
+  line-height: 1;
+  color: #536348;
+}
+
+#worldEventBanner.is-compact #worldEventTimer::before {
+  content: '· ';
+  opacity: 0.65;
+}
+
+/* --------------------------------------------------------------------------
+ * 0:30 Overtime Frenzy Pill (#overtimeBanner) & Edge Vignette (#frenzyEdgeGlow)
+ * -------------------------------------------------------------------------- */
+#overtimeBanner,
+#overtimeFrenzyPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 28px;
+  padding: 4px 13px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fff8ea 0%, #ffe29e 100%);
+  border: 2px solid #ffbe4d;
+  color: #3a4832;
+  font-family: 'Fredoka', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-align: center;
+  white-space: nowrap;
+  max-width: min(86vw, 390px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow:
+    0 3px 0 rgba(110, 65, 12, 0.25),
+    0 6px 16px rgba(180, 92, 18, 0.24);
+  animation: weBannerIn 0.32s cubic-bezier(0.22, 1.3, 0.36, 1) both;
+}
+
+.we-ot-mobile {
+  display: none;
+}
+
+#overtimeBanner.hidden,
+#overtimeFrenzyPill.hidden {
+  display: none !important;
+}
+
+#overtimeBanner.is-final10,
+#overtimeFrenzyPill.is-final10 {
+  background: linear-gradient(180deg, #fff3da 0%, #ffd07a 100%);
+  border-color: #ff9933;
+  animation: weOvertimePulseFast 0.78s ease-in-out infinite;
+}
+
+@keyframes weOvertimePulseFast {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.035);
+  }
+}
+
+#frenzyEdgeGlow {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    84% 78% at 50% 50%,
+    rgba(255, 190, 77, 0) 62%,
+    rgba(255, 190, 77, 0.14) 85%,
+    rgba(242, 134, 46, 0.28) 100%
+  );
+  animation: weFrenzyGlow 1.5s ease-in-out infinite;
+}
+
+#frenzyEdgeGlow.hidden {
+  display: none !important;
+}
+
+@keyframes weFrenzyGlow {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.88;
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * Compact Responsive Rules for Narrow Screens & Short Landscape Viewports
+ * -------------------------------------------------------------------------- */
+@media (max-width: 600px) {
+  .we-banner-stack {
+    top: calc(env(safe-area-inset-top, 0px) + 68px);
+    max-width: min(88vw, 320px);
+    gap: 4px;
+  }
+
+  #hud:has(#matchBox:not(.hidden)) .we-banner-stack,
+  .we-banner-stack.below-match {
+    top: calc(env(safe-area-inset-top, 0px) + 122px);
+  }
+
+  .we-kicker,
+  .we-bonus-pill {
+    display: none !important;
+  }
+
+  #worldEventBanner {
+    padding: 4px 10px 6px;
+    border-radius: 14px;
+  }
+
+  .we-icon-wrap {
+    width: 22px;
+    height: 22px;
+    font-size: 13px;
+    border-radius: 7px;
+  }
+
+  #worldEventTitle {
+    font-size: 12.5px;
+  }
+
+  #worldEventSub,
+  .we-desc {
+    font-size: 10.5px;
+  }
+
+  .we-ot-desktop {
+    display: none;
+  }
+
+  .we-ot-mobile {
+    display: inline;
+  }
+
+  #overtimeBanner,
+  #overtimeFrenzyPill {
+    height: 24px;
+    padding: 0 10px;
+    font-size: 11px;
+    max-width: 165px;
+  }
+}
+
+/* Short Landscape Viewports (Phones in Landscape: 844x390, 667x375, etc.)
+ * Dock top-left so center viewport & crosshair remain 100% unobstructed! */
+@media (max-height: 500px) {
+  .we-banner-stack,
+  #hud:has(#matchBox:not(.hidden)) .we-banner-stack,
+  .we-banner-stack.below-match {
+    left: calc(env(safe-area-inset-left, 0px) + 58px);
+    right: auto;
+    top: calc(env(safe-area-inset-top, 0px) + 58px);
+    transform: none;
+    align-items: flex-start;
+    width: auto;
+    max-width: min(36vw, 265px);
+    gap: 4px;
+    transition: none;
+  }
+
+  .we-kicker,
+  .we-bonus-pill {
+    display: none !important;
+  }
+
+  #worldEventBanner {
+    height: 34px;
+    padding: 4px 10px;
+    border-radius: 14px;
+    border-width: 1.5px;
+  }
+
+  .we-row {
+    gap: 7px;
+  }
+
+  .we-icon-wrap {
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+    font-size: 13px;
+  }
+
+  #worldEventTitle {
+    font-size: 12px;
+    line-height: 1.08;
+  }
+
+  #worldEventTimer {
+    font-size: 10.5px;
+    padding: 1px 5px;
+  }
+
+  #worldEventSub,
+  .we-desc {
+    font-size: 10.5px;
+    line-height: 1.08;
+  }
+
+  .we-progress-track {
+    left: 8px;
+    right: 8px;
+    bottom: 1.5px;
+    height: 2px;
+  }
+
+  #worldEventBanner.is-compact {
+    height: 24px;
+    min-height: 24px;
+    padding: 0 9px;
+    border-radius: 999px;
+    border-width: 1.5px;
+  }
+
+  #worldEventBanner.is-compact .we-icon-wrap {
+    font-size: 12.5px;
+  }
+
+  #worldEventBanner.is-compact #worldEventTitle {
+    font-size: 11px;
+  }
+
+  #worldEventBanner.is-compact #worldEventTimer {
+    font-size: 10.5px;
+  }
+
+  .we-ot-desktop {
+    display: none;
+  }
+
+  .we-ot-mobile {
+    display: inline;
+  }
+
+  #overtimeBanner,
+  #overtimeFrenzyPill {
+    height: 24px;
+    min-height: 24px;
+    padding: 0 10px;
+    border-width: 1.5px;
+    font-size: 11px;
+    max-width: 165px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * Desktop / tablet: keep the top-centre banners clear of the timer box and the
+ * hider status box (they used to sit on top of both during the final 30s).
+ * Phones keep their own docked layout (mobile_ui.css).
+ * -------------------------------------------------------------------------- */
+@media (min-height: 501px) and (min-width: 601px) {
+  html:not(.is-mobile-touch) .we-banner-stack {
+    top: calc(env(safe-area-inset-top, 0px) + 94px);
+  }
+  html:not(.is-mobile-touch) #hud:has(#matchBox:not(.hidden)) .we-banner-stack,
+  html:not(.is-mobile-touch) .we-banner-stack.below-match {
+    top: calc(env(safe-area-inset-top, 0px) + 148px);
+  }
+  html:not(.is-mobile-touch) #feverBanner {
+    top: calc(env(safe-area-inset-top, 0px) + 94px);
+  }
+  html:not(.is-mobile-touch) #hud:has(#matchBox:not(.hidden)) #feverBanner {
+    top: calc(env(safe-area-inset-top, 0px) + 148px);
+  }
+  html:not(.is-mobile-touch) #hud:has(#feverBanner:not(.hidden)) .we-banner-stack {
+    top: calc(env(safe-area-inset-top, 0px) + 131px);
+  }
+  html:not(.is-mobile-touch) #hud:has(#feverBanner:not(.hidden)):has(#matchBox:not(.hidden)) .we-banner-stack {
+    top: calc(env(safe-area-inset-top, 0px) + 185px);
+  }
+}

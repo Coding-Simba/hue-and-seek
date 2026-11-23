@@ -1,0 +1,139 @@
+/* Hue & Seek — end-of-match cinematic overlay (driven frame-by-frame from end_cinematic.js) */
+
+/* while the cinematic runs, everything except the 3D canvas and the overlay steps aside */
+body.ec-active #app > :not(canvas):not(#endCine):not(.vignette) { visibility: hidden !important; }
+body.ec-active > :not(#app):not(script):not(style) { visibility: hidden !important; }
+
+#endCine {
+  position: absolute; inset: 0; z-index: 60;
+  display: none; pointer-events: none; opacity: 0;
+  overflow: hidden; touch-action: manipulation; user-select: none; -webkit-user-select: none;
+}
+#endCine.on { display: block; pointer-events: auto; }
+
+#endCine .ec-shade {
+  position: absolute; inset: 0; opacity: 0;
+  background: radial-gradient(70% 62% at 50% 46%, rgba(40, 24, 6, 0) 35%, rgba(30, 16, 4, .55) 100%);
+}
+#endCine.is-defeat .ec-shade {
+  background: radial-gradient(64% 58% at 50% 46%, rgba(14, 20, 32, .12) 25%, rgba(10, 14, 24, .78) 100%);
+}
+
+/* rotating light rays behind the title */
+#endCine .ec-rays {
+  position: absolute; left: 50%; top: 42%;
+  width: 190vmax; height: 190vmax; opacity: 0;
+  background: repeating-conic-gradient(from 0deg, rgba(255, 228, 140, .34) 0deg 5deg, rgba(255, 228, 140, 0) 5deg 15deg);
+  -webkit-mask-image: radial-gradient(circle, #000 0, rgba(0, 0, 0, .55) 18%, transparent 46%);
+          mask-image: radial-gradient(circle, #000 0, rgba(0, 0, 0, .55) 18%, transparent 46%);
+  will-change: transform, opacity;
+}
+#endCine.is-draw .ec-rays {
+  background: repeating-conic-gradient(from 0deg, rgba(210, 236, 255, .28) 0deg 5deg, rgba(210, 236, 255, 0) 5deg 15deg);
+}
+
+#endCine .ec-flash { position: absolute; inset: 0; opacity: 0; background: radial-gradient(circle at 50% 44%, #fffbe6 0, rgba(255, 246, 214, .7) 40%, rgba(255, 240, 200, 0) 75%); }
+#endCine.is-defeat .ec-flash { background: radial-gradient(circle at 50% 44%, rgba(210, 222, 240, .7) 0, rgba(180, 196, 220, 0) 70%); }
+
+#endCine .ec-stage {
+  position: absolute; left: 0; right: 0; top: 50%;
+  display: flex; flex-direction: column; align-items: center;
+  transform-origin: 50% 50%;
+  margin-top: calc(-1 * min(19vh, 9.5vw));
+}
+
+/* ---------- title ---------- */
+#endCine .ec-title {
+  --shine: 130%;
+  position: relative;
+  display: flex; gap: 0.01em;
+  font-family: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: min(28vh, 15.5vw);
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+#endCine .ec-title span {
+  display: inline-block;
+  opacity: 0;
+  will-change: transform, opacity;
+  /* gold fill + moving shine band, thick warm outline, stacked drop shadow */
+  background:
+    linear-gradient(105deg, rgba(255, 255, 255, 0) calc(var(--shine) - 14%), rgba(255, 255, 255, .95) var(--shine), rgba(255, 255, 255, 0) calc(var(--shine) + 14%)),
+    linear-gradient(180deg, #fffbe0 0%, #ffe066 30%, #ffb21e 58%, #e07b0c 82%, #b9590a 100%);
+  background-size: 100% 100%, 100% 100%;
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: max(2px, .035em) #5b2d04;
+  paint-order: stroke fill;
+  filter: drop-shadow(0 .055em 0 #4a2403) drop-shadow(0 .12em .14em rgba(30, 12, 0, .55)) drop-shadow(0 0 .22em rgba(255, 196, 70, .55));
+}
+#endCine.is-draw .ec-title span {
+  background:
+    linear-gradient(105deg, rgba(255, 255, 255, 0) calc(var(--shine) - 14%), rgba(255, 255, 255, .95) var(--shine), rgba(255, 255, 255, 0) calc(var(--shine) + 14%)),
+    linear-gradient(180deg, #ffffff 0%, #e4eef8 35%, #a9bfd4 65%, #6f87a1 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-stroke-color: #253448;
+  filter: drop-shadow(0 .055em 0 #1b2738) drop-shadow(0 .12em .14em rgba(0, 10, 25, .5)) drop-shadow(0 0 .2em rgba(160, 210, 255, .5));
+}
+#endCine.is-defeat .ec-title span {
+  background: linear-gradient(180deg, #eef3fa 0%, #b7c5d8 38%, #7c90aa 68%, #4c5f78 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-stroke-color: #19222f;
+  filter: drop-shadow(0 .05em 0 #121a25) drop-shadow(0 .12em .16em rgba(0, 0, 0, .6));
+  transform-origin: 50% 100%;
+}
+
+/* defeat cracks drawn over the letters */
+#endCine .ec-cracks {
+  position: absolute; left: 50%; top: 0; transform: translateX(-50%);
+  width: min(88vw, calc(min(28vh, 15.5vw) * 3.6)); height: min(28vh, 15.5vw);
+  display: none; pointer-events: none; overflow: visible;
+}
+#endCine.is-defeat .ec-cracks { display: block; }
+#endCine .ec-cracks path {
+  fill: none; stroke: #0f1621; stroke-width: .9; stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 40; stroke-dashoffset: 40; vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, .35));
+}
+#endCine.is-defeat .ec-cracks path { stroke-width: 2.4; }
+
+/* ---------- ribbon banner ---------- */
+#endCine .ec-ribbon {
+  position: relative; margin-top: min(2.4vh, 12px);
+  padding: min(1.6vh, 8px) min(6vw, 46px);
+  opacity: 0; transform-origin: 50% 50%;
+  background: linear-gradient(180deg, #e2553f 0%, #b93a28 60%, #8f2a1c 100%);
+  clip-path: polygon(0 0, 100% 0, 96% 50%, 100% 100%, 0 100%, 4% 50%);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .25);
+  filter: drop-shadow(0 4px 0 rgba(60, 14, 6, .55));
+}
+#endCine.is-draw .ec-ribbon { background: linear-gradient(180deg, #4d7aa8 0%, #355d86 100%); }
+#endCine.is-defeat .ec-ribbon { background: linear-gradient(180deg, #4a586d 0%, #323e50 100%); }
+#endCine .ec-ribbon-txt {
+  font-family: 'Fredoka', 'Nunito', system-ui, sans-serif; font-weight: 700;
+  font-size: min(5.2vh, 3vw); letter-spacing: .14em; white-space: nowrap;
+  color: #fff6df; text-shadow: 0 2px 0 rgba(60, 14, 6, .6);
+}
+#endCine .ec-sub {
+  margin-top: min(1.4vh, 7px); opacity: 0;
+  font-family: 'Nunito', system-ui, sans-serif; font-weight: 800;
+  font-size: min(3.8vh, 2.2vw); letter-spacing: .08em; text-transform: uppercase;
+  color: #fff3d6; text-shadow: 0 2px 6px rgba(0, 0, 0, .6);
+}
+
+/* ---------- sparkles + hint ---------- */
+#endCine .ec-sparkles { position: absolute; inset: 0; pointer-events: none; }
+#endCine .ec-sparkles i {
+  position: absolute; font-style: normal; opacity: 0;
+  font-size: min(5vh, 26px); color: #fff4c2;
+  text-shadow: 0 0 10px rgba(255, 214, 90, .95), 0 0 22px rgba(255, 170, 40, .7);
+  will-change: transform, opacity;
+}
+#endCine .ec-hint {
+  position: absolute; left: 0; right: 0;
+  bottom: max(14px, calc(env(safe-area-inset-bottom, 0px) + 10px));
+  text-align: center; opacity: 0;
+  font-family: 'Nunito', system-ui, sans-serif; font-weight: 800; font-size: 13px; letter-spacing: .18em; text-transform: uppercase;
+  color: #fff8e6; text-shadow: 0 1px 4px rgba(0, 0, 0, .7);
+}

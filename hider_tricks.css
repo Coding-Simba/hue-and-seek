@@ -1,0 +1,435 @@
+/* ============================================================
+ * Hue & Seek — Active Hider Tricks UI & Soap-Bubble Blind Overlay
+ * Storybook Warm Cream Tactile Aesthetic (hider_tricks.css)
+ * ============================================================ */
+
+#hiderTricksBar {
+  position: absolute;
+  left: 14px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 3;
+  pointer-events: none;
+  transition: bottom 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Lift cleanly above the desktop keyboard help bar whenever #help is populated */
+#help:not(:empty) ~ #hiderTricksBar {
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 62px);
+}
+
+#hiderTricksBar.hidden {
+  display: none !important;
+}
+
+.ht-pill {
+  position: relative;
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 46px;
+  padding: 5px 12px 5px 9px;
+  border-radius: 18px;
+  background: rgba(255, 248, 234, 0.94);
+  color: var(--ink, #2f3b28);
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  box-shadow:
+    0 3px 0 rgba(47, 59, 40, 0.26),
+    0 8px 18px rgba(25, 35, 22, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  border: 1.5px solid rgba(216, 203, 176, 0.85);
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 0.1s ease, box-shadow 0.14s ease, background 0.18s ease, border-color 0.18s ease;
+}
+
+.ht-pill:hover {
+  transform: translateY(-1.5px);
+  background: #fffdf6;
+}
+
+.ht-pill:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 1px 0 rgba(47, 59, 40, 0.26),
+    0 4px 10px rgba(25, 35, 22, 0.15);
+}
+
+/* Cooldown radial/vertical sweep overlay */
+.ht-sweep {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(62, 74, 54, 0.20), rgba(47, 59, 40, 0.32));
+  transform-origin: bottom center;
+  transform: scaleY(0);
+  transition: transform 0.08s linear;
+  z-index: 1;
+}
+
+.ht-pill.is-cooling {
+  background: rgba(242, 235, 219, 0.90);
+  color: rgba(47, 59, 40, 0.72);
+}
+
+.ht-key {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 6px;
+  background: #2f3b28;
+  color: #fff8ea;
+  font: 900 11px var(--fb, 'Nunito', sans-serif);
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 0 rgba(20, 26, 18, 0.28);
+  flex-shrink: 0;
+}
+
+.ht-ic {
+  position: relative;
+  z-index: 2;
+  font-size: 20px;
+  line-height: 1;
+  flex-shrink: 0;
+  filter: drop-shadow(0 1px 1px rgba(40, 50, 32, 0.14));
+}
+
+.ht-txt {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.08;
+  text-align: left;
+}
+
+.ht-txt b {
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--ink, #2f3b28);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.ht-txt small {
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 800;
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  color: #657559;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.ht-3x {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 99px;
+  background: linear-gradient(180deg, #ffe28a, #ffb73b);
+  color: #543305;
+  font-family: var(--fb, 'Nunito', sans-serif);
+  font-weight: 900;
+  font-size: 10px;
+  line-height: 1.15;
+  box-shadow: 0 1px 0 rgba(120, 78, 12, 0.25);
+}
+
+.ht-cd {
+  position: relative;
+  z-index: 2;
+  display: none;
+  min-width: 24px;
+  padding: 2px 5px;
+  border-radius: 8px;
+  background: rgba(47, 59, 40, 0.84);
+  color: #fff8ea;
+  font-family: var(--fd, 'Fredoka', sans-serif);
+  font-style: normal;
+  font-weight: 700;
+  font-size: 11.5px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.ht-pill.is-cooling .ht-cd {
+  display: inline-block;
+}
+
+/* Active & Contextual Trick Highlights */
+#btnTrickDecoy.has-active:not(.is-cooling) {
+  border-color: #88b672;
+  box-shadow:
+    0 3px 0 rgba(58, 92, 44, 0.28),
+    0 0 0 2px rgba(143, 181, 122, 0.34),
+    0 8px 18px rgba(25, 35, 22, 0.18);
+}
+
+#btnTrickSmoke.is-dashing {
+  background: linear-gradient(180deg, #fff0f5, #ffd6e4);
+  border-color: #f08da8;
+  box-shadow:
+    0 3px 0 rgba(150, 68, 92, 0.28),
+    0 0 0 2.5px rgba(255, 166, 194, 0.55),
+    0 8px 20px rgba(190, 82, 118, 0.25);
+}
+
+#btnTrickSmoke.is-dashing .ht-txt small {
+  color: #a93c5d;
+  font-weight: 900;
+}
+
+#btnTrickTaunt.is-daredevil:not(.is-cooling) {
+  background: linear-gradient(180deg, #fff6d6, #ffe08c);
+  border-color: #f0a830;
+  box-shadow:
+    0 3px 0 rgba(148, 92, 14, 0.32),
+    0 0 0 2.5px rgba(255, 190, 68, 0.62),
+    0 8px 20px rgba(160, 102, 16, 0.26);
+  animation: htDarePulse 1.35s ease-in-out infinite;
+}
+
+#btnTrickTaunt.is-daredevil:not(.is-cooling) .ht-txt small {
+  color: #7c4906;
+  font-weight: 900;
+}
+
+@keyframes htDarePulse {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-1.5px) scale(1.022); }
+}
+
+/* Whistle Auto-Giggle 35s Countdown Ring */
+.ht-ring-wrap {
+  position: relative;
+  z-index: 2;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ht-giggle-svg {
+  position: absolute;
+  inset: -2px;
+  width: 32px;
+  height: 32px;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+
+.ht-giggle-track {
+  fill: none;
+  stroke: rgba(75, 90, 64, 0.16);
+  stroke-width: 2.8;
+}
+
+.ht-giggle-arc {
+  fill: none;
+  stroke: #7bb062;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  stroke-dasharray: 84.82;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.2s linear, stroke 0.25s ease;
+}
+
+#btnTrickTaunt.giggle-soon .ht-giggle-arc {
+  stroke: #ef7a6b;
+}
+
+#btnTrickTaunt.giggle-soon:not(.is-cooling) {
+  border-color: #ef7a6b;
+}
+
+/* ============================================================
+ * Seeker 1.5s Soap-Bubble & Puffball Screen Blind (#hsBubbleBlind)
+ * ============================================================ */
+#hsBubbleBlind {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  background:
+    radial-gradient(65% 60% at 32% 38%, rgba(255, 220, 236, 0.72), transparent 72%),
+    radial-gradient(62% 58% at 72% 62%, rgba(196, 238, 255, 0.72), transparent 72%),
+    radial-gradient(90% 85% at 50% 50%, rgba(255, 248, 234, 0.68), rgba(226, 242, 248, 0.82));
+  backdrop-filter: blur(9px) saturate(1.22);
+  -webkit-backdrop-filter: blur(9px) saturate(1.22);
+  transition: opacity 0.32s ease, visibility 0.32s ease;
+}
+
+#hsBubbleBlind.on {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.08s ease, visibility 0s;
+}
+
+.hs-bub {
+  position: absolute;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 28%, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.32) 18%, transparent 42%),
+    radial-gradient(circle at 72% 76%, rgba(255, 186, 218, 0.55) 0%, rgba(164, 228, 255, 0.44) 46%, rgba(255, 244, 196, 0.52) 78%, rgba(255, 255, 255, 0.85) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.82);
+  box-shadow:
+    inset 0 0 18px rgba(255, 255, 255, 0.75),
+    inset -6px -8px 16px rgba(168, 224, 255, 0.48),
+    0 8px 22px rgba(65, 95, 110, 0.16);
+  will-change: transform, opacity;
+  animation: hsBubFloat var(--dur, 1.55s) ease-out forwards;
+}
+
+.hs-bub::after {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 19%;
+  width: 24%;
+  height: 14%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  transform: rotate(-28deg);
+}
+
+@keyframes hsBubFloat {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0) scale(0.45);
+  }
+  18% {
+    opacity: 0.96;
+    transform: translate3d(var(--sway, 14px), -8px, 0) scale(1.04);
+  }
+  82% {
+    opacity: 0.92;
+    transform: translate3d(calc(var(--sway, 14px) * -0.8), -68px, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--sway, 14px), -96px, 0) scale(1.18);
+  }
+}
+
+.hs-puffball {
+  position: absolute;
+  width: var(--sz, 44px);
+  height: var(--sz, 44px);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 253, 246, 0.98) 0%, rgba(255, 245, 228, 0.9) 38%, rgba(247, 236, 210, 0.45) 62%, rgba(247, 236, 210, 0) 74%),
+    repeating-conic-gradient(from 0deg, rgba(255, 250, 236, 0.85) 0deg 6deg, rgba(255, 250, 236, 0) 6deg 18deg);
+  filter: drop-shadow(0 4px 8px rgba(90, 80, 50, 0.22));
+  will-change: transform, opacity;
+  animation: hsPuffballHop var(--dur, 1.45s) cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+
+@keyframes hsPuffballHop {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0) scale(0.3) rotate(-18deg);
+  }
+  25% {
+    opacity: 0.95;
+    transform: translate3d(var(--dx, 24px), -22px, 0) scale(1.08) rotate(10deg);
+  }
+  75% {
+    opacity: 0.88;
+    transform: translate3d(calc(var(--dx, 24px) * 1.6), -48px, 0) scale(0.96) rotate(-8deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(calc(var(--dx, 24px) * 2), -64px, 0) scale(0.6) rotate(14deg);
+  }
+}
+
+.hs-blind-banner {
+  position: absolute;
+  left: 50%;
+  top: 26%;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  border-radius: 22px;
+  background: #fff8ea;
+  color: var(--ink, #2f3b28);
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: clamp(16px, 2.4vw, 21px);
+  box-shadow:
+    0 4px 0 rgba(47, 59, 40, 0.26),
+    0 14px 32px rgba(30, 42, 28, 0.24);
+  white-space: nowrap;
+  animation: hsBannerPop 0.34s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+@keyframes hsBannerPop {
+  from { opacity: 0; transform: translate(-50%, -36%) scale(0.78); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Mobile & Touch Responsiveness */
+@media (pointer: coarse) {
+  .ht-key {
+    display: none;
+  }
+  .ht-pill {
+    padding: 5px 11px 5px 9px;
+  }
+}
+
+@media (max-width: 760px) {
+  #hiderTricksBar {
+    left: 10px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+    gap: 6px;
+  }
+  #help:not(:empty) ~ #hiderTricksBar {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 56px);
+  }
+  .ht-pill {
+    height: 42px;
+    padding: 4px 9px 4px 8px;
+    border-radius: 15px;
+    gap: 5px;
+  }
+  .ht-txt b {
+    font-size: 12px;
+  }
+  .ht-txt small {
+    font-size: 9px;
+  }
+  .ht-ic {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ht-txt small {
+    display: none;
+  }
+  .ht-pill {
+    height: 38px;
+    padding: 4px 8px;
+  }
+}

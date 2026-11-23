@@ -1,0 +1,1152 @@
+/* ==========================================================================
+ * Hue & Seek — Interactive First-Time Hider & Seeker Dojo Tutorial Styles
+ * (`tutorial.css`)
+ * Warm Storybook cream & sage aesthetic with looping visual control
+ * animations for both Mobile Touch (dual-thumb) and Desktop (Mouse + Keyboard).
+ * ========================================================================== */
+
+/* Hide bottom tiny keyboard strip during guided tutorial so coach card owns focus */
+body.is-tutorial-active #help {
+  display: none !important;
+}
+
+/* Title & Lobby Replay Tutorial Pill + First-Time Mode Badge */
+.tut-title-btn {
+  position: absolute;
+  top: max(12px, calc(env(safe-area-inset-top, 0px) + 12px));
+  right: max(322px, calc(env(safe-area-inset-right, 0px) + 322px));
+  z-index: 12;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 2px solid rgba(92, 74, 48, 0.22);
+  background: rgba(255, 251, 240, 0.94);
+  color: #3d3122;
+  font: 800 13px/1 'Nunito', system-ui, sans-serif;
+  box-shadow: 0 3px 0 rgba(74, 58, 36, 0.16), 0 6px 16px rgba(45, 35, 20, 0.10);
+  cursor: pointer;
+  transition: transform 0.14s ease, background 0.14s ease;
+}
+.tut-title-btn:hover {
+  transform: translateY(-1px);
+  background: #fffdf7;
+}
+.tut-title-btn:active {
+  transform: translateY(1px);
+}
+html.is-mobile-touch .tut-title-btn {
+  display: none !important;
+}
+
+.mode .tut-first-pill {
+  display: inline-block;
+  margin-top: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ffe799, #ffc95c);
+  color: #4a3210;
+  font: 900 11px/1.1 'Nunito', sans-serif;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 0 rgba(120, 82, 20, 0.18);
+}
+
+/* ==========================================================================
+ * 1. Top-Center Floating Coach Card (`#tutCoach`)
+ * ========================================================================== */
+#tutCoach {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 70px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 58;
+  width: min(568px, calc(100vw - 24px));
+  display: grid;
+  grid-template-columns: 152px 1fr;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 15px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255, 252, 243, 0.97) 0%, rgba(249, 241, 224, 0.96) 100%);
+  border: 2.5px solid rgba(110, 86, 52, 0.28);
+  box-shadow:
+    0 5px 0 rgba(80, 62, 36, 0.18),
+    0 14px 32px rgba(32, 26, 16, 0.22);
+  color: #3a2e1f;
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+#tutCoach.hidden {
+  display: none !important;
+}
+#tutCoach.step-pop {
+  animation: tutCardPop 0.34s cubic-bezier(0.22, 1.28, 0.36, 1);
+}
+#tutCoach.step-done {
+  border-color: #5bb85d;
+  box-shadow:
+    0 0 0 3px rgba(91, 184, 93, 0.35),
+    0 5px 0 rgba(62, 128, 64, 0.24),
+    0 14px 32px rgba(32, 26, 16, 0.22);
+}
+
+@keyframes tutCardPop {
+  0% { transform: translateX(-50%) scale(0.93) translateY(-6px); }
+  65% { transform: translateX(-50%) scale(1.02) translateY(0); }
+  100% { transform: translateX(-50%) scale(1) translateY(0); }
+}
+
+/* Visual Animation Box inside Coach Card */
+.tut-anim-stage {
+  position: relative;
+  width: 152px;
+  height: 106px;
+  border-radius: 16px;
+  background: radial-gradient(circle at 50% 35%, #eef7ea 0%, #dcebd8 62%, #cde0cb 100%);
+  border: 2px solid rgba(86, 118, 76, 0.28);
+  box-shadow: inset 0 2px 6px rgba(45, 70, 40, 0.10);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#tutCoach[data-mode="seek"] .tut-anim-stage {
+  background: radial-gradient(circle at 50% 35%, #eaf7fd 0%, #d4ecf8 62%, #c1e1f2 100%);
+  border-color: rgba(58, 124, 165, 0.28);
+}
+
+/* Right Column Copy & Controls */
+.tut-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.tut-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.tut-step-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(105, 168, 88, 0.18);
+  color: #356629;
+  font: 900 10.5px/1.1 'Nunito', sans-serif;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+#tutCoach[data-mode="seek"] .tut-step-pill {
+  background: rgba(58, 146, 200, 0.18);
+  color: #1f5f8b;
+}
+
+.tut-ctrl-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  pointer-events: auto;
+}
+
+.tut-input-pill,
+.tut-skip-btn {
+  border: 1.5px solid rgba(92, 74, 48, 0.22);
+  background: rgba(255, 255, 255, 0.85);
+  color: #5b4933;
+  border-radius: 999px;
+  padding: 3px 9px;
+  font: 800 11px/1.1 'Nunito', sans-serif;
+  cursor: pointer;
+  transition: background 0.14s ease, transform 0.12s ease;
+}
+.tut-input-pill:hover,
+.tut-skip-btn:hover {
+  background: #ffffff;
+}
+.tut-skip-btn {
+  background: rgba(242, 231, 210, 0.92);
+  color: #4b3a25;
+}
+.tut-skip-btn:active,
+.tut-input-pill:active {
+  transform: scale(0.95);
+}
+
+.tut-title {
+  margin: 0;
+  font: 700 18px/1.15 'Fredoka', 'Nunito', sans-serif;
+  color: #2f2417;
+}
+
+.tut-desc {
+  margin: 0;
+  font: 700 13px/1.32 'Nunito', sans-serif;
+  color: #53422e;
+}
+.tut-desc kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  margin: 0 1px;
+  border-radius: 6px;
+  background: #fffdf7;
+  border: 1.5px solid #cbb99c;
+  box-shadow: 0 2px 0 #cbb99c;
+  font: 900 11px/1.2 'Nunito', monospace;
+  color: #36291a;
+}
+
+.tut-lock-nudge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-start;
+  padding: 3px 9px;
+  border-radius: 8px;
+  background: #ffe8a3;
+  border: 1.5px solid #e0a938;
+  color: #5c3c09;
+  font: 800 11.5px/1.15 'Nunito', sans-serif;
+  animation: tutPulseSoft 1.15s ease-in-out infinite;
+}
+.tut-lock-nudge.hidden {
+  display: none !important;
+}
+
+.tut-prog-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+.tut-prog-track {
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(95, 78, 52, 0.14);
+  overflow: hidden;
+}
+.tut-prog-fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #68be56, #f5b942);
+  transition: width 0.16s ease;
+}
+#tutCoach[data-mode="seek"] .tut-prog-fill {
+  background: linear-gradient(90deg, #3ba8e0, #59cf99);
+}
+.tut-prog-lbl {
+  font: 900 11px/1 'Nunito', sans-serif;
+  color: #6b573e;
+  min-width: 34px;
+  text-align: right;
+}
+
+/* ==========================================================================
+ * 2. Live On-Screen HUD Button Spotlight (`#tutSpotlight`)
+ * ========================================================================== */
+#tutSpotlight {
+  position: fixed;
+  z-index: 62;
+  pointer-events: none;
+  border-radius: 20px;
+  border: 3px solid #ffc43d;
+  box-shadow:
+    0 0 0 4px rgba(255, 196, 61, 0.28),
+    0 0 22px rgba(255, 184, 42, 0.65);
+  animation: tutSpotPulse 1.15s ease-in-out infinite;
+  transition: left 0.14s ease, top 0.14s ease, width 0.14s ease, height 0.14s ease;
+}
+#tutSpotlight.hidden {
+  display: none !important;
+}
+
+@keyframes tutSpotPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 4px rgba(255, 196, 61, 0.28), 0 0 18px rgba(255, 184, 42, 0.6);
+  }
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 0 0 8px rgba(255, 196, 61, 0.16), 0 0 28px rgba(255, 184, 42, 0.85);
+  }
+}
+
+.tut-spot-tag {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 7px);
+  transform: translateX(-50%);
+  white-space: nowrap;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #332617;
+  color: #ffe89e;
+  border: 2px solid #ffc43d;
+  font: 900 11.5px/1 'Nunito', sans-serif;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.28);
+  animation: tutTagBounce 0.95s ease-in-out infinite;
+}
+#tutSpotlight.tag-below .tut-spot-tag {
+  bottom: auto;
+  top: calc(100% + 7px);
+}
+
+@keyframes tutTagBounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-5px); }
+}
+
+@keyframes tutPulseSoft {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+/* ==========================================================================
+ * 3. Bespoke Looping Control Animations inside `.tut-anim-stage`
+ * ========================================================================== */
+.ta-scene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.ta-caption {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(46, 36, 22, 0.78);
+  color: #fff9eb;
+  font: 800 9.5px/1.15 'Nunito', sans-serif;
+  letter-spacing: 0.02em;
+}
+
+/* --- A. Camera Turn / Aim (`look` & `look_seek`) --- */
+.ta-phone {
+  position: relative;
+  width: 112px;
+  height: 60px;
+  margin-bottom: 12px;
+  border-radius: 11px;
+  background: #fffdf7;
+  border: 2.5px solid #594732;
+  overflow: hidden;
+  box-shadow: 0 3px 0 rgba(70, 54, 34, 0.2);
+}
+.ta-phone-right {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 56%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255, 200, 72, 0.16), rgba(255, 190, 58, 0.42));
+  border-left: 1.5px dashed rgba(180, 125, 24, 0.55);
+}
+.ta-fov-cone {
+  position: absolute;
+  top: 8px;
+  left: 26px;
+  width: 34px;
+  height: 34px;
+  background: conic-gradient(from -32deg at 50% 85%, rgba(92, 184, 92, 0.52) 0deg 64deg, transparent 65deg);
+  transform-origin: 50% 85%;
+  animation: taPanCone 2.2s ease-in-out infinite;
+}
+#tutCoach[data-mode="seek"] .ta-fov-cone {
+  background: conic-gradient(from -32deg at 50% 85%, rgba(56, 165, 224, 0.55) 0deg 64deg, transparent 65deg);
+}
+.ta-crosshair-mini {
+  position: absolute;
+  top: 17px;
+  left: 36px;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #2b7bb9;
+  border-radius: 50%;
+  animation: taSwipeHorizSmall 2.2s ease-in-out infinite;
+}
+.ta-finger-swipe {
+  position: absolute;
+  bottom: 6px;
+  right: 18px;
+  font-size: 22px;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.22));
+  animation: taFingerSwipe 2.2s ease-in-out infinite;
+}
+.ta-arrows-lr {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font: 900 11px/1 'Nunito', sans-serif;
+  color: #9e6810;
+}
+
+.ta-mouse-pad {
+  position: relative;
+  width: 116px;
+  height: 62px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  background: rgba(255, 253, 246, 0.88);
+  border: 2px solid rgba(90, 72, 48, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ta-mouse-ico {
+  width: 26px;
+  height: 38px;
+  border-radius: 13px;
+  background: #fffdf8;
+  border: 2.5px solid #4d3d2a;
+  position: relative;
+  box-shadow: 0 3px 0 rgba(70, 54, 34, 0.2);
+  animation: taMouseGlide 2.1s ease-in-out infinite;
+}
+.ta-mouse-ico::before {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 8px;
+  border-radius: 2px;
+  background: #e39b2d;
+}
+
+@keyframes taFingerSwipe {
+  0%, 100% { transform: translateX(-14px) rotate(-8deg); }
+  50% { transform: translateX(14px) rotate(10deg); }
+}
+@keyframes taMouseGlide {
+  0%, 100% { transform: translateX(-24px); }
+  50% { transform: translateX(24px); }
+}
+@keyframes taPanCone {
+  0%, 100% { transform: rotate(-26deg); }
+  50% { transform: rotate(26deg); }
+}
+@keyframes taSwipeHorizSmall {
+  0%, 100% { transform: translateX(-10px); }
+  50% { transform: translateX(12px); }
+}
+
+/* --- B. Move Stick / WASD (`move` & `move_jump`) --- */
+.ta-joy-ring {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 12px;
+  border-radius: 50%;
+  background: rgba(255, 253, 246, 0.85);
+  border: 2.5px solid #638c56;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ta-joy-knob {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #ffd66b, #f0a832);
+  border: 2px solid #6b4c1b;
+  animation: taJoyOrbit 2.2s ease-in-out infinite;
+}
+@keyframes taJoyOrbit {
+  0%, 100% { transform: translate(0, 4px); }
+  30% { transform: translate(0, -13px); }
+  65% { transform: translate(11px, -8px); }
+}
+
+.ta-wasd {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  margin-bottom: 12px;
+}
+.ta-key-row {
+  display: flex;
+  gap: 3px;
+}
+.ta-key {
+  min-width: 24px;
+  height: 23px;
+  padding: 0 5px;
+  border-radius: 6px;
+  background: #fffdf7;
+  border: 2px solid #6d5a42;
+  box-shadow: 0 2px 0 #6d5a42;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: 900 11px/1 'Nunito', sans-serif;
+  color: #3a2d1d;
+}
+.ta-key.lit-1 { animation: taKeyLit 2.0s infinite 0s; }
+.ta-key.lit-2 { animation: taKeyLit 2.0s infinite 0.5s; }
+.ta-key.lit-3 { animation: taKeyLit 2.0s infinite 1.0s; }
+.ta-key.lit-4 { animation: taKeyLit 2.0s infinite 1.5s; }
+
+@keyframes taKeyLit {
+  0%, 35% {
+    background: #ffd15c;
+    border-color: #9e6710;
+    box-shadow: 0 1px 0 #9e6710;
+    transform: translateY(1px);
+  }
+  45%, 100% {
+    background: #fffdf7;
+    border-color: #6d5a42;
+    box-shadow: 0 2px 0 #6d5a42;
+    transform: translateY(0);
+  }
+}
+
+/* --- C. Jump & Vault (`jump`) --- */
+.ta-jump-lane {
+  position: relative;
+  width: 128px;
+  height: 70px;
+  margin-bottom: 12px;
+}
+.ta-bench {
+  position: absolute;
+  bottom: 8px;
+  left: 52px;
+  width: 30px;
+  height: 15px;
+  border-radius: 4px;
+  background: #c7884e;
+  border: 2px solid #6e4523;
+}
+.ta-arc-dots {
+  position: absolute;
+  bottom: 18px;
+  left: 24px;
+  width: 80px;
+  height: 38px;
+  border-top: 2.5px dashed rgba(214, 148, 28, 0.72);
+  border-radius: 50% 50% 0 0;
+}
+.ta-jumper {
+  position: absolute;
+  bottom: 8px;
+  left: 16px;
+  font-size: 22px;
+  animation: taVaultArc 1.75s cubic-bezier(0.35, 0, 0.25, 1) infinite;
+}
+.ta-jump-pill {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  padding: 2px 7px;
+  border-radius: 8px;
+  background: #ffe07d;
+  border: 1.5px solid #9e6810;
+  font: 900 10px/1.1 'Nunito', sans-serif;
+  color: #4d3208;
+  animation: taBtnTap 1.75s ease-in-out infinite;
+}
+@keyframes taVaultArc {
+  0% { transform: translate(0, 0) scale(1.05, 0.9); }
+  18% { transform: translate(8px, -2px) scale(0.92, 1.12); }
+  50% { transform: translate(44px, -34px) rotate(8deg); }
+  82% { transform: translate(82px, 0) scale(1.12, 0.88); }
+  100% { transform: translate(82px, 0) scale(1, 1); }
+}
+@keyframes taBtnTap {
+  0%, 30%, 100% { transform: scale(1); }
+  14% { transform: scale(0.88); background: #ffc238; }
+}
+
+/* --- D. Morph Into Prop (`morph`) --- */
+.ta-morph-wrap {
+  position: relative;
+  width: 128px;
+  height: 68px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ta-morph-spirit {
+  position: absolute;
+  font-size: 28px;
+  animation: taMorphA 2.6s ease-in-out infinite;
+}
+.ta-morph-prop {
+  position: absolute;
+  font-size: 30px;
+  animation: taMorphB 2.6s ease-in-out infinite;
+}
+.ta-morph-poof {
+  position: absolute;
+  font-size: 26px;
+  animation: taPoofFlash 2.6s ease-in-out infinite;
+}
+@keyframes taMorphA {
+  0%, 38% { opacity: 1; transform: scale(1); }
+  46%, 88% { opacity: 0; transform: scale(0.4); }
+  96%, 100% { opacity: 1; transform: scale(1); }
+}
+@keyframes taMorphB {
+  0%, 42% { opacity: 0; transform: scale(0.4); }
+  52%, 86% { opacity: 1; transform: scale(1.06); }
+  95%, 100% { opacity: 0; transform: scale(0.5); }
+}
+@keyframes taPoofFlash {
+  0%, 36%, 58%, 86%, 100% { opacity: 0; transform: scale(0.5); }
+  45%, 92% { opacity: 1; transform: scale(1.35) rotate(18deg); }
+}
+
+/* --- E. Rotate & Blend (`rotate`) --- */
+.ta-rot-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.ta-rot-box {
+  width: 34px;
+  height: 34px;
+  border-radius: 7px;
+  background: #c98a4b;
+  border: 2.5px solid #6b421f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  animation: taSnapRotate 2.4s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+@keyframes taSnapRotate {
+  0%, 20% { transform: rotate(0deg); }
+  35%, 55% { transform: rotate(45deg); }
+  70%, 90% { transform: rotate(90deg); }
+  100% { transform: rotate(90deg); }
+}
+
+/* --- F. Decoy Clone (`decoy`) --- */
+.ta-decoy-wrap {
+  position: relative;
+  width: 132px;
+  height: 68px;
+  margin-bottom: 12px;
+}
+.ta-decoy-real {
+  position: absolute;
+  left: 22px;
+  bottom: 10px;
+  font-size: 25px;
+}
+.ta-decoy-clone {
+  position: absolute;
+  left: 22px;
+  bottom: 10px;
+  font-size: 25px;
+  filter: drop-shadow(0 0 6px #ffd54f);
+  animation: taCloneSplit 2.6s ease-in-out infinite;
+}
+.ta-decoy-bubbles {
+  position: absolute;
+  right: 18px;
+  bottom: 12px;
+  font-size: 22px;
+  animation: taBubblePop 2.6s ease-in-out infinite;
+}
+@keyframes taCloneSplit {
+  0%, 15% { transform: translateX(0) scale(0.5); opacity: 0; }
+  32%, 62% { transform: translateX(52px) scale(1); opacity: 0.92; }
+  72%, 100% { transform: translateX(52px) scale(1.3); opacity: 0; }
+}
+@keyframes taBubblePop {
+  0%, 62% { opacity: 0; transform: scale(0.5); }
+  72%, 88% { opacity: 1; transform: scale(1.2) translateY(-6px); }
+  100% { opacity: 0; transform: scale(1.4) translateY(-12px); }
+}
+
+/* --- G. Sakura Smoke Dash (`dash`) --- */
+.ta-dash-wrap {
+  position: relative;
+  width: 132px;
+  height: 68px;
+  margin-bottom: 12px;
+}
+.ta-dash-cloud {
+  position: absolute;
+  left: 16px;
+  bottom: 10px;
+  font-size: 26px;
+  animation: taSmokePuff 1.9s ease-out infinite;
+}
+.ta-dash-runner {
+  position: absolute;
+  left: 22px;
+  bottom: 12px;
+  font-size: 24px;
+  animation: taDashSprint 1.9s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+@keyframes taSmokePuff {
+  0% { opacity: 0; transform: scale(0.4); }
+  25%, 65% { opacity: 1; transform: scale(1.25); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+@keyframes taDashSprint {
+  0%, 15% { transform: translateX(0); }
+  65%, 90% { transform: translateX(68px); }
+  100% { transform: translateX(68px); opacity: 0; }
+}
+
+/* --- H. Whistle & Cedar Tub (`whistle`) --- */
+.ta-whistle-wrap {
+  position: relative;
+  width: 132px;
+  height: 68px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+.ta-notes {
+  font-size: 22px;
+  animation: taFloatNotes 1.8s ease-in-out infinite;
+}
+.ta-tub-duck {
+  font-size: 25px;
+  animation: taDuckBob 1.6s ease-in-out infinite;
+}
+@keyframes taFloatNotes {
+  0%, 100% { transform: translateY(4px) rotate(-8deg); }
+  50% { transform: translateY(-7px) rotate(10deg); }
+}
+@keyframes taDuckBob {
+  0%, 100% { transform: translateY(2px) rotate(-4deg); }
+  50% { transform: translateY(-3px) rotate(5deg); }
+}
+
+/* --- I. Seeker Spray (`spray`) --- */
+.ta-spray-wrap {
+  position: relative;
+  width: 134px;
+  height: 68px;
+  margin-bottom: 12px;
+}
+.ta-spray-gun {
+  position: absolute;
+  left: 12px;
+  bottom: 14px;
+  font-size: 23px;
+}
+.ta-spray-stream {
+  position: absolute;
+  left: 38px;
+  bottom: 24px;
+  width: 52px;
+  height: 8px;
+  border-radius: 99px;
+  background: repeating-linear-gradient(90deg, #44b8f2 0 8px, transparent 8px 13px);
+  animation: taStreamFlow 0.45s linear infinite;
+}
+.ta-spray-target {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  font-size: 25px;
+  animation: taTargetShake 0.4s ease-in-out infinite;
+}
+@keyframes taStreamFlow {
+  0% { background-position: 0 0; }
+  100% { background-position: 26px 0; }
+}
+@keyframes taTargetShake {
+  0%, 100% { transform: translateX(0) rotate(-3deg); }
+  50% { transform: translateX(2px) rotate(4deg); }
+}
+
+/* --- J. Seeker Echo Pulse (`pulse`) --- */
+.ta-pulse-wrap {
+  position: relative;
+  width: 132px;
+  height: 68px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ta-pulse-ring {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2.5px solid #2aa8d8;
+  animation: taRadarWave 1.9s ease-out infinite;
+}
+.ta-pulse-ring.r2 {
+  animation-delay: 0.65s;
+}
+.ta-pulse-ping {
+  position: absolute;
+  right: 18px;
+  top: 12px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #ff6b4a;
+  color: #fff;
+  font: 900 9.5px/1.1 'Nunito', sans-serif;
+  animation: taPingHot 1.9s ease-in-out infinite;
+}
+@keyframes taRadarWave {
+  0% { transform: scale(0.4); opacity: 0.95; }
+  100% { transform: scale(3.4); opacity: 0; }
+}
+@keyframes taPingHot {
+  0%, 42% { opacity: 0.25; transform: scale(0.85); }
+  58%, 88% { opacity: 1; transform: scale(1.08); }
+  100% { opacity: 0.25; transform: scale(0.85); }
+}
+
+/* --- K. Seeker Splash Bomb (`bomb`) --- */
+.ta-bomb-wrap {
+  position: relative;
+  width: 134px;
+  height: 68px;
+  margin-bottom: 12px;
+}
+.ta-bomb-zone {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  width: 48px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(58, 178, 232, 0.25);
+  border: 2px dashed #2389bd;
+}
+.ta-bomb-ball {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  font-size: 20px;
+  animation: taBombArc 2.1s cubic-bezier(0.32, 0, 0.45, 1) infinite;
+}
+.ta-bomb-burst {
+  position: absolute;
+  right: 18px;
+  bottom: 10px;
+  font-size: 25px;
+  animation: taBombSplash 2.1s ease-out infinite;
+}
+@keyframes taBombArc {
+  0% { transform: translate(0, 0) scale(0.9); opacity: 1; }
+  35% { transform: translate(40px, -32px) rotate(120deg); opacity: 1; }
+  62% { transform: translate(78px, 0) rotate(240deg); opacity: 1; }
+  66%, 100% { transform: translate(78px, 0) scale(0.2); opacity: 0; }
+}
+@keyframes taBombSplash {
+  0%, 60% { opacity: 0; transform: scale(0.4); }
+  70%, 88% { opacity: 1; transform: scale(1.28); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+
+/* ==========================================================================
+ * 4. Graduation Modal (`#tutGradModal`) & Replay Picker (`#tutPickerModal`)
+ * ========================================================================== */
+.tut-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 88;
+  background: rgba(24, 32, 22, 0.56);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.tut-modal-backdrop.hidden {
+  display: none !important;
+}
+
+.tut-modal-card {
+  width: min(490px, 100%);
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  border-radius: 26px;
+  padding: 20px 22px;
+  background: linear-gradient(180deg, #fffdf6 0%, #f7edd9 100%);
+  border: 3px solid rgba(102, 80, 48, 0.28);
+  box-shadow: 0 8px 0 rgba(72, 56, 32, 0.22), 0 22px 48px rgba(0, 0, 0, 0.35);
+  color: #362a1b;
+  text-align: center;
+  animation: tutModalIn 0.28s cubic-bezier(0.22, 1.2, 0.36, 1);
+}
+@keyframes tutModalIn {
+  from { opacity: 0; transform: scale(0.92) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.tut-grad-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ffe794, #ffc447);
+  color: #52360a;
+  font: 900 11.5px/1.1 'Nunito', sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.tut-grad-emoji {
+  font-size: 42px;
+  line-height: 1.1;
+  margin: 6px 0 4px;
+}
+.tut-modal-card h2 {
+  margin: 2px 0 6px;
+  font: 700 24px/1.15 'Fredoka', sans-serif;
+  color: #2d2215;
+}
+.tut-modal-sub {
+  margin: 0 0 12px;
+  font: 700 13.5px/1.35 'Nunito', sans-serif;
+  color: #5b4933;
+}
+
+.tut-reward-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: #eef8e8;
+  border: 2px solid #7bc66a;
+  color: #2c6322;
+  font: 900 13px/1 'Nunito', sans-serif;
+}
+
+.tut-skills-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.tut-skill-chip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1.5px solid rgba(102, 80, 48, 0.2);
+  font: 800 11.5px/1.1 'Nunito', sans-serif;
+  color: #4a3a26;
+}
+
+.tut-cta-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tut-btn-primary {
+  width: 100%;
+  padding: 12px 18px;
+  border-radius: 16px;
+  border: 2.5px solid #3c7d32;
+  background: linear-gradient(180deg, #74cc62 0%, #52ab42 100%);
+  color: #ffffff;
+  font: 700 17px/1.1 'Fredoka', 'Nunito', sans-serif;
+  box-shadow: 0 4px 0 #356e2c;
+  cursor: pointer;
+}
+.tut-btn-primary.seek {
+  border-color: #226a99;
+  background: linear-gradient(180deg, #4db8eb 0%, #2c8ec4 100%);
+  box-shadow: 0 4px 0 #1d5c85;
+}
+.tut-btn-secondary {
+  width: 100%;
+  padding: 9px 14px;
+  border-radius: 13px;
+  border: 2px solid rgba(98, 76, 46, 0.28);
+  background: rgba(255, 255, 255, 0.88);
+  color: #423320;
+  font: 800 13.5px/1.1 'Nunito', sans-serif;
+  cursor: pointer;
+}
+.tut-btn-link {
+  background: none;
+  border: none;
+  padding: 5px;
+  color: #6e593f;
+  font: 800 12.5px/1 'Nunito', sans-serif;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Picker Modal Grid */
+.tut-picker-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 10px 0 12px;
+  text-align: left;
+}
+.tut-pick-card {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 12px;
+  border-radius: 18px;
+  border: 2.5px solid rgba(98, 76, 46, 0.25);
+  background: #fffdf8;
+  cursor: pointer;
+  transition: transform 0.14s ease, border-color 0.14s ease;
+}
+.tut-pick-card:hover {
+  transform: translateY(-2px);
+  border-color: #e09f2d;
+}
+.tut-pick-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.tut-pick-ic {
+  font-size: 26px;
+}
+.tut-pick-status {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font: 900 10px/1.1 'Nunito', sans-serif;
+  background: #ffe8a1;
+  color: #5c3d09;
+}
+.tut-pick-status.done {
+  background: #def4d8;
+  color: #296120;
+}
+.tut-pick-card b {
+  font: 700 15.5px/1.15 'Fredoka', sans-serif;
+  color: #2e2215;
+}
+.tut-pick-card small {
+  font: 700 11.5px/1.28 'Nunito', sans-serif;
+  color: #635039;
+}
+
+/* ==========================================================================
+ * 5. HUD De-Clutter During Solo Dojo & Compact Mobile Landscape Tuning
+ * ========================================================================== */
+body.is-tutorial-active #roundSeriesBadge,
+body.is-tutorial-active #elemHudSwitch {
+  display: none !important;
+}
+
+@media (max-height: 500px), (max-width: 920px) and (orientation: landscape) {
+  body.is-tutorial-active #feed,
+  body.is-tutorial-active #matchBox {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+  #tutCoach {
+    top: calc(env(safe-area-inset-top, 0px) + 45px);
+    width: min(468px, calc(100vw - 170px));
+    grid-template-columns: 116px 1fr;
+    gap: 10px;
+    padding: 7px 11px;
+    border-radius: 17px;
+  }
+  .tut-anim-stage {
+    width: 116px;
+    height: 80px;
+    border-radius: 12px;
+  }
+  .ta-scene {
+    transform: scale(0.82);
+    transform-origin: center center;
+  }
+  .tut-title {
+    font-size: 14.5px;
+  }
+  .tut-desc {
+    font-size: 11.2px;
+    line-height: 1.24;
+  }
+  .tut-step-pill,
+  .tut-input-pill,
+  .tut-skip-btn {
+    font-size: 9.8px;
+    padding: 2px 7px;
+  }
+  .tut-prog-track {
+    height: 6px;
+  }
+  .tut-modal-card {
+    width: min(490px, calc(100vw - 32px));
+    max-height: calc(100dvh - 18px);
+    overflow-y: auto;
+    padding: 10px 16px;
+    border-radius: 20px;
+  }
+  .tut-grad-badge {
+    font-size: 10px;
+    padding: 2px 9px;
+    margin-bottom: 2px;
+  }
+  .tut-grad-emoji {
+    font-size: 24px;
+    margin: 1px 0;
+  }
+  .tut-modal-card h2 {
+    font-size: 18px;
+    margin-bottom: 2px;
+  }
+  .tut-modal-sub {
+    font-size: 11.5px;
+    line-height: 1.25;
+    margin-bottom: 6px;
+  }
+  .tut-reward-pill {
+    font-size: 11.5px;
+    padding: 3px 11px;
+    margin-bottom: 6px;
+  }
+  .tut-skills-chips {
+    margin-bottom: 7px;
+    gap: 4px;
+  }
+  .tut-skill-chip {
+    font-size: 10.5px;
+    padding: 2px 7px;
+  }
+  .tut-cta-col {
+    gap: 5px;
+  }
+  .tut-btn-primary {
+    padding: 8px 14px;
+    font-size: 14.5px;
+  }
+  .tut-btn-secondary {
+    padding: 6px 12px;
+    font-size: 12.5px;
+  }
+  .tut-btn-link {
+    padding: 2px 8px;
+    font-size: 11.5px;
+  }
+}

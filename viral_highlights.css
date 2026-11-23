@@ -1,0 +1,1006 @@
+/* ==========================================================================
+ * Hue & Seek — Viral Highlights 2.0: 3D Bullet-Time Action Replay Overlay,
+ * Anime Speed-Lines, Climax Sticker, 9:16 Social Clip Modal & Spectator Bar
+ * Storybook Warm Cream (#fff8ea), Festival Gold (#ffb842), Sage (#4f8f3c),
+ * Sky (#3888ce), Sunset Coral (#ef6850), Fredoka + Nunito typography.
+ * ========================================================================== */
+
+/* --------------------------------------------------------------------------
+ * 1. End-of-Round 3D Bullet-Time Action Replay Overlay (#vhHighlightOverlay)
+ * -------------------------------------------------------------------------- */
+#vhHighlightOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#vhHighlightOverlay.on {
+  display: flex;
+}
+
+.vh-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(62% 58% at 50% 46%, rgba(255, 232, 175, 0.04) 0%, rgba(14, 22, 16, 0.30) 74%, rgba(8, 13, 10, 0.66) 100%);
+  transition: background 0.18s ease, box-shadow 0.18s ease;
+  animation: vhFadeIn 0.24s ease-out both;
+}
+
+#vhHighlightOverlay.slowmo-active .vh-vignette {
+  background:
+    radial-gradient(56% 52% at 50% 46%, rgba(255, 240, 190, 0.10) 0%, rgba(255, 166, 48, 0.16) 66%, rgba(10, 16, 22, 0.74) 100%);
+  box-shadow: inset 0 0 70px rgba(255, 196, 72, 0.36);
+}
+
+@keyframes vhFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Radial Anime Action Speed-Lines Layer (Ignites during Bullet-Time Slow-Mo) */
+.vh-speedlines {
+  position: absolute;
+  inset: -12%;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(1.08);
+  background:
+    repeating-conic-gradient(
+      from 0deg at 50% 47%,
+      rgba(255, 250, 232, 0.0) 0deg 4.4deg,
+      rgba(255, 248, 224, 0.42) 4.4deg 5.2deg,
+      rgba(255, 250, 232, 0.0) 5.2deg 9.5deg,
+      rgba(255, 198, 78, 0.34) 9.5deg 10.1deg
+    );
+  -webkit-mask-image: radial-gradient(circle at 50% 47%, transparent 0%, transparent 36%, rgba(0, 0, 0, 0.55) 56%, #000 80%);
+  mask-image: radial-gradient(circle at 50% 47%, transparent 0%, transparent 36%, rgba(0, 0, 0, 0.55) 56%, #000 80%);
+  transition: opacity 0.14s ease-out, transform 0.22s ease-out;
+}
+
+#vhHighlightOverlay.slowmo-active .vh-speedlines {
+  opacity: 0.92;
+  transform: scale(1);
+  animation: vhSpeedPulse 0.24s ease-in-out infinite alternate;
+}
+
+@keyframes vhSpeedPulse {
+  0% {
+    transform: scale(0.985) rotate(-0.6deg);
+    opacity: 0.78;
+  }
+  100% {
+    transform: scale(1.02) rotate(0.6deg);
+    opacity: 0.98;
+  }
+}
+
+/* Hide underlying live gameplay HUD clutter while 3D Action Replay is playing */
+body.vh-replay-active #hud {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Popped Bullet-Time Climax Sticker Chip (#vhClimaxChip) — swaps cleanly into badge slot during slow-mo! */
+.vh-climax-wrap {
+  position: absolute;
+  top: calc(clamp(44px, 8vh, 68px) + env(safe-area-inset-top, 0px) + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  pointer-events: none;
+}
+
+#vhHighlightOverlay.slowmo-active .vh-highlight-badge {
+  opacity: 0 !important;
+  transform: scale(0.82) !important;
+  transition: opacity 0.14s ease, transform 0.16s ease;
+}
+
+.vh-climax-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 18px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff512f 0%, #f09819 55%, #ffe270 100%);
+  color: #2b1302;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: clamp(13px, 2.2vw, 17px);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow:
+    0 4px 0 rgba(92, 24, 6, 0.55),
+    0 0 0 2.5px #fffdf6,
+    0 0 28px rgba(255, 184, 66, 0.72),
+    0 12px 26px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transform: scale(0.55) rotate(-4deg) translateY(8px);
+  transition: opacity 0.14s ease, transform 0.22s cubic-bezier(0.2, 1.6, 0.35, 1);
+}
+
+#vhHighlightOverlay.slowmo-active .vh-climax-chip {
+  opacity: 1;
+  transform: scale(1) rotate(-2deg) translateY(0);
+}
+
+/* Storybook Cinematic Letterbox Bars */
+.vh-letterbox {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  background: linear-gradient(180deg, rgba(14, 21, 16, 0.94) 0%, rgba(18, 27, 20, 0.88) 100%);
+  pointer-events: auto;
+}
+
+.vh-letterbox.top {
+  height: clamp(44px, 8vh, 68px);
+  padding-top: env(safe-area-inset-top, 0px);
+  border-bottom: 1.5px solid rgba(255, 184, 66, 0.52);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: clamp(14px, 3vw, 28px);
+  padding-right: clamp(14px, 3vw, 28px);
+  animation: vhSlideTop 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.vh-letterbox.bottom {
+  min-height: clamp(44px, 7.8vh, 68px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  border-top: 1.5px solid rgba(255, 184, 66, 0.52);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 12px;
+  padding-right: 12px;
+  animation: vhSlideBottom 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes vhSlideTop {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes vhSlideBottom {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.vh-rec-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(255, 248, 234, 0.13);
+  border: 1px solid rgba(255, 248, 234, 0.26);
+  color: #fff8ea;
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+#vhHighlightOverlay.slowmo-active .vh-rec-pill {
+  background: rgba(255, 184, 66, 0.24);
+  border-color: rgba(255, 226, 138, 0.68);
+  color: #ffe9ad;
+}
+
+.vh-rec-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff5e57;
+  box-shadow: 0 0 0 3px rgba(255, 94, 87, 0.28);
+  animation: vhRecPulse 1s ease-in-out infinite;
+}
+
+@keyframes vhRecPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.26); opacity: 0.62; }
+}
+
+/* Animated Highlight Category Badge */
+.vh-badge-wrap {
+  position: absolute;
+  top: calc(clamp(44px, 8vh, 68px) + env(safe-area-inset-top, 0px) + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.vh-highlight-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 18px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffe597 0%, #ffb842 100%);
+  color: #472b03;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: clamp(13px, 2.1vw, 16px);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow:
+    0 4px 0 rgba(110, 68, 8, 0.44),
+    0 0 0 2.5px #fff8ea,
+    0 12px 28px rgba(0, 0, 0, 0.42);
+  animation: vhBadgePop 0.42s 0.05s cubic-bezier(0.2, 1.45, 0.36, 1) both;
+}
+
+.vh-highlight-badge[data-cat="clutch_escape"],
+.vh-highlight-badge[data-cat="miracle_escape"],
+.vh-highlight-badge[data-cat="ankle_breaker"] {
+  background: linear-gradient(180deg, #ff9d76 0%, #ea4c3b 100%);
+  color: #fffdf8;
+  box-shadow:
+    0 4px 0 rgba(122, 26, 16, 0.52),
+    0 0 0 2.5px #fff8ea,
+    0 12px 28px rgba(0, 0, 0, 0.42);
+}
+
+.vh-highlight-badge[data-cat="matrix_dodge"],
+.vh-highlight-badge[data-cat="sky_escape"] {
+  background: linear-gradient(180deg, #ffe985 0%, #f59322 100%);
+  color: #3a1f02;
+  box-shadow:
+    0 4px 0 rgba(118, 58, 6, 0.48),
+    0 0 0 2.5px #fff8ea,
+    0 12px 28px rgba(0, 0, 0, 0.42);
+}
+
+.vh-highlight-badge[data-cat="turret_snipe"],
+.vh-highlight-badge[data-cat="clutch_tag"] {
+  background: linear-gradient(180deg, #9ed6ff 0%, #2c7ec9 100%);
+  color: #fff8ea;
+  box-shadow:
+    0 4px 0 rgba(18, 62, 110, 0.48),
+    0 0 0 2.5px #fff8ea,
+    0 12px 28px rgba(0, 0, 0, 0.42);
+}
+
+@keyframes vhBadgePop {
+  0% {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.84);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Lower-Third Shareable Quote & Quick Controls */
+.vh-stage-bottom {
+  position: relative;
+  z-index: 3;
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px 10px;
+  pointer-events: none;
+}
+
+.vh-lower-third {
+  pointer-events: auto;
+  width: min(94vw, 690px);
+  padding: 12px 18px 11px;
+  border-radius: 22px;
+  background: rgba(20, 30, 22, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #fff8ea;
+  box-shadow:
+    0 8px 0 rgba(10, 16, 11, 0.46),
+    0 0 0 2px rgba(255, 184, 66, 0.76),
+    0 20px 44px rgba(0, 0, 0, 0.5);
+  animation: vhCardRise 0.38s 0.06s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+#vhHighlightOverlay.slowmo-active .vh-lower-third {
+  box-shadow:
+    0 8px 0 rgba(10, 16, 11, 0.46),
+    0 0 0 2.5px #ffd778,
+    0 0 32px rgba(255, 184, 66, 0.34),
+    0 20px 44px rgba(0, 0, 0, 0.54);
+}
+
+@keyframes vhCardRise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.vh-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 900;
+  font-size: 11.5px;
+  letter-spacing: 0.05em;
+  color: #ffe39e;
+}
+
+.vh-meta-actor {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vh-meta-world {
+  color: rgba(255, 248, 234, 0.78);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.vh-quote {
+  margin: 0 0 9px;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: clamp(17px, 2.8vw, 24px);
+  line-height: 1.16;
+  color: #fff8ea;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.52);
+}
+
+.vh-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.vh-controls-left,
+.vh-controls-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.vh-share-quick-btn,
+.vh-preview-quick-btn {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 15px;
+  border-radius: 999px;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.1s, filter 0.15s;
+}
+
+.vh-share-quick-btn {
+  background: linear-gradient(180deg, #ffe18d 0%, #ffb842 100%);
+  color: #492c04;
+  box-shadow: 0 3px 0 rgba(120, 76, 8, 0.4), 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.vh-preview-quick-btn {
+  background: rgba(255, 248, 234, 0.16);
+  border: 1.5px solid rgba(255, 224, 140, 0.58);
+  color: #fff8ea;
+  font-size: 13px;
+  padding: 6px 13px;
+}
+
+.vh-share-quick-btn:hover,
+.vh-preview-quick-btn:hover {
+  filter: brightness(1.07);
+  transform: translateY(-1px);
+}
+
+.vh-share-quick-btn:active,
+.vh-preview-quick-btn:active {
+  transform: translateY(2px);
+}
+
+.vh-skip-btn {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: #fff8ea;
+  border: 1.5px solid #ffffff;
+  color: #1c2a1f;
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: 0 2px 0 rgba(10, 16, 11, 0.5), 0 4px 12px rgba(0, 0, 0, 0.35);
+  transition: background 0.15s, transform 0.1s;
+}
+
+.vh-skip-btn.compact {
+  padding: 6px 14px;
+  font-size: 12.5px;
+}
+
+/* The replay is ~12 s between rounds: the way out has to be obvious from the first frame */
+.vh-skip-btn.primary {
+  padding: 7px 18px;
+  font-size: 15px;
+  white-space: nowrap;
+  animation: vhSkipPulse 1.5s ease-out 0.25s 3 both;
+}
+
+@keyframes vhSkipPulse {
+  0% {
+    box-shadow: 0 2px 0 rgba(10, 16, 11, 0.5), 0 0 0 0 rgba(255, 248, 234, 0.75);
+  }
+  100% {
+    box-shadow: 0 2px 0 rgba(10, 16, 11, 0.5), 0 0 0 14px rgba(255, 248, 234, 0);
+  }
+}
+
+.vh-skip-btn:hover {
+  background: #ffffff;
+}
+
+.vh-skip-btn:active {
+  transform: translateY(1px);
+}
+
+.vh-progress-track {
+  margin-top: 8px;
+  width: 100%;
+  height: 5.5px;
+  border-radius: 999px;
+  background: rgba(255, 248, 234, 0.18);
+  overflow: hidden;
+}
+
+.vh-progress-fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #69c85a 0%, #ffb842 52%, #ff5f45 100%);
+  transition: width 0.05s linear;
+}
+
+.vh-letterbox-hint {
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 800;
+  font-size: 12px;
+  color: rgba(255, 248, 234, 0.78);
+  letter-spacing: 0.04em;
+}
+
+/* --------------------------------------------------------------------------
+ * 2. 9:16 Vertical Social Video Clip Preview Modal (#vhClipModal)
+ * -------------------------------------------------------------------------- */
+#vhClipModal {
+  position: fixed;
+  inset: 0;
+  z-index: 48;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: calc(env(safe-area-inset-top, 0px) + 12px) 14px calc(env(safe-area-inset-bottom, 0px) + 12px);
+  background: rgba(10, 16, 12, 0.80);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#vhClipModal.on {
+  display: flex;
+  animation: vhFadeIn 0.2s ease-out both;
+}
+
+.vh-modal-card {
+  position: relative;
+  width: min(94vw, 430px);
+  max-height: 94vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px 16px;
+  border-radius: 28px;
+  background: linear-gradient(180deg, #213225 0%, #162219 100%);
+  color: #fff8ea;
+  box-shadow:
+    0 12px 0 rgba(8, 13, 9, 0.55),
+    0 0 0 2.5px rgba(255, 184, 66, 0.82),
+    0 28px 64px rgba(0, 0, 0, 0.65);
+  animation: vhCardRise 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.vh-modal-hdr {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.vh-modal-title-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.vh-modal-kicker {
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 900;
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #ffd984;
+}
+
+.vh-modal-title {
+  margin: 0;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 17px;
+  color: #fff8ea;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vh-modal-close-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 248, 234, 0.32);
+  background: rgba(255, 248, 234, 0.12);
+  color: #fff8ea;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.14s, transform 0.1s;
+}
+
+.vh-modal-close-btn:hover {
+  background: rgba(255, 94, 87, 0.38);
+  border-color: rgba(255, 160, 150, 0.65);
+}
+
+.vh-phone-frame {
+  position: relative;
+  aspect-ratio: 9 / 16;
+  height: min(56vh, 470px);
+  max-width: 100%;
+  border-radius: 22px;
+  overflow: hidden;
+  background: #0f1712;
+  box-shadow:
+    0 0 0 3px #ffb842,
+    0 0 0 6px rgba(255, 248, 234, 0.14),
+    0 16px 36px rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#vhClipPreviewVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background: #0f1712;
+}
+
+.vh-clip-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 18px;
+  text-align: center;
+  background: rgba(14, 22, 16, 0.78);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: #fff8ea;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-size: 14px;
+}
+
+.vh-clip-loading.on {
+  display: flex;
+}
+
+/* Clip still recording: the phone frame shows the 9:16 replay live, the notice shrinks to a bottom strip */
+.vh-clip-loading.live {
+  inset: auto 0 0 0;
+  flex-direction: row;
+  gap: 8px;
+  padding: 9px 12px;
+  font-size: 12.5px;
+  background: linear-gradient(180deg, rgba(14, 22, 16, 0) 0%, rgba(14, 22, 16, 0.86) 45%);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.vh-clip-loading.live .vh-spinner {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-width: 2.5px;
+}
+
+.vh-clip-loading.live span {
+  white-space: nowrap;
+}
+
+.vh-spinner {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 3.5px solid rgba(255, 248, 234, 0.22);
+  border-top-color: #ffb842;
+  animation: vhSpin 0.75s linear infinite;
+}
+
+@keyframes vhSpin {
+  to { transform: rotate(360deg); }
+}
+
+.vh-modal-caption {
+  margin: 0;
+  width: 100%;
+  text-align: center;
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 800;
+  font-size: 13px;
+  line-height: 1.28;
+  color: #ffefc6;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.vh-modal-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vh-modal-primary-btn {
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(180deg, #ffdf85 0%, #ff9f2e 100%);
+  color: #3d2102;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 15.5px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(124, 64, 6, 0.48), 0 8px 20px rgba(0, 0, 0, 0.34);
+  transition: transform 0.1s, filter 0.14s;
+}
+
+.vh-modal-primary-btn:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+.vh-modal-primary-btn:active {
+  transform: translateY(2px);
+}
+
+.vh-modal-secondary-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.vh-modal-sec-btn {
+  padding: 8.5px 10px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255, 248, 234, 0.28);
+  background: rgba(255, 248, 234, 0.12);
+  color: #fff8ea;
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 900;
+  font-size: 12.5px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background 0.14s, transform 0.1s;
+}
+
+.vh-modal-sec-btn:hover {
+  background: rgba(255, 248, 234, 0.22);
+}
+
+.vh-modal-sec-btn:active {
+  transform: translateY(1px);
+}
+
+/* --------------------------------------------------------------------------
+ * 3. Post-Elimination Active Spectator Bar (#vhSpectatorBar)
+ * -------------------------------------------------------------------------- */
+body.vh-spectating-active #specBar {
+  display: none !important;
+}
+
+#vhSpectatorBar {
+  position: absolute;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
+  transform: translateX(-50%);
+  z-index: 5;
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  max-width: min(95vw, 720px);
+  padding: 8px 13px;
+  border-radius: 999px;
+  background: rgba(28, 40, 29, 0.86);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #fff8ea;
+  box-shadow:
+    0 5px 0 rgba(14, 22, 15, 0.38),
+    0 0 0 2px rgba(255, 184, 66, 0.58),
+    0 14px 32px rgba(0, 0, 0, 0.34);
+  animation: vhSpecSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+#vhSpectatorBar.hidden {
+  display: none !important;
+}
+
+@keyframes vhSpecSlideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 14px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+.vh-spec-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px;
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 800;
+  font-size: 13px;
+  color: #fff8ea;
+  white-space: nowrap;
+  max-width: 56vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vh-spec-info b {
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  color: #ffe39a;
+}
+
+.vh-spec-info em {
+  font-style: normal;
+  color: #bfe6b0;
+  font-weight: 800;
+}
+
+.vh-spec-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.vh-spec-btn {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: rgba(255, 248, 234, 0.15);
+  border: 1px solid rgba(255, 248, 234, 0.28);
+  color: #fff8ea;
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 900;
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.14s, transform 0.1s;
+}
+
+.vh-spec-btn:hover {
+  background: rgba(255, 248, 234, 0.26);
+}
+
+.vh-spec-btn:active {
+  transform: translateY(1.5px);
+}
+
+.vh-spec-btn.clip {
+  background: linear-gradient(180deg, #ffe291 0%, #ffb842 100%);
+  border-color: #ffe8a8;
+  color: #4a2d04;
+  box-shadow: 0 2px 0 rgba(120, 76, 8, 0.34);
+}
+
+/* --------------------------------------------------------------------------
+ * 4. Celebratory Viral Share Toast (#vhShareToast)
+ * -------------------------------------------------------------------------- */
+#vhShareToast {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 16px);
+  left: 50%;
+  transform: translate(-50%, -18px);
+  z-index: 62;
+  pointer-events: none;
+  padding: 10px 20px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fffdf6 0%, #ffefc6 100%);
+  color: #3b2806;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 14.5px;
+  text-align: center;
+  max-width: min(92vw, 540px);
+  box-shadow:
+    0 5px 0 rgba(120, 78, 12, 0.28),
+    0 0 0 2.5px #ffb842,
+    0 16px 36px rgba(14, 22, 15, 0.38);
+  opacity: 0;
+  transition: opacity 0.24s ease, transform 0.28s cubic-bezier(0.2, 1.4, 0.36, 1);
+}
+
+#vhShareToast.on {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* Mobile Responsive Refinements */
+@media (max-width: 640px) {
+  .vh-letterbox.top {
+    height: clamp(36px, 6.2vh, 50px);
+  }
+
+  .vh-skip-btn.primary {
+    padding: 5px 15px;
+    font-size: 14px;
+  }
+
+  .vh-letterbox.bottom {
+    min-height: clamp(34px, 5.8vh, 48px);
+  }
+
+  .vh-badge-wrap {
+    top: calc(clamp(36px, 6.2vh, 50px) + env(safe-area-inset-top, 0px) + 8px);
+  }
+
+  .vh-climax-wrap {
+    top: calc(clamp(36px, 6.2vh, 50px) + env(safe-area-inset-top, 0px) + 46px);
+  }
+
+  .vh-lower-third {
+    padding: 9px 12px 9px;
+    border-radius: 18px;
+  }
+
+  .vh-quote {
+    font-size: 16px;
+    margin-bottom: 7px;
+  }
+
+  .vh-phone-frame {
+    height: min(48vh, 390px);
+  }
+
+  #vhSpectatorBar {
+    border-radius: 20px;
+    padding: 7px 10px;
+    gap: 6px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+  }
+
+  .vh-spec-info {
+    font-size: 12px;
+    max-width: 84vw;
+  }
+
+  .vh-spec-btn {
+    padding: 4.5px 9px;
+    font-size: 11.5px;
+  }
+}
+
+/* Landscape phones: keep the lower-third out of the middle of the picture — that is where the hero is */
+@media (max-height: 480px) {
+  .vh-lower-third {
+    padding: 7px 12px 8px;
+    border-radius: 16px;
+  }
+
+  .vh-meta-row {
+    display: none;
+  }
+
+  .vh-quote {
+    font-size: 15px;
+    margin-bottom: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .vh-share-quick-btn {
+    padding: 5px 12px;
+    font-size: 13px;
+  }
+
+  .vh-preview-quick-btn {
+    padding: 4px 11px;
+    font-size: 12px;
+  }
+
+  .vh-clip-loading.live {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+}

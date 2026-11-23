@@ -1,0 +1,26 @@
+{
+  "name": "Hue & Seek — 5v5 Storybook Prop Hunt",
+  "short_name": "Hue & Seek",
+  "description": "Cozy 5v5 Storybook 3D prop-hunt game — disguise as village props or splash hidden spirits!",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#f9f1e2",
+  "theme_color": "#f9f1e2",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    {
+      "src": "assets/app_icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/app_icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

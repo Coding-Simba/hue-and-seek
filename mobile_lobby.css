@@ -1,0 +1,3241 @@
+/* ==========================================================================
+ * Hue & Seek — Supercell / Apple-Arcade Grade Storybook Mobile Lobby
+ * & Widescreen Landscape Modals (mobile_lobby.css)
+ *
+ * Scoping & GPU Performance Contract:
+ *   • Every lobby & modal override is strictly scoped under `html.is-mobile-touch`
+ *     so desktop browsers remain 100% unchanged.
+ *   • Zero Gaussian blur layers over the live 60 FPS WebGL canvas: uses crisp
+ *     98% opaque Storybook parchment gradients (#fffbf2 -> #f5ecda) and
+ *     clean dark modal scrims (rgba(20, 30, 20, 0.62)).
+ *   • `#mobHeroLogo` bobs strictly on GPU `transform: translate3d(0, -4px, 0)`
+ *     with `will-change: transform` and a static radial halo `::before`.
+ *   • Lobby entrance & modal open/close animations are 160ms `transform` + `opacity`
+ *     only, with zero layout-thrashing transitions.
+ * ========================================================================== */
+
+/* --------------------------------------------------------------------------
+ * 0. Global Safe Defaults (Hidden on Desktop — Zero Visual Impact)
+ * -------------------------------------------------------------------------- */
+#mobLobbyShell,
+#mobWorldModal,
+#mobProfileModal,
+#mobPartyModal,
+#mobMapTransition {
+  display: none;
+}
+
+#mobRotateGuard {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: max(24px, env(safe-area-inset-top, 0px))
+           max(24px, env(safe-area-inset-right, 0px))
+           max(24px, env(safe-area-inset-bottom, 0px))
+           max(24px, env(safe-area-inset-left, 0px));
+  background:
+    radial-gradient(75% 60% at 50% 42%, #fffcf3 0%, #f9f1e2 62%, #efe3cc 100%);
+  color: var(--ink, #33402f);
+  text-align: center;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Show Rotate Guard on portrait mobile browsers unless explicitly disabled */
+html.is-mobile-touch #mobRotateGuard.on:not([data-guard-disabled="1"]) {
+  display: flex;
+}
+
+@media (pointer: coarse) and (orientation: portrait) {
+  #mobRotateGuard.on:not([data-guard-disabled="1"]) {
+    display: flex;
+  }
+}
+
+.mob-rg-logo-wrap {
+  position: relative;
+  width: 148px;
+  height: 148px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(
+    50% 50% at 50% 54%,
+    rgba(40, 52, 34, 0.18) 0%,
+    rgba(40, 52, 34, 0) 76%
+  );
+}
+
+.mob-rg-logo-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.mob-rg-phone-anim {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #fffdf7 0%, #f2e6ce 100%);
+  box-shadow:
+    0 4px 0 rgba(70, 82, 56, 0.2),
+    inset 0 0 0 2px #e5d6b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mob-rg-phone-svg {
+  width: 38px;
+  height: 38px;
+  color: #3f6e31;
+  will-change: transform;
+  animation: mobPhoneTilt 2.4s cubic-bezier(0.34, 1.36, 0.64, 1) infinite;
+}
+
+@keyframes mobPhoneTilt {
+  0%, 18% { transform: rotate(0deg) scale(0.96); }
+  52%, 78% { transform: rotate(-90deg) scale(1.05); }
+  100% { transform: rotate(0deg) scale(0.96); }
+}
+
+.mob-rg-title {
+  margin: 2px 0 0;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 23px;
+  line-height: 1.15;
+  color: #2e3c2a;
+}
+
+.mob-rg-sub {
+  margin: 0;
+  max-width: 280px;
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 800;
+  font-size: 13.5px;
+  line-height: 1.35;
+  color: #657558;
+}
+
+/* --------------------------------------------------------------------------
+ * 1. Spacious Storybook Landscape Home Screen (`html.is-mobile-touch #title`)
+ * -------------------------------------------------------------------------- */
+html.is-mobile-touch #title {
+  padding: 0 !important;
+  gap: 0 !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+
+/* Visually hide stacked desktop boxes while keeping 100% of their DOM & listeners intact */
+html.is-mobile-touch #title > #btnTitleQuality,
+html.is-mobile-touch #title > .title-head,
+html.is-mobile-touch #title > .world-picker,
+html.is-mobile-touch #title > .player-row,
+html.is-mobile-touch #title > #progStrip,
+html.is-mobile-touch #title > .prog-strip,
+html.is-mobile-touch #title > .modes,
+html.is-mobile-touch #title > .note {
+  display: none !important;
+}
+
+html.is-mobile-touch #title #mobLobbyShell {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Ultra-snappy 160ms GPU-only lobby entrance (transform + opacity only) */
+html.is-mobile-touch #title.on #mobTopBar {
+  animation: mobTopBarEnter 160ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+html.is-mobile-touch #title.on #mobBottomDock {
+  animation: mobBottomDockEnter 160ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes mobTopBarEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes mobBottomDockEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Gentle top/bottom sunlit scrims — keeps center 65% of live 3D Storybook village crystal-clear */
+html.is-mobile-touch .mob-scrim-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 76px;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(22, 36, 28, 0.34) 0%,
+    rgba(28, 44, 32, 0.11) 58%,
+    rgba(28, 44, 32, 0) 100%
+  );
+}
+
+html.is-mobile-touch .mob-scrim-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 102px;
+  pointer-events: none;
+  background: linear-gradient(
+    0deg,
+    rgba(18, 30, 20, 0.42) 0%,
+    rgba(24, 38, 26, 0.14) 58%,
+    rgba(24, 38, 26, 0) 100%
+  );
+}
+
+/* ---- Top HUD Bar (#mobTopBar, ~46px height) ---- */
+html.is-mobile-touch #mobTopBar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 46px;
+  padding: max(8px, calc(env(safe-area-inset-top, 0px) + 6px))
+           max(16px, calc(env(safe-area-inset-right, 0px) + 14px))
+           0
+           max(16px, calc(env(safe-area-inset-left, 0px) + 14px));
+  pointer-events: none;
+}
+
+/* Top-Left: Player Profile Pill + Cozy Friends Party Pill */
+html.is-mobile-touch .mob-top-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  pointer-events: none;
+}
+
+html.is-mobile-touch #mobProfileBtn {
+  pointer-events: auto;
+  touch-action: manipulation;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 4px 11px 4px 7px;
+  border-radius: 999px;
+  background-color: #fffbf2;
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 251, 242, 0.985) 0%,
+    rgba(245, 236, 218, 0.985) 100%
+  );
+  box-shadow:
+    0 3.5px 0 rgba(36, 48, 32, 0.3),
+    0 0 0 1.5px rgba(226, 208, 174, 0.92),
+    0 8px 18px rgba(16, 26, 16, 0.22),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.9);
+  color: var(--ink, #33402f);
+  text-align: left;
+  max-width: min(36vw, 240px);
+  transition: transform 120ms cubic-bezier(0.22, 1, 0.36, 1), opacity 120ms ease-out;
+}
+
+html.is-mobile-touch #mobProfileBtn:active {
+  transform: translate3d(0, 2px, 0) scale(0.985);
+}
+
+html.is-mobile-touch #mobPartyBtn {
+  pointer-events: auto;
+  touch-action: manipulation;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 42px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fff5dc 0%, #ffd98a 100%);
+  box-shadow:
+    0 3.5px 0 #b37412,
+    0 0 0 1.5px rgba(255, 224, 150, 0.95),
+    0 8px 18px rgba(18, 28, 16, 0.24),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.88);
+  color: #4d2f04;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: transform 120ms cubic-bezier(0.22, 1, 0.36, 1), opacity 120ms ease-out;
+}
+
+html.is-mobile-touch #mobPartyBtn:active {
+  transform: translate3d(0, 2px, 0) scale(0.975);
+}
+
+html.is-mobile-touch #mobPartyBtn .mob-party-live-dot {
+  display: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #38c92e;
+  box-shadow: 0 0 0 2px #f2ffea;
+  flex-shrink: 0;
+}
+
+html.is-mobile-touch #mobPartyBtn.in-party {
+  background: linear-gradient(180deg, #e7fcdb 0%, #b5ec97 100%);
+  color: #1f4d16;
+  box-shadow:
+    0 3.5px 0 #2e7820,
+    0 0 0 2px #7fe05e,
+    0 8px 20px rgba(38, 128, 26, 0.34),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.92);
+}
+
+html.is-mobile-touch #mobPartyBtn.in-party .mob-party-live-dot {
+  display: inline-block;
+  animation: mobShopPulse 1.6s ease-in-out infinite;
+}
+
+html.is-mobile-touch .mob-prof-avatar-wrap {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #e7f5dc 0%, #cbe6b8 100%);
+  box-shadow: inset 0 0 0 1.5px #96c77c;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+
+html.is-mobile-touch .mob-prof-online {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #52c443;
+  box-shadow: 0 0 0 2px #fffbf2;
+}
+
+html.is-mobile-touch .mob-prof-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  min-width: 0;
+}
+
+html.is-mobile-touch .mob-prof-top-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+html.is-mobile-touch #mobGamertagTxt {
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.05;
+  color: #2c3a28;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 128px;
+}
+
+html.is-mobile-touch #mobLvBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1.5px 7px;
+  border-radius: 999px;
+  background: #e1f2d5;
+  box-shadow: inset 0 0 0 1px #a2cf89;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 10.5px;
+  line-height: 1.1;
+  color: #325c24;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+html.is-mobile-touch .mob-xp-mini-track {
+  width: 100%;
+  min-width: 96px;
+  height: 5px;
+  border-radius: 999px;
+  background: #e3dbc7;
+  box-shadow: inset 0 1px 2px rgba(45, 56, 38, 0.16);
+  overflow: hidden;
+}
+
+html.is-mobile-touch #mobXpMiniFill {
+  display: block;
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #56a644 0%, #87d668 100%);
+}
+
+html.is-mobile-touch .mob-prof-edit-ic {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #efe7d4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+/* Top-Right: Economy, Wardrobe & Audio Cluster */
+html.is-mobile-touch .mob-top-cluster {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+html.is-mobile-touch #mobTokensPill {
+  touch-action: manipulation;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fff9e6 0%, #ffe8ab 100%);
+  box-shadow:
+    0 3.5px 0 rgba(120, 78, 12, 0.28),
+    0 8px 18px rgba(18, 28, 16, 0.2),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.88),
+    inset 0 0 0 1.5px #f0b643;
+  color: #513305;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transition: transform 140ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html.is-mobile-touch #mobTokensPill.bump {
+  transform: scale(1.1);
+}
+
+html.is-mobile-touch #mobTokensPill:active {
+  transform: translate3d(0, 2px, 0) scale(0.97);
+}
+
+html.is-mobile-touch #mobWardrobeBtn {
+  position: relative;
+  touch-action: manipulation;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 15px;
+  background: linear-gradient(180deg, #ffe49c 0%, #ffb73d 100%);
+  color: #4b2e04;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  box-shadow:
+    0 3.5px 0 #b57310,
+    0 8px 18px rgba(18, 28, 16, 0.24),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.72);
+  transition: transform 120ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html.is-mobile-touch #mobWardrobeBtn:active {
+  transform: translate3d(0, 2.5px, 0) scale(0.985);
+}
+
+html.is-mobile-touch #mobShopDot {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #4ec43f;
+  box-shadow: 0 0 0 2.5px #fffbf2;
+  will-change: transform;
+  animation: mobShopPulse 1.8s ease-in-out infinite;
+}
+
+html.is-mobile-touch #title:not(.on) #mobShopDot {
+  animation: none;
+  will-change: auto;
+}
+
+@keyframes mobShopPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.22); }
+}
+
+html.is-mobile-touch #mobLobbyQualityBtn {
+  touch-action: manipulation;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fff9e6 0%, #ffe8a8 100%);
+  box-shadow:
+    0 3.5px 0 rgba(120, 78, 12, 0.28),
+    0 8px 18px rgba(18, 28, 16, 0.2),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.88),
+    inset 0 0 0 1.5px #f0b643;
+  color: #4f3205;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 13.5px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 120ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html.is-mobile-touch #mobLobbyQualityBtn[data-tier="high"] {
+  background: linear-gradient(180deg, #f3fbeb 0%, #d6f0be 100%);
+  box-shadow:
+    0 3.5px 0 rgba(48, 86, 34, 0.28),
+    0 8px 18px rgba(18, 28, 16, 0.2),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.88),
+    inset 0 0 0 1.5px #96cf72;
+  color: #2c521e;
+}
+
+html.is-mobile-touch #mobLobbyQualityBtn[data-tier="battery"] {
+  background: linear-gradient(180deg, #fffbf2 0%, #f1e8d4 100%);
+  box-shadow:
+    0 3.5px 0 rgba(36, 48, 32, 0.28),
+    0 8px 18px rgba(18, 28, 16, 0.18),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.9),
+    inset 0 0 0 1.5px rgba(214, 198, 166, 0.92);
+  color: #384633;
+}
+
+html.is-mobile-touch #mobLobbyQualityBtn:active {
+  transform: translate3d(0, 2px, 0) scale(0.97);
+}
+
+html.is-mobile-touch #mobLobbyTutorialBtn,
+html.is-mobile-touch #mobLobbyMuteBtn {
+  touch-action: manipulation;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #fffbf2;
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 251, 242, 0.985) 0%,
+    rgba(245, 236, 218, 0.985) 100%
+  );
+  box-shadow:
+    0 3.5px 0 rgba(36, 48, 32, 0.3),
+    0 0 0 1.5px rgba(226, 208, 174, 0.92),
+    0 8px 18px rgba(18, 28, 16, 0.2),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.9);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: transform 120ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html.is-mobile-touch #mobLobbyTutorialBtn:active,
+html.is-mobile-touch #mobLobbyMuteBtn:active {
+  transform: translate3d(0, 2px, 0) scale(0.97);
+}
+
+/* ---- Hero Brand Emblem (#mobHeroLogo, Left-Center Showcase — Zero Filter!) ---- */
+html.is-mobile-touch #mobHeroLogo {
+  position: absolute;
+  left: max(22px, calc(env(safe-area-inset-left, 0px) + 18px));
+  top: 0;
+  bottom: 18px;
+  margin: auto 0;
+  width: clamp(148px, 43vh, 196px);
+  height: clamp(148px, 43vh, 196px);
+  max-width: calc(100dvh - 142px);
+  max-height: calc(100dvh - 142px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  animation: mobHeroBob 4.2s ease-in-out infinite;
+}
+
+/* Soft static radial shadow quad baked into the single promoted layer */
+html.is-mobile-touch #mobHeroLogo::before {
+  content: '';
+  position: absolute;
+  inset: -10%;
+  border-radius: 50%;
+  background: radial-gradient(
+    50% 50% at 50% 54%,
+    rgba(18, 30, 16, 0.34) 0%,
+    rgba(18, 30, 16, 0.13) 56%,
+    rgba(18, 30, 16, 0) 100%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+
+html.is-mobile-touch #title:not(.on) #mobHeroLogo {
+  animation: none;
+  will-change: auto;
+}
+
+@keyframes mobHeroBob {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -4px, 0); }
+}
+
+html.is-mobile-touch #mobHeroLogo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Graceful Storybook Crest Fallback if logo_mobile.png is unavailable */
+html.is-mobile-touch .mob-hero-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 14px 16px;
+  border-radius: 28px;
+  background: radial-gradient(80% 80% at 50% 35%, #fffbf2 0%, #f5ecda 100%);
+  box-shadow:
+    0 6px 0 #5b7e4c,
+    0 0 0 3px #ffd275,
+    0 14px 28px rgba(18, 28, 16, 0.38);
+  text-align: center;
+}
+
+html.is-mobile-touch .mob-fb-kicker {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: #4c6d3c;
+  text-transform: uppercase;
+}
+
+html.is-mobile-touch .mob-fb-title {
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1;
+  color: #2f3f2a;
+}
+
+html.is-mobile-touch .mob-fb-title em {
+  font-style: normal;
+  color: #e6951d;
+}
+
+html.is-mobile-touch .mob-fb-sub {
+  font-size: 10.5px;
+  font-weight: 900;
+  color: #6b7a5e;
+}
+
+/* ---- Bottom Action Dock (#mobBottomDock) ---- */
+html.is-mobile-touch #mobBottomDock {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0
+           max(16px, calc(env(safe-area-inset-right, 0px) + 14px))
+           max(10px, calc(env(safe-area-inset-bottom, 0px) + 8px))
+           max(16px, calc(env(safe-area-inset-left, 0px) + 14px));
+  pointer-events: none;
+}
+
+/* Bottom-Left: Active World Selector Card (#mobWorldCardBtn) */
+html.is-mobile-touch #mobWorldCardBtn {
+  pointer-events: auto;
+  touch-action: manipulation;
+  width: clamp(276px, 38vw, 344px);
+  height: 68px;
+  padding: 6px 10px 6px 7px;
+  border-radius: 20px;
+  background-color: #fffbf2;
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 251, 242, 0.985) 0%,
+    rgba(245, 236, 218, 0.985) 100%
+  );
+  box-shadow:
+    0 4px 0 rgba(42, 54, 34, 0.36),
+    0 0 0 2px rgba(255, 206, 108, 0.8),
+    0 12px 24px rgba(14, 24, 14, 0.3),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.92);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-align: left;
+  color: var(--ink, #33402f);
+  transition: transform 120ms cubic-bezier(0.22, 1, 0.36, 1), opacity 120ms ease-out;
+}
+
+html.is-mobile-touch #mobWorldCardBtn:active {
+  transform: translate3d(0, 3px, 0) scale(0.985);
+}
+
+html.is-mobile-touch .mob-wc-thumb {
+  position: relative;
+  width: 78px;
+  height: 54px;
+  border-radius: 13px;
+  overflow: hidden;
+  background: #8fb57a;
+  box-shadow: inset 0 0 0 1.5px rgba(45, 58, 36, 0.18);
+  flex-shrink: 0;
+}
+
+html.is-mobile-touch .mob-wc-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+html.is-mobile-touch .mob-wc-meta {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+}
+
+html.is-mobile-touch #mobWorldThemeBadge {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 1.5px 6px;
+  border-radius: 6px;
+  background: #e7dec7;
+  color: #4b5d40;
+  font-size: 8.5px;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+html.is-mobile-touch #mobWorldTitleTxt {
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 14.5px;
+  line-height: 1.1;
+  color: #2b3927;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+html.is-mobile-touch .mob-wc-ChangePill {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 5px 8px;
+  border-radius: 11px;
+  background: linear-gradient(180deg, #ffe7a4 0%, #ffc252 100%);
+  box-shadow: 0 2px 0 rgba(135, 88, 12, 0.28);
+  color: #4d3005;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+/* Bottom-Right: Dual Premium 3D Arcade Play Buttons (#mobPlayCluster) */
+html.is-mobile-touch #mobPlayCluster {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+html.is-mobile-touch .mob-play-btn {
+  touch-action: manipulation;
+  position: relative;
+  width: clamp(146px, 19.2vw, 166px);
+  height: 66px;
+  padding: 6px 12px 8px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: #ffffff;
+  overflow: hidden;
+  transition: transform 110ms cubic-bezier(0.22, 1, 0.36, 1), opacity 110ms ease-out;
+}
+
+/* Subtle top specular gloss band */
+html.is-mobile-touch .mob-play-btn::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 4px;
+  height: 38%;
+  border-radius: 14px 14px 40% 40%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.30) 0%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+}
+
+html.is-mobile-touch #mobPlayHideBtn {
+  background: linear-gradient(180deg, #5eb346 0%, #3f8e2e 100%);
+  box-shadow:
+    0 4px 0 #2a661d,
+    0 0 0 2px rgba(255, 251, 242, 0.88),
+    0 12px 24px rgba(18, 38, 14, 0.36),
+    inset 0 2px 0 rgba(255, 255, 255, 0.42);
+}
+
+html.is-mobile-touch #mobPlayHideBtn:active {
+  transform: translate3d(0, 3px, 0) scale(0.985);
+}
+
+html.is-mobile-touch #mobPlaySeekBtn {
+  background: linear-gradient(180deg, #3da5eb 0%, #227dc4 100%);
+  box-shadow:
+    0 4px 0 #16578c,
+    0 0 0 2px rgba(255, 251, 242, 0.88),
+    0 12px 24px rgba(12, 32, 52, 0.36),
+    inset 0 2px 0 rgba(255, 255, 255, 0.42);
+}
+
+html.is-mobile-touch #mobPlaySeekBtn:active {
+  transform: translate3d(0, 3px, 0) scale(0.985);
+}
+
+html.is-mobile-touch .mob-play-main {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 17.5px;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  text-shadow: 0 2px 0 rgba(16, 40, 20, 0.48);
+  white-space: nowrap;
+}
+
+html.is-mobile-touch #mobPlaySeekBtn .mob-play-main {
+  text-shadow: 0 2px 0 rgba(12, 46, 78, 0.52);
+}
+
+html.is-mobile-touch .mob-play-sub {
+  position: relative;
+  z-index: 1;
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 900;
+  font-size: 11px;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  color: rgba(255, 252, 242, 0.94);
+  white-space: nowrap;
+}
+
+/* Narrower landscape phones (e.g. 667x375 iPhone SE) */
+@media (max-width: 720px) {
+  html.is-mobile-touch .mob-top-left {
+    gap: 6px;
+  }
+
+  html.is-mobile-touch #mobProfileBtn {
+    max-width: 186px;
+    padding-right: 8px;
+  }
+
+  html.is-mobile-touch #mobGamertagTxt {
+    max-width: 84px;
+    font-size: 13px;
+  }
+
+  html.is-mobile-touch .mob-xp-mini-track {
+    min-width: 72px;
+  }
+
+  html.is-mobile-touch #mobPartyBtn {
+    height: 38px;
+    padding: 0 11px;
+    font-size: 12.5px;
+  }
+
+  html.is-mobile-touch .mob-top-cluster {
+    gap: 6px;
+  }
+
+  html.is-mobile-touch #mobWorldCardBtn {
+    width: 232px;
+    height: 62px;
+  }
+
+  html.is-mobile-touch .mob-wc-thumb {
+    width: 66px;
+    height: 48px;
+  }
+
+  html.is-mobile-touch .mob-play-btn {
+    width: 140px;
+    height: 62px;
+  }
+
+  html.is-mobile-touch .mob-play-main {
+    font-size: 15.5px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * 1B. Cozy Sunlit Map-Switch Transition Veil & Pill (#mobMapTransition)
+ * -------------------------------------------------------------------------- */
+html.is-mobile-touch #mobMapTransition {
+  position: absolute;
+  inset: 0;
+  z-index: 36;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 180ms ease-out, visibility 0s linear 180ms;
+}
+
+html.is-mobile-touch #mobMapTransition.on {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 110ms ease-out, visibility 0s linear 0s;
+}
+
+html.is-mobile-touch #mobMapTransitionCurtain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    72% 66% at 50% 50%,
+    rgba(255, 251, 242, 0.32) 0%,
+    rgba(245, 236, 218, 0.5) 100%
+  );
+}
+
+html.is-mobile-touch .mob-map-transition-pill {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  background-color: #fffbf2;
+  background-image: linear-gradient(180deg, #fffbf2 0%, #f5ecda 100%);
+  box-shadow:
+    0 4px 0 rgba(42, 54, 34, 0.34),
+    0 0 0 2px rgba(255, 202, 102, 0.88),
+    0 14px 30px rgba(16, 26, 16, 0.32);
+  color: #2c3a28;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 15.5px;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  transform: translate3d(0, 6px, 0) scale(0.97);
+  transition: transform 110ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html.is-mobile-touch #mobMapTransition.on .mob-map-transition-pill {
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+/* --------------------------------------------------------------------------
+ * 2. Dedicated Clean Sub-Modals (#mobWorldModal, #mobProfileModal & #mobPartyModal)
+ *    160ms GPU transform + opacity open/close, clean dark scrim, zero blur
+ * -------------------------------------------------------------------------- */
+html.is-mobile-touch #mobWorldModal,
+html.is-mobile-touch #mobProfileModal,
+html.is-mobile-touch #mobPartyModal,
+#mobPartyModal.on {
+  position: absolute;
+  inset: 0;
+  z-index: 34;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(8px, env(safe-area-inset-top, 0px))
+           max(14px, calc(env(safe-area-inset-right, 0px) + 10px))
+           max(8px, env(safe-area-inset-bottom, 0px))
+           max(14px, calc(env(safe-area-inset-left, 0px) + 10px));
+  background: rgba(20, 30, 20, 0.62);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 160ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 160ms;
+}
+
+html.is-mobile-touch #mobWorldModal.on,
+html.is-mobile-touch #mobProfileModal.on,
+html.is-mobile-touch #mobPartyModal.on,
+#mobPartyModal.on {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 160ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 0s;
+}
+
+html.is-mobile-touch .mob-modal-card,
+#mobPartyModal.on .mob-modal-card {
+  background-color: #fffbf2;
+  background-image: linear-gradient(180deg, #fffbf2 0%, #f5ecda 100%);
+  color: var(--ink, #33402f);
+  border-radius: 24px;
+  box-shadow:
+    0 8px 0 rgba(38, 50, 32, 0.36),
+    0 0 0 2.5px rgba(255, 198, 92, 0.72),
+    0 22px 48px rgba(12, 20, 12, 0.48);
+  max-height: calc(100dvh - 16px);
+  overflow: hidden;
+  opacity: 0;
+  transform: translate3d(0, 8px, 0) scale(0.97);
+  transition:
+    transform 160ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 160ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html.is-mobile-touch #mobWorldModal.on .mob-modal-card,
+html.is-mobile-touch #mobProfileModal.on .mob-modal-card,
+html.is-mobile-touch #mobPartyModal.on .mob-modal-card,
+#mobPartyModal.on .mob-modal-card {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+html.is-mobile-touch .mob-modal-hdr,
+#mobPartyModal .mob-modal-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 8px;
+  margin-bottom: 9px;
+  border-bottom: 2px solid #ebe0c8;
+}
+
+html.is-mobile-touch .mob-modal-title-group,
+#mobPartyModal .mob-modal-title-group {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+html.is-mobile-touch .mob-modal-title-group h2,
+#mobPartyModal .mob-modal-title-group h2 {
+  margin: 0;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 18.5px;
+  line-height: 1.1;
+  color: #2c3a28;
+  white-space: nowrap;
+}
+
+html.is-mobile-touch .mob-modal-pill,
+#mobPartyModal .mob-modal-pill {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #eae0c9;
+  color: #48593e;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+html.is-mobile-touch .mob-modal-close,
+#mobPartyModal .mob-modal-close {
+  touch-action: manipulation;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #ede4d0;
+  color: #3a4835;
+  font-size: 15px;
+  font-weight: 900;
+  box-shadow: 0 2.5px 0 rgba(55, 66, 45, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 110ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html.is-mobile-touch .mob-modal-close:active,
+#mobPartyModal .mob-modal-close:active {
+  transform: translate3d(0, 2px, 0);
+}
+
+/* 2A. #mobWorldModal — 3x2 Widescreen Storybook World Gallery (fits 390px height cleanly) */
+html.is-mobile-touch .mob-world-dialog {
+  width: min(94vw, 780px);
+  padding: 11px 15px 13px;
+}
+
+html.is-mobile-touch #mobWorldModalGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+
+html.is-mobile-touch .mob-wcard {
+  touch-action: manipulation;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 5px 5px 6px;
+  border-radius: 16px;
+  background: #efe6d2;
+  box-shadow: 0 3px 0 rgba(56, 68, 46, 0.2);
+  text-align: left;
+  color: var(--ink, #33402f);
+  transition: transform 110ms cubic-bezier(0.22, 1, 0.36, 1), opacity 110ms ease-out;
+}
+
+html.is-mobile-touch .mob-wcard:active {
+  transform: translate3d(0, 2px, 0) scale(0.985);
+}
+
+html.is-mobile-touch .mob-wcard.active {
+  background: #fffdf6;
+  box-shadow:
+    0 4px 0 #cf861f,
+    0 0 0 3px #ffb946,
+    0 8px 18px rgba(34, 44, 24, 0.24);
+}
+
+html.is-mobile-touch .mob-wcard-art {
+  position: relative;
+  width: 100%;
+  height: clamp(74px, 23dvh, 94px);
+  border-radius: 11px;
+  overflow: hidden;
+  background: #8fb57a;
+}
+
+html.is-mobile-touch .mob-wcard-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+html.is-mobile-touch .mob-wcard-badge {
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  padding: 2px 7px;
+  border-radius: 7px;
+  background: rgba(20, 30, 22, 0.84);
+  color: #fffbf2;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+html.is-mobile-touch .mob-wcard-check {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffe494 0%, #ffb73b 100%);
+  color: #4c2f04;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  box-shadow: 0 2px 0 rgba(90, 56, 6, 0.28);
+}
+
+html.is-mobile-touch .mob-wcard-lock {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  padding: 2.5px 8px;
+  border-radius: 999px;
+  background: rgba(38, 28, 20, 0.9);
+  color: #ffe298;
+  font-size: 9.5px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.34), inset 0 0 0 1px rgba(255, 208, 108, 0.55);
+}
+
+html.is-mobile-touch .mob-wcard.is-locked {
+  background: #e3dac6;
+  opacity: 0.9;
+}
+
+html.is-mobile-touch .mob-wcard.is-locked .mob-wcard-art img {
+  filter: saturate(0.42) brightness(0.72);
+}
+
+html.is-mobile-touch .mob-wcard.is-locked .mob-wcard-name {
+  color: #636c5b;
+}
+
+html.is-mobile-touch .mob-wcard.locked-shake {
+  animation: mobWcardShake 0.32s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+@keyframes mobWcardShake {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  25% { transform: translate3d(-4px, 0, 0); }
+  50% { transform: translate3d(4px, 0, 0); }
+  75% { transform: translate3d(-3px, 0, 0); }
+}
+
+html.is-mobile-touch .mob-wcard-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 5px 4px 0;
+}
+
+html.is-mobile-touch .mob-wcard-name {
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 13.5px;
+  line-height: 1.15;
+  color: #2c3a28;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 2B. #mobProfileModal — Gamertag & 7-Spirit Picker (fits 390px height cleanly) */
+html.is-mobile-touch .mob-profile-dialog {
+  width: min(92vw, 620px);
+  padding: 12px 16px 14px;
+}
+
+html.is-mobile-touch .mob-done-btn {
+  touch-action: manipulation;
+  height: 34px;
+  padding: 0 15px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #67ba4e 0%, #449431 100%);
+  color: #ffffff;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 14px;
+  box-shadow: 0 3px 0 #2b681d;
+  flex-shrink: 0;
+  transition: transform 110ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html.is-mobile-touch .mob-done-btn:active {
+  transform: translate3d(0, 2px, 0);
+}
+
+html.is-mobile-touch .mob-prof-sec {
+  padding: 9px 11px 10px;
+  border-radius: 17px;
+  background: #f1e8d5;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+html.is-mobile-touch .mob-prof-sec + .mob-prof-sec {
+  margin-top: 9px;
+}
+
+html.is-mobile-touch .mob-sec-lbl {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #57684c;
+}
+
+html.is-mobile-touch .mob-gt-editor-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+html.is-mobile-touch #mobNameMirrorInput {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 2px solid #dcd2bc;
+  background: #fffdf8;
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 800;
+  font-size: 16px !important;
+  color: var(--ink, #33402f);
+  outline: none;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+html.is-mobile-touch #mobNameMirrorInput:focus {
+  border-color: #f2a629;
+  box-shadow: 0 0 0 3px rgba(242, 166, 41, 0.22);
+}
+
+html.is-mobile-touch #mobRollNameBtn {
+  touch-action: manipulation;
+  height: 38px;
+  padding: 0 13px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffe69f 0%, #ffc04d 100%);
+  color: #4d3005;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 13.5px;
+  box-shadow: 0 3px 0 rgba(135, 88, 12, 0.28);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: transform 110ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html.is-mobile-touch #mobRollNameBtn:active {
+  transform: translate3d(0, 2px, 0);
+}
+
+html.is-mobile-touch #mobSpiritGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+}
+
+html.is-mobile-touch .mob-sp-choice {
+  touch-action: manipulation;
+  height: 42px;
+  padding: 0 9px;
+  border-radius: 13px;
+  background: #fffdf7;
+  box-shadow: 0 2.5px 0 rgba(56, 68, 46, 0.16);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 600;
+  font-size: 12.5px;
+  color: #364531;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: transform 110ms cubic-bezier(0.22, 1, 0.36, 1), opacity 110ms ease-out;
+}
+
+html.is-mobile-touch .mob-sp-choice:active {
+  transform: translate3d(0, 2px, 0);
+}
+
+html.is-mobile-touch .mob-sp-choice.active {
+  background: linear-gradient(180deg, #ffe49c 0%, #ffbf4e 100%);
+  color: #4c2f04;
+  font-weight: 700;
+  box-shadow:
+    0 2.5px 0 rgba(132, 86, 12, 0.3),
+    0 0 0 2px #f2a629;
+}
+
+/* 2C. #mobPartyModal — Storybook Friends Party Room (4-Digit Codes + Share Link) */
+#mobPartyModal .hidden {
+  display: none !important;
+}
+
+#mobPartyModal .mob-party-dialog {
+  position: relative;
+  width: min(94vw, 720px);
+  padding: 12px 16px 14px;
+}
+
+#mobPartyModal .mob-party-toast {
+  display: none;
+  margin: 0 0 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #e7fadb 0%, #c8eeb2 100%);
+  box-shadow:
+    0 2px 0 rgba(42, 92, 28, 0.24),
+    inset 0 0 0 1.5px #7ccf5e;
+  color: #214e17;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 12.5px;
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+
+#mobPartyModal .mob-party-toast.on {
+  display: block;
+  animation: mobTopBarEnter 140ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+#mobPartyModal .mob-party-toast.is-warn {
+  background: linear-gradient(180deg, #fff5d8 0%, #ffe19c 100%);
+  box-shadow:
+    0 2px 0 rgba(126, 78, 12, 0.24),
+    inset 0 0 0 1.5px #f0b138;
+  color: #5a3405;
+}
+
+/* Idle 2-Column Create / Join Cards */
+#mobPartyModal .mob-party-idle-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: stretch;
+}
+
+#mobPartyModal .mob-party-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 14px;
+  border-radius: 18px;
+  background: #f1e8d5;
+  box-shadow:
+    0 3px 0 rgba(56, 68, 46, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78);
+}
+
+#mobPartyModal .mob-party-card.is-create {
+  background: linear-gradient(180deg, #f5fbea 0%, #e4f3d2 100%);
+  box-shadow:
+    0 3px 0 rgba(48, 86, 34, 0.2),
+    inset 0 0 0 1.5px #a8d88c,
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.88);
+}
+
+#mobPartyModal .mob-party-card-top h3 {
+  margin: 0 0 5px;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.15;
+  color: #2b3a27;
+}
+
+#mobPartyModal .mob-party-card-top p {
+  margin: 0;
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 800;
+  font-size: 12px;
+  line-height: 1.32;
+  color: #59694e;
+}
+
+#mobPartyModal .mob-party-primary-btn {
+  touch-action: manipulation;
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #62b84a 0%, #3f912c 100%);
+  box-shadow:
+    0 3.5px 0 #28631b,
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.42);
+  color: #ffffff;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1.5px 0 rgba(18, 44, 14, 0.42);
+  transition: transform 110ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#mobPartyModal .mob-party-primary-btn:active {
+  transform: translate3d(0, 2px, 0) scale(0.985);
+}
+
+#mobPartyModal .mob-party-join-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#mobPartyModal #mobPartyCodeInput {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 44px;
+  padding: 0 10px;
+  border-radius: 13px;
+  border: 2px solid #d5cab0;
+  background: #fffdf8;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 20px !important;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-align: center;
+  color: #2b3a27;
+  outline: none;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+#mobPartyModal #mobPartyCodeInput::placeholder {
+  color: #b5aa92;
+  letter-spacing: 0.16em;
+}
+
+#mobPartyModal #mobPartyCodeInput:focus {
+  border-color: #f2a629;
+  box-shadow: 0 0 0 3px rgba(242, 166, 41, 0.24);
+}
+
+#mobPartyModal #mobPartyCodeInput.locked-shake {
+  animation: mobWcardShake 0.32s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+#mobPartyModal #mobPartyJoinBtn {
+  touch-action: manipulation;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 13px;
+  background: linear-gradient(180deg, #ffe39a 0%, #ffb63b 100%);
+  box-shadow:
+    0 3.5px 0 #b57210,
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.72);
+  color: #4b2e04;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 15px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: transform 110ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#mobPartyModal #mobPartyJoinBtn:active {
+  transform: translate3d(0, 2px, 0) scale(0.98);
+}
+
+/* Active Party 2-Column Widescreen View */
+#mobPartyModal .mob-party-active-grid {
+  display: grid;
+  grid-template-columns: 268px minmax(0, 1fr);
+  gap: 12px;
+  align-items: stretch;
+}
+
+#mobPartyModal .mob-party-col-code {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 11px 12px;
+  border-radius: 18px;
+  background: #f1e8d5;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+}
+
+#mobPartyModal .mob-party-role-tag {
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #3d642e;
+  text-align: center;
+}
+
+#mobPartyModal .mob-party-code-badge {
+  touch-action: manipulation;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 15px;
+  background: linear-gradient(180deg, #fffdf7 0%, #fff3d6 100%);
+  box-shadow:
+    0 3.5px 0 rgba(145, 96, 16, 0.26),
+    inset 0 0 0 2px #f2b84b;
+  color: #2c3b27;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 27px;
+  line-height: 1.08;
+  letter-spacing: 0.14em;
+  text-align: center;
+  transition: transform 110ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#mobPartyModal .mob-party-code-badge:active {
+  transform: translate3d(0, 2px, 0) scale(0.985);
+}
+
+#mobPartyModal .mob-party-invite-row {
+  display: grid;
+  grid-template-columns: 1.25fr 0.95fr;
+  gap: 7px;
+}
+
+#mobPartyModal #mobPartyShareBtn,
+#mobPartyModal #mobPartyCopyBtn {
+  touch-action: manipulation;
+  height: 36px;
+  padding: 0 9px;
+  border-radius: 11px;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 12px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: transform 110ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#mobPartyModal #mobPartyShareBtn {
+  background: linear-gradient(180deg, #ffe49c 0%, #ffb73d 100%);
+  color: #4b2e04;
+  box-shadow: 0 2.5px 0 #b57310;
+}
+
+#mobPartyModal #mobPartyCopyBtn {
+  background: #fffdf7;
+  color: #364531;
+  box-shadow:
+    0 2.5px 0 rgba(56, 68, 46, 0.2),
+    inset 0 0 0 1.5px #ddd2ba;
+}
+
+#mobPartyModal #mobPartyShareBtn:active,
+#mobPartyModal #mobPartyCopyBtn:active {
+  transform: translate3d(0, 2px, 0);
+}
+
+#mobPartyModal .mob-party-quickplay-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+#mobPartyModal .mob-party-play-btn {
+  touch-action: manipulation;
+  height: 40px;
+  padding: 0 8px;
+  border-radius: 12px;
+  color: #ffffff;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 13px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: transform 110ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#mobPartyModal .mob-party-play-btn.is-hide {
+  background: linear-gradient(180deg, #5eb346 0%, #3f8e2e 100%);
+  box-shadow: 0 3px 0 #2a661d;
+  text-shadow: 0 1.5px 0 rgba(16, 40, 20, 0.42);
+}
+
+#mobPartyModal .mob-party-play-btn.is-seek {
+  background: linear-gradient(180deg, #3da5eb 0%, #227dc4 100%);
+  box-shadow: 0 3px 0 #16578c;
+  text-shadow: 0 1.5px 0 rgba(12, 46, 78, 0.45);
+}
+
+#mobPartyModal .mob-party-play-btn:active {
+  transform: translate3d(0, 2px, 0) scale(0.98);
+}
+
+#mobPartyModal .mob-party-leave-btn {
+  touch-action: manipulation;
+  height: 31px;
+  border-radius: 10px;
+  background: #e6dcc7;
+  color: #6b4238;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 12px;
+  box-shadow: 0 2px 0 rgba(78, 52, 44, 0.18);
+  transition: transform 110ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#mobPartyModal .mob-party-leave-btn:active {
+  transform: translate3d(0, 1.5px, 0);
+}
+
+#mobPartyModal .mob-party-col-roster {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-height: min(62dvh, 252px);
+  padding: 10px 12px;
+  border-radius: 18px;
+  background: #f1e8d5;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+}
+
+#mobPartyModal .mob-party-roster-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+#mobPartyModal .mob-party-roster-hdr .mob-sec-lbl {
+  margin: 0;
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #57684c;
+}
+
+#mobPartyModal .mob-party-count-pill {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #dff3d2;
+  color: #2d5b21;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+
+#mobPartyModal #mobPartyRosterList {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  padding-right: 2px;
+}
+
+#mobPartyModal .mob-party-member {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 9px;
+  border-radius: 12px;
+  background: #fffdf8;
+  box-shadow: 0 2px 0 rgba(56, 68, 46, 0.12);
+}
+
+#mobPartyModal .mob-party-member.is-self {
+  background: linear-gradient(180deg, #f6fded 0%, #eaf8db 100%);
+  box-shadow:
+    0 2px 0 rgba(48, 86, 34, 0.16),
+    inset 0 0 0 1.5px #9fd482;
+}
+
+#mobPartyModal .mob-pm-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+#mobPartyModal .mob-pm-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #ece3ce;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+#mobPartyModal .mob-pm-name {
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 13px;
+  color: #2c3a28;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#mobPartyModal .mob-pm-you,
+#mobPartyModal .mob-pm-host {
+  padding: 1.5px 6px;
+  border-radius: 999px;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+#mobPartyModal .mob-pm-you {
+  background: #d8f2c8;
+  color: #27581b;
+}
+
+#mobPartyModal .mob-pm-host {
+  background: #ffe6a3;
+  color: #5b3905;
+}
+
+#mobPartyModal .mob-pm-right {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
+#mobPartyModal .mob-pm-role {
+  padding: 2.5px 8px;
+  border-radius: 999px;
+  background: #efe6d2;
+  color: #425339;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+#mobPartyModal .mob-pm-role.is-toggle {
+  touch-action: manipulation;
+  background: linear-gradient(180deg, #fff5dc 0%, #ffe19e 100%);
+  box-shadow: 0 1.5px 0 rgba(126, 82, 12, 0.24);
+  color: #4e3105;
+  cursor: pointer;
+}
+
+#mobPartyModal .mob-pm-ping {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 800;
+  font-size: 11px;
+  color: #637356;
+  font-variant-numeric: tabular-nums;
+}
+
+#mobPartyModal .mob-pm-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #48c23d;
+  display: inline-block;
+}
+
+#mobPartyModal .mob-party-ai-row {
+  margin-top: 2px;
+  padding: 7px 10px;
+  border-radius: 11px;
+  border: 1.5px dashed #cbbda0;
+  background: rgba(255, 252, 244, 0.65);
+  text-align: center;
+}
+
+#mobPartyModal .mob-party-ai-txt {
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 800;
+  font-size: 11.5px;
+  color: #5a6a4f;
+}
+
+@media (max-width: 680px) {
+  #mobPartyModal .mob-party-idle-grid,
+  #mobPartyModal .mob-party-active-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #mobPartyModal .mob-party-code-badge {
+    font-size: 22px;
+    padding: 6px 8px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * 3. Widescreen Non-Scrolling Game Modals (844x390 / 932x430 Landscape)
+ * -------------------------------------------------------------------------- */
+
+/* ---- 3.1 #queueScreen (2-Column Widescreen Matchmaking Lobby) ---- */
+html.is-mobile-touch #queueScreen {
+  padding: max(8px, env(safe-area-inset-top, 0px))
+           max(14px, calc(env(safe-area-inset-right, 0px) + 10px))
+           max(8px, env(safe-area-inset-bottom, 0px))
+           max(14px, calc(env(safe-area-inset-left, 0px) + 10px));
+  background: rgba(20, 30, 20, 0.62);
+}
+
+html.is-mobile-touch #queueScreen #qCard {
+  width: min(92vw, 760px);
+  max-height: calc(100dvh - 20px);
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
+  column-gap: 16px;
+  row-gap: 5px;
+  align-items: center;
+  justify-items: center;
+  padding: 13px 18px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #fffbf2 0%, #f5ecda 100%);
+  animation-duration: 160ms;
+}
+
+html.is-mobile-touch #queueScreen #qCard > .q-top-pill {
+  grid-column: 1;
+  grid-row: 1;
+  padding: 3px 11px;
+  font-size: 9.5px;
+}
+
+html.is-mobile-touch #queueScreen #qCard > #qWorldTitle {
+  grid-column: 1;
+  grid-row: 2;
+  margin: 1px 0 0;
+  font-size: 20px;
+  line-height: 1.1;
+}
+
+html.is-mobile-touch #queueScreen #qCard > #qRoleBadge {
+  grid-column: 1;
+  grid-row: 3;
+  padding: 3px 11px;
+  font-size: 11px;
+}
+
+html.is-mobile-touch #queueScreen #qCard > .q-clock-wrap {
+  grid-column: 1;
+  grid-row: 4;
+  margin: 3px 0;
+  padding: 6px 12px;
+  gap: 10px;
+  width: 100%;
+  justify-content: center;
+  border-radius: 16px;
+}
+
+html.is-mobile-touch #queueScreen .q-dial,
+html.is-mobile-touch #queueScreen .q-dial-svg {
+  width: 38px;
+  height: 38px;
+}
+
+html.is-mobile-touch #queueScreen .q-dial-ic {
+  font-size: 15px;
+}
+
+html.is-mobile-touch #queueScreen .q-clock b {
+  font-size: 21px;
+}
+
+html.is-mobile-touch #queueScreen .q-count {
+  padding-left: 10px;
+}
+
+html.is-mobile-touch #queueScreen .q-count b {
+  font-size: 20px;
+}
+
+html.is-mobile-touch #queueScreen #qCard > #qStatus {
+  grid-column: 1;
+  grid-row: 5;
+  margin: 1px 0;
+  font-size: 11.5px;
+  min-height: 15px;
+  line-height: 1.2;
+}
+
+html.is-mobile-touch #queueScreen #qCard > #btnCancelQueue {
+  grid-column: 1;
+  grid-row: 6;
+  flex: none;
+  width: 100%;
+  max-width: 186px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  font-size: 14.5px;
+}
+
+html.is-mobile-touch #queueScreen #qCard > .q-teams {
+  grid-column: 2;
+  grid-row: 1 / span 6;
+  width: 100%;
+  align-self: center;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+html.is-mobile-touch #queueScreen .q-col {
+  padding: 7px 8px 8px;
+  border-radius: 16px;
+  min-width: 0;
+}
+
+html.is-mobile-touch #queueScreen .q-col-hdr {
+  font-size: 12.5px;
+  padding: 0 4px 5px;
+}
+
+html.is-mobile-touch #queueScreen .q-slots {
+  gap: 4px;
+}
+
+html.is-mobile-touch #queueScreen .q-slot {
+  min-height: 29px;
+  padding: 3.5px 7px 3.5px 6px;
+  border-radius: 10px;
+  font-size: 11.5px;
+}
+
+html.is-mobile-touch #queueScreen .q-slot-txt {
+  font-size: 12.5px;
+}
+
+/* ---- 3.2 #vsScreen (5v5 Widescreen Match Intro — Zero Clipping) ---- */
+html.is-mobile-touch #vsScreen {
+  padding: max(6px, env(safe-area-inset-top, 0px))
+           max(14px, calc(env(safe-area-inset-right, 0px) + 10px))
+           max(6px, env(safe-area-inset-bottom, 0px))
+           max(14px, calc(env(safe-area-inset-left, 0px) + 10px));
+}
+
+html.is-mobile-touch #vsScreen .vs-stage {
+  width: min(94vw, 800px);
+  max-height: calc(100dvh - 12px);
+  gap: 7px;
+  overflow: hidden;
+}
+
+html.is-mobile-touch #vsScreen .vs-kicker {
+  padding: 2.5px 12px;
+  font-size: 9.5px;
+}
+
+html.is-mobile-touch #vsScreen .vs-banner h2 {
+  margin: 3px 0 0;
+  font-size: clamp(19px, 3.2vw, 24px);
+}
+
+html.is-mobile-touch #vsScreen .vs-arena {
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+html.is-mobile-touch #vsScreen .vs-team {
+  padding: 8px 10px 9px;
+  border-radius: 18px;
+  min-width: 0;
+}
+
+html.is-mobile-touch #vsScreen .vs-team-hdr {
+  padding: 0 2px 5px;
+  margin-bottom: 5px;
+}
+
+html.is-mobile-touch #vsScreen .vs-team.hiders .vs-team-hdr span,
+html.is-mobile-touch #vsScreen .vs-team.seekers .vs-team-hdr span {
+  font-size: 14px;
+}
+
+html.is-mobile-touch #vsScreen .vs-list {
+  gap: 4px;
+}
+
+html.is-mobile-touch #vsScreen .vs-player {
+  padding: 4px 8px;
+  border-radius: 10px;
+}
+
+html.is-mobile-touch #vsScreen .vs-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  font-size: 13px;
+}
+
+html.is-mobile-touch #vsScreen .vs-name {
+  font-size: 12.5px;
+}
+
+html.is-mobile-touch #vsScreen .vs-center {
+  width: 72px;
+  height: 72px;
+  margin: 0;
+}
+
+html.is-mobile-touch #vsScreen .vs-crest {
+  width: 66px;
+  height: 66px;
+}
+
+html.is-mobile-touch #vsScreen .vs-num {
+  font-size: 22px;
+}
+
+html.is-mobile-touch #vsScreen .vs-word {
+  font-size: 12px;
+  padding: 2px 5px;
+}
+
+html.is-mobile-touch #vsScreen .vs-foot {
+  gap: 3px;
+  width: min(82vw, 460px);
+}
+
+html.is-mobile-touch #vsScreen .vs-bar {
+  height: 7px;
+}
+
+html.is-mobile-touch #vsScreen #vsFootTxt {
+  font-size: 10.5px;
+}
+
+/* ---- 3.3 #halftimeScreen (2-Column Widescreen Side-Swap Card) ---- */
+html.is-mobile-touch #halftimeScreen {
+  padding: max(8px, env(safe-area-inset-top, 0px))
+           max(14px, calc(env(safe-area-inset-right, 0px) + 10px))
+           max(8px, env(safe-area-inset-bottom, 0px))
+           max(14px, calc(env(safe-area-inset-left, 0px) + 10px));
+}
+
+html.is-mobile-touch #halftimeScreen .hf-card {
+  width: min(94vw, 780px);
+  max-height: calc(100dvh - 18px);
+  overflow-y: auto;
+  padding: 12px 18px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #fffbf2 0%, #f5ecda 100%);
+  display: grid;
+  grid-template-columns: minmax(0, 0.94fr) minmax(0, 1.06fr);
+  column-gap: 16px;
+  row-gap: 5px;
+  align-items: center;
+  animation-duration: 160ms;
+}
+
+html.is-mobile-touch #halftimeScreen .hf-card > * {
+  grid-column: 1;
+}
+
+html.is-mobile-touch #halftimeScreen .hf-kicker,
+html.is-mobile-touch #halftimeScreen .hf-top-pill {
+  grid-row: 1;
+  justify-self: center;
+  padding: 3px 11px;
+  font-size: 10px;
+}
+
+html.is-mobile-touch #halftimeScreen .hf-banner-title,
+html.is-mobile-touch #halftimeScreen #hfTitle {
+  grid-row: 2;
+  margin: 1px 0 0;
+  font-size: 20px;
+  line-height: 1.1;
+}
+
+html.is-mobile-touch #halftimeScreen .hf-banner-sub,
+html.is-mobile-touch #halftimeScreen #hfSub {
+  grid-row: 3;
+  margin: 0 0 2px;
+  font-size: 11.5px;
+  line-height: 1.2;
+}
+
+html.is-mobile-touch #halftimeScreen .hf-scoreboard {
+  grid-row: 4;
+  width: 100%;
+  padding: 7px 10px;
+  gap: 8px;
+  border-radius: 17px;
+}
+
+html.is-mobile-touch #halftimeScreen .hf-squad-box {
+  padding: 5px 8px;
+  border-radius: 13px;
+}
+
+html.is-mobile-touch #halftimeScreen .hf-score-num {
+  font-size: 25px;
+}
+
+html.is-mobile-touch #halftimeScreen .hf-score-detail {
+  font-size: 10px;
+}
+
+html.is-mobile-touch #halftimeScreen .hf-standout,
+html.is-mobile-touch #halftimeScreen #hfStoryLine {
+  grid-row: 5;
+  justify-self: center;
+  margin: 2px 0 0;
+  padding: 3.5px 11px;
+  font-size: 11px;
+}
+
+html.is-mobile-touch #halftimeScreen .hf-actions {
+  grid-row: 6;
+  margin-top: 3px;
+  width: 100%;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+html.is-mobile-touch #halftimeScreen .hf-go-btn {
+  flex: 1 1 auto;
+  width: auto;
+  padding: 9px 14px;
+  border-radius: 14px;
+  font-size: 15.5px;
+}
+
+html.is-mobile-touch #halftimeScreen .hf-menu-link {
+  flex-shrink: 0;
+  font-size: 11.5px;
+  padding: 4px 6px;
+}
+
+html.is-mobile-touch #halftimeScreen .hf-swap-box {
+  grid-column: 2;
+  grid-row: 1 / span 5;
+  width: 100%;
+  margin-top: 0;
+  padding: 9px 11px 10px;
+  border-radius: 18px;
+}
+
+html.is-mobile-touch #halftimeScreen .hf-swap-visual {
+  margin-bottom: 3px;
+  gap: 8px;
+}
+
+html.is-mobile-touch #halftimeScreen .hf-role-chip {
+  padding: 3px 10px;
+  font-size: 12.5px;
+}
+
+html.is-mobile-touch #halftimeScreen .hf-swap-arrows {
+  width: 28px;
+  height: 28px;
+  font-size: 15px;
+}
+
+html.is-mobile-touch #halftimeScreen .hf-swap-headline {
+  margin: 1px 0 6px;
+  font-size: 14.5px;
+}
+
+html.is-mobile-touch #halftimeScreen .hf-rosters {
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+
+html.is-mobile-touch #halftimeScreen .hf-roster-col {
+  padding: 6px 8px;
+  border-radius: 12px;
+  min-width: 0;
+}
+
+html.is-mobile-touch #halftimeScreen .hf-roster-hdr {
+  font-size: 9.5px;
+  margin-bottom: 4px;
+}
+
+html.is-mobile-touch #halftimeScreen .hf-p-tag {
+  padding: 2px 6px;
+  font-size: 10.5px;
+}
+
+html.is-mobile-touch #halftimeScreen .hf-progress-wrap,
+html.is-mobile-touch #halftimeScreen .hf-timer-wrap {
+  grid-column: 2;
+  grid-row: 6;
+  width: 100%;
+  margin-top: 0;
+  gap: 4px;
+}
+
+html.is-mobile-touch #halftimeScreen .hf-bar {
+  height: 8px;
+}
+
+html.is-mobile-touch #halftimeScreen .hf-countdown-txt {
+  font-size: 11px;
+}
+
+/* ---- 3.4 #result (Post-Match Victory & 2-Column MVP Highlights) ---- */
+html.is-mobile-touch #result {
+  padding: max(8px, env(safe-area-inset-top, 0px))
+           max(14px, calc(env(safe-area-inset-right, 0px) + 10px))
+           max(8px, env(safe-area-inset-bottom, 0px))
+           max(14px, calc(env(safe-area-inset-left, 0px) + 10px));
+  background: rgba(20, 30, 20, 0.62);
+}
+
+/* ==========================================================================
+ * v4.1 Zero-Scroll Landscape Mobile Result Cockpit (Pinned Bottom Actions!)
+ * ========================================================================== */
+html.is-mobile-touch #result .card,
+html.is-mobile-touch #result .card.has-mvp-grid,
+html.is-mobile-touch #result .card:has(#mvpSectionWrap:not(.hidden)),
+html.is-mobile-touch #result .card:has(#mvpHighlightsWrap:not(:empty):not(.hidden)) {
+  position: relative !important;
+  width: min(96vw, 820px) !important;
+  max-height: calc(100dvh - 14px) !important;
+  padding: 8px 14px 6px !important;
+  border-radius: 20px !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr) !important;
+  column-gap: 12px !important;
+  row-gap: 4px !important;
+  align-content: start !important;
+  align-items: start !important;
+  overflow-y: auto !important;
+}
+
+/* Compact 1-line header across full width (always Row 1 & 2) */
+html.is-mobile-touch #result .card .r-emoji {
+  grid-column: 1 / -1 !important;
+  display: none !important;
+}
+html.is-mobile-touch #result .card h2 {
+  grid-column: 1 / -1 !important;
+  grid-row: 1 !important;
+  margin: 0 !important;
+  padding: 0 70px !important;
+  font-size: 17px !important;
+  line-height: 1.15 !important;
+}
+html.is-mobile-touch #result .card > p#rSub {
+  grid-column: 1 / -1 !important;
+  grid-row: 2 !important;
+  margin: 0 0 2px !important;
+  font-size: 10.5px !important;
+  line-height: 1.15 !important;
+}
+html.is-mobile-touch #result .card > p#rSub:empty {
+  display: none !important;
+}
+
+/* Left Column: Scoreboard + XP/League Rewards + Your Game */
+html.is-mobile-touch #result .card #seriesScoreSummary,
+html.is-mobile-touch #result .card .series-scoreboard,
+html.is-mobile-touch #result .card #resultRewardsSlot,
+html.is-mobile-touch #result .card .your-game {
+  grid-column: 1 !important;
+  margin: 0 !important;
+}
+
+/* Right Column: Compact Superlative Awards + 3-Map Vote + MVP Highlights */
+html.is-mobile-touch #result .card #resultAwardsSlot {
+  grid-column: 2 !important;
+  grid-row: 3 !important;
+  margin: 0 !important;
+}
+html.is-mobile-touch #result .card #resultMapVote {
+  grid-column: 2 !important;
+  grid-row: 4 !important;
+  margin: 0 !important;
+}
+html.is-mobile-touch #result .card #mvpSectionWrap,
+html.is-mobile-touch #result .card #mvpHighlightsWrap {
+  grid-column: 2 !important;
+  grid-row: 5 !important;
+  margin: 0 !important;
+}
+
+/* Ultra-compact Match Awards on mobile (horizontal wrapping chips instead of 3 tall boxes!) */
+html.is-mobile-touch #result .gk-awards {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  gap: 4px !important;
+  margin: 0 !important;
+}
+html.is-mobile-touch #result .gk-award {
+  flex: 1 1 auto !important;
+  padding: 4px 7px !important;
+  gap: 5px !important;
+  border-radius: 10px !important;
+}
+html.is-mobile-touch #result .gk-aw-ic { font-size: 14px !important; }
+html.is-mobile-touch #result .gk-aw-meta b { font-size: 11px !important; }
+html.is-mobile-touch #result .gk-aw-meta small { display: none !important; }
+
+/* Ultra-compact 3-Map Vote on mobile */
+html.is-mobile-touch #result .mv-wrap {
+  padding: 5px 7px !important;
+  border-radius: 11px !important;
+}
+html.is-mobile-touch #result .mv-hdr {
+  font-size: 10px !important;
+  margin-bottom: 4px !important;
+}
+html.is-mobile-touch #result .mv-btn {
+  padding: 4px 3px !important;
+  font-size: 10px !important;
+  border-radius: 8px !important;
+}
+
+/* Ultra-compact XP + League bar on mobile */
+html.is-mobile-touch #result .prog-res-league {
+  margin: 3px 0 2px !important;
+  padding: 4px 7px !important;
+  gap: 2px !important;
+}
+html.is-mobile-touch #result .prog-res-next,
+html.is-mobile-touch #result .prog-res-foot,
+html.is-mobile-touch #result .prog-res-nudge {
+  font-size: 10px !important;
+  margin: 2px 0 0 !important;
+  padding: 3px 7px !important;
+}
+
+/* PINNED STICKY BOTTOM ACTION ROW — ALWAYS VISIBLE WITH ZERO SCROLLING! */
+html.is-mobile-touch #result .card .r-row {
+  grid-column: 1 / -1 !important;
+  position: sticky !important;
+  bottom: -6px !important;
+  z-index: 25 !important;
+  background: linear-gradient(180deg, rgba(255, 251, 242, 0.92), #fffbf2 28%) !important;
+  border-top: 1.5px solid rgba(180, 160, 120, 0.34) !important;
+  margin: 4px -14px -6px !important;
+  padding: 6px 14px 7px !important;
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 7px !important;
+}
+html.is-mobile-touch #result .card .r-row .btn {
+  padding: 8px 8px !important;
+  font-size: 13px !important;
+  border-radius: 12px !important;
+  white-space: nowrap !important;
+}
+html.is-mobile-touch #result .card #btnNextMap {
+  display: none !important;
+}
+html.is-mobile-touch #result .card #btnMenu {
+  position: absolute !important;
+  top: 7px !important;
+  right: 12px !important;
+  margin: 0 !important;
+  padding: 4px 11px !important;
+  border-radius: 999px !important;
+  background: rgba(65, 76, 54, 0.14) !important;
+  color: #414c36 !important;
+  font-size: 11.5px !important;
+  font-weight: 900 !important;
+  text-decoration: none !important;
+  z-index: 30 !important;
+}
+
+html.is-mobile-touch #result .card .r-emoji {
+  font-size: 28px;
+  line-height: 1;
+}
+
+html.is-mobile-touch #result .card h2 {
+  margin: 2px 0;
+  font-size: 20px;
+  line-height: 1.1;
+}
+
+html.is-mobile-touch #result .card > p#rSub {
+  margin: 0 0 6px;
+  font-size: 11.5px;
+  line-height: 1.25;
+}
+
+html.is-mobile-touch #result .r-row {
+  gap: 8px;
+}
+
+html.is-mobile-touch #result .r-row .btn {
+  padding: 8px 10px;
+  border-radius: 13px;
+  font-size: 14.5px;
+}
+
+html.is-mobile-touch #result #btnNextMap {
+  margin-top: 5px;
+  padding: 7px 10px;
+  border-radius: 13px;
+  font-size: 13.5px;
+}
+
+html.is-mobile-touch #result #btnMenu {
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+/* 2-Column Widescreen Finale Card when MVP Highlights are visible */
+html.is-mobile-touch #result .card.has-mvp-grid,
+html.is-mobile-touch #result .card:has(#mvpSectionWrap:not(.hidden)),
+html.is-mobile-touch #result .card:has(#mvpHighlightsWrap:not(:empty):not(.hidden)) {
+  width: min(94vw, 800px);
+  max-height: calc(100dvh - 18px);
+  padding: 10px 18px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.04fr) minmax(0, 0.96fr);
+  column-gap: 16px;
+  row-gap: 4px;
+  align-items: center;
+}
+
+html.is-mobile-touch #result .card.has-mvp-grid > *,
+html.is-mobile-touch #result .card:has(#mvpSectionWrap:not(.hidden)) > *,
+html.is-mobile-touch #result .card:has(#mvpHighlightsWrap:not(:empty):not(.hidden)) > * {
+  grid-column: 1;
+}
+
+html.is-mobile-touch #result .card.has-mvp-grid .r-emoji,
+html.is-mobile-touch #result .card:has(#mvpSectionWrap:not(.hidden)) .r-emoji,
+html.is-mobile-touch #result .card:has(#mvpHighlightsWrap:not(:empty):not(.hidden)) .r-emoji {
+  font-size: 22px;
+  line-height: 1;
+}
+
+html.is-mobile-touch #result .card.has-mvp-grid h2,
+html.is-mobile-touch #result .card:has(#mvpSectionWrap:not(.hidden)) h2,
+html.is-mobile-touch #result .card:has(#mvpHighlightsWrap:not(:empty):not(.hidden)) h2 {
+  font-size: 18px;
+  margin: 0;
+}
+
+html.is-mobile-touch #result .card.has-mvp-grid > p#rSub,
+html.is-mobile-touch #result .card:has(#mvpSectionWrap:not(.hidden)) > p#rSub,
+html.is-mobile-touch #result .card:has(#mvpHighlightsWrap:not(:empty):not(.hidden)) > p#rSub {
+  margin: 0 0 2px;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+html.is-mobile-touch #result .series-scoreboard,
+html.is-mobile-touch #result #seriesScoreSummary {
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: 15px;
+}
+
+html.is-mobile-touch #result .series-sb-team {
+  padding: 4px 7px;
+  border-radius: 11px;
+}
+
+html.is-mobile-touch #result .series-sb-pts {
+  font-size: 21px;
+}
+
+html.is-mobile-touch #result .series-sb-rounds {
+  margin-top: 4px;
+  font-size: 10px;
+}
+
+html.is-mobile-touch #result #resultRewardsSlot {
+  margin: 0;
+}
+
+html.is-mobile-touch #result .prog-result-bar {
+  margin: 0;
+  padding: 6px 9px;
+  border-radius: 13px;
+}
+
+html.is-mobile-touch #result .prog-res-top {
+  margin-bottom: 4px;
+}
+
+html.is-mobile-touch #result .prog-res-earned {
+  font-size: 11.5px;
+  padding: 2px 8px;
+}
+
+html.is-mobile-touch #result .prog-res-lv {
+  font-size: 11.5px;
+}
+
+html.is-mobile-touch #result .prog-res-track {
+  height: 6px;
+}
+
+html.is-mobile-touch #result .prog-res-foot {
+  margin-top: 3px;
+  font-size: 10px;
+}
+
+html.is-mobile-touch #result .card.has-mvp-grid #btnNextMap,
+html.is-mobile-touch #result .card:has(#mvpSectionWrap:not(.hidden)) #btnNextMap,
+html.is-mobile-touch #result .card:has(#mvpHighlightsWrap:not(:empty):not(.hidden)) #btnNextMap {
+  margin-top: 0;
+  padding: 6.5px 10px;
+  font-size: 13px;
+}
+
+html.is-mobile-touch #result .card.has-mvp-grid #btnMenu,
+html.is-mobile-touch #result .card:has(#mvpSectionWrap:not(.hidden)) #btnMenu,
+html.is-mobile-touch #result .card:has(#mvpHighlightsWrap:not(:empty):not(.hidden)) #btnMenu {
+  margin-top: 0;
+  padding: 1px 8px;
+  font-size: 11.5px;
+}
+
+/* Right Column: Compact MVP Highlight Cards stacked cleanly under Awards & Map Vote */
+html.is-mobile-touch #result .card #mvpSectionWrap:not(.hidden),
+html.is-mobile-touch #result .card #mvpHighlightsWrap:not(:empty):not(.hidden) {
+  grid-column: 2 !important;
+  grid-row: auto !important;
+  align-self: start;
+  width: 100%;
+  margin: 0;
+}
+
+html.is-mobile-touch #result .mvp-section-hdr {
+  margin: 0 0 5px;
+  font-size: 9.5px;
+}
+
+html.is-mobile-touch #result .mvp-awards-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 0;
+}
+
+html.is-mobile-touch #result .mvp-card {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+  padding: 7px 10px;
+  gap: 9px;
+  border-radius: 14px;
+}
+
+html.is-mobile-touch #result .mvp-badge {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  padding: 1.5px 6px;
+  font-size: 8px;
+}
+
+html.is-mobile-touch #result .mvp-icon {
+  font-size: 25px;
+  margin-top: 0;
+  flex-shrink: 0;
+  width: 30px;
+  text-align: center;
+}
+
+html.is-mobile-touch #result .mvp-body {
+  align-items: flex-start;
+  gap: 2px;
+  padding-right: 52px;
+}
+
+html.is-mobile-touch #result .mvp-title {
+  font-size: 12.5px;
+}
+
+html.is-mobile-touch #result .mvp-player {
+  font-size: 11px;
+  padding: 1.5px 7px;
+}
+
+html.is-mobile-touch #result .mvp-desc {
+  font-size: 10px;
+  line-height: 1.22;
+}
+
+/* ---- 3.5 #wardrobeModal (Widescreen Cozy Spirit Shop, 780 x 366px) ---- */
+html.is-mobile-touch #wardrobeModal {
+  padding: max(6px, env(safe-area-inset-top, 0px))
+           max(14px, calc(env(safe-area-inset-right, 0px) + 10px))
+           max(6px, env(safe-area-inset-bottom, 0px))
+           max(14px, calc(env(safe-area-inset-left, 0px) + 10px));
+  background: rgba(20, 30, 20, 0.62);
+}
+
+html.is-mobile-touch #wardrobeModal .w-dialog {
+  width: min(96vw, 808px);
+  height: min(90dvh, 366px);
+  max-height: calc(100dvh - 14px);
+  border-radius: 24px;
+  background: linear-gradient(180deg, #fffbf2 0%, #f5ecda 100%);
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: 44px minmax(0, 1fr) auto;
+  animation-duration: 160ms;
+}
+
+/* Flatten .w-header into Row 1 alongside inline .w-tabs without moving DOM nodes */
+html.is-mobile-touch #wardrobeModal .w-header {
+  display: contents;
+}
+
+html.is-mobile-touch #wardrobeModal .w-title-wrap {
+  grid-column: 1;
+  grid-row: 1;
+  height: 44px;
+  padding: 0 8px 0 14px;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(180deg, #fffbf2 0%, #f5ecda 100%);
+  border-bottom: 2px solid #ebe2cd;
+}
+
+html.is-mobile-touch #wardrobeModal .w-title-wrap h2 {
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+html.is-mobile-touch #wardrobeModal .w-title-wrap p {
+  display: none;
+}
+
+html.is-mobile-touch #wardrobeModal .w-tabs {
+  grid-column: 2;
+  grid-row: 1;
+  height: 44px;
+  padding: 5px 6px;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  align-items: center;
+  background: linear-gradient(180deg, #fffbf2 0%, #f5ecda 100%);
+  border-bottom: 2px solid #ebe2cd;
+}
+
+html.is-mobile-touch #wardrobeModal .w-tab {
+  flex: 0 1 auto;
+  height: 32px;
+  padding: 0 9px;
+  border-radius: 10px;
+  font-size: 11.5px;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+html.is-mobile-touch #wardrobeModal .w-tab small {
+  padding: 1px 4px;
+  font-size: 9px;
+}
+
+html.is-mobile-touch #wardrobeModal .w-header-right {
+  grid-column: 3;
+  grid-row: 1;
+  height: 44px;
+  padding: 0 12px 0 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(180deg, #fffbf2 0%, #f5ecda 100%);
+  border-bottom: 2px solid #ebe2cd;
+}
+
+html.is-mobile-touch #wardrobeModal .w-lv-mini {
+  display: none;
+}
+
+html.is-mobile-touch #wardrobeModal .w-wallet {
+  padding: 4px 10px;
+  font-size: 13.5px;
+  white-space: nowrap;
+}
+
+html.is-mobile-touch #wardrobeModal .w-close {
+  width: 31px;
+  height: 31px;
+  font-size: 14px;
+}
+
+html.is-mobile-touch #wardrobeModal .w-body {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  padding: 9px 12px;
+}
+
+html.is-mobile-touch #wardrobeModal .w-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+
+html.is-mobile-touch #wardrobeModal .w-card {
+  padding: 8px 9px 8px;
+  gap: 5px;
+  border-radius: 16px;
+}
+
+html.is-mobile-touch #wardrobeModal .w-art-well {
+  height: 58px;
+  border-radius: 11px;
+}
+
+html.is-mobile-touch #wardrobeModal .w-art-well svg {
+  width: 54px;
+  height: 54px;
+}
+
+html.is-mobile-touch #wardrobeModal .w-info h3 {
+  font-size: 13px;
+}
+
+html.is-mobile-touch #wardrobeModal .w-info p {
+  font-size: 10.5px;
+  line-height: 1.22;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+html.is-mobile-touch #wardrobeModal .w-btn {
+  padding: 6px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+html.is-mobile-touch #wardrobeModal .w-footer {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  padding: 5px 14px;
+  font-size: 10.5px;
+}
+
+@media (max-width: 700px) {
+  html.is-mobile-touch #wardrobeModal .w-title-wrap h2 {
+    font-size: 13.5px;
+  }
+
+  html.is-mobile-touch #wardrobeModal .w-tab small {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+ * Desktop Title Screen "Friends Party" Button (`.party-title-btn`)
+ * ========================================================================== */
+.party-title-btn {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  z-index: 12;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 2px solid rgba(92, 74, 48, 0.24);
+  background: linear-gradient(180deg, rgba(255, 252, 244, 0.96) 0%, rgba(246, 236, 214, 0.96) 100%);
+  color: #3d3122;
+  font: 800 13px/1 'Nunito', system-ui, sans-serif;
+  box-shadow: 0 3px 0 rgba(74, 58, 36, 0.16), 0 6px 16px rgba(45, 35, 20, 0.10);
+  cursor: pointer;
+  transition: transform 0.14s ease, background 0.14s ease, box-shadow 0.14s ease;
+}
+.party-title-btn:hover {
+  transform: translateY(-1px);
+  background: #fffdf7;
+}
+.party-title-btn:active {
+  transform: translateY(1px);
+}
+.party-title-btn.in-party {
+  border-color: rgba(58, 146, 78, 0.65);
+  background: linear-gradient(180deg, #effceb 0%, #d4f4ca 100%);
+  color: #1f4f28;
+  box-shadow: 0 3px 0 rgba(42, 108, 56, 0.25), 0 6px 18px rgba(42, 140, 64, 0.22);
+}
+html.is-mobile-touch .party-title-btn {
+  display: none !important;
+}
+
+html.is-mobile-touch #mobAdminBtn {
+  touch-action: manipulation;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 15px;
+  background: linear-gradient(180deg, #fff1b8 0%, #f5b93a 100%);
+  color: #4a2a00;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 13.5px;
+  white-space: nowrap;
+  box-shadow: 0 3.5px 0 rgba(132, 82, 8, 0.34), inset 0 1.5px 0 rgba(255, 255, 255, 0.72);
+}
+
+html.is-mobile-touch #mobAdminBtn.hidden {
+  display: none !important;
+}
+
+
+/* ==========================================================================
+   Phone result screen v2 (2026-11-19): everything that matters on ONE screen, no scrolling.
+   Left column, top to bottom: result line, series score, XP bar, PLAY AGAIN / SWITCH SIDE, small links.
+   Right column: MVP cards (and "Your game" stats), which may scroll inside their own panel.
+   Clip sharing collapses to one compact icon row. Same elements and handlers, layout only.
+   ========================================================================== */
+html.is-mobile-touch #result .card.card {
+  width: min(96vw, 820px);
+  height: auto;
+  max-height: calc(100dvh - 14px);
+  overflow: hidden;
+  padding: 10px 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr);
+  grid-template-rows: auto auto auto auto auto minmax(0, 1fr) auto auto;
+  padding-bottom: 12px;
+  grid-template-areas:
+    "emoji  side"
+    "title  side"
+    "sub    side"
+    "score  side"
+    "xp     side"
+    ".      side"
+    "play   side"
+    "links  side";
+  column-gap: 14px;
+  row-gap: 5px;
+  align-items: start;
+}
+html.is-mobile-touch #result .card.card > * { grid-column: auto; grid-row: auto; margin: 0; min-width: 0; }
+html.is-mobile-touch #result .card.card .r-emoji { grid-area: emoji; display: none; }
+html.is-mobile-touch #result .card.card h2 { grid-area: title; font-size: 19px; line-height: 1.1; }
+html.is-mobile-touch #result .card.card > p#rSub { grid-area: sub; font-size: 11px; line-height: 1.25; }
+html.is-mobile-touch #result .card.card #seriesScoreboardBox { grid-area: score; }
+html.is-mobile-touch #result .card.card #seriesScoreboardBox .series-sb-rounds { display: none; }
+html.is-mobile-touch #result .card.card #resultRewardsSlot { grid-area: xp; display: flex; flex-direction: column; gap: 5px; }
+html.is-mobile-touch #result .card.card .r-row { grid-area: play; display: flex; gap: 8px; }
+html.is-mobile-touch #result .card.card .r-row .btn { flex: 1 1 0; padding: 9px 10px; font-size: 16px; border-radius: 14px; }
+html.is-mobile-touch #result .card.card .r-row #btnAgain { flex-grow: 1.4; }
+/* small secondary links share one row under the play buttons */
+html.is-mobile-touch #result .card.card #btnNextMap,
+html.is-mobile-touch #result .card.card #btnMenu { grid-area: links; align-self: center; }
+html.is-mobile-touch #result .card.card #btnNextMap { justify-self: start; width: auto; padding: 4px 10px; font-size: 12px; border-radius: 11px; box-shadow: none; }
+html.is-mobile-touch #result .card.card #btnMenu { justify-self: end; padding: 4px 8px; font-size: 12px; }
+
+/* XP bar: keep level, XP earned and the track; drop the milestone line, bonus chips and wallet footer */
+html.is-mobile-touch #result .card.card .prog-result-bar { padding: 6px 9px; }
+html.is-mobile-touch #result .card.card .prog-res-bonus,
+html.is-mobile-touch #result .card.card .prog-res-next,
+html.is-mobile-touch #result .card.card .prog-res-foot span { display: none; }
+html.is-mobile-touch #result .card.card .prog-res-foot { margin-top: 3px; text-align: right; }
+
+/* Clip sharing: one compact row of three small buttons instead of a 230 px tall card */
+html.is-mobile-touch #result .card.card #resultHighlightShareBox { padding: 5px 7px; border-radius: 12px; order: 2; }
+html.is-mobile-touch #result .card.card #resultHighlightShareBox .rh-top-row { display: none; }
+html.is-mobile-touch #result .card.card #resultHighlightShareBox .rh-btn-row { display: flex; flex-direction: row; gap: 5px; margin: 0; }
+html.is-mobile-touch #result .card.card #resultHighlightShareBox .rh-btn-row button {
+  flex: 1 1 0; min-width: 0; margin: 0; padding: 6px 4px; font-size: 11px; line-height: 1.15; border-radius: 10px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Right column: MVPs first, then "Your game"; scrolls inside its own panel if a long name needs room */
+html.is-mobile-touch #result .card.card #mvpSectionWrap,
+html.is-mobile-touch #result .card.card #yourGameBox {
+  grid-area: side;
+}
+html.is-mobile-touch #result .card.card #mvpSectionWrap:not(.hidden) ~ #yourGameBox,
+html.is-mobile-touch #result .card.card:has(#mvpSectionWrap:not(.hidden)) #yourGameBox { display: none; }
+html.is-mobile-touch #result .card.card #mvpSectionWrap:not(.hidden),
+html.is-mobile-touch #result .card.card #yourGameBox {
+  align-self: stretch;
+  max-height: calc(100dvh - 34px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+html.is-mobile-touch #result .card.card #yourGameBox .yg-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
+html.is-mobile-touch #result .card.card #yourGameBox .yg-stat { padding: 5px 7px; }
+html.is-mobile-touch #result .card.card #yourGameBox .yg-line { display: none; }
+
+/* very short screens (<= 330 px tall): drop the subtitle */
+@media (max-height: 330px) {
+  html.is-mobile-touch #result .card.card > p#rSub { display: none; }
+}
+/* short labels on phones (the full text stays for desktop and screen readers via aria-label) */
+html.is-mobile-touch #result .card.card #btnResultPreviewClip,
+html.is-mobile-touch #result .card.card #btnResultShareHighlight,
+html.is-mobile-touch #result .card.card #btnResultSaveCard { font-size: 0 !important; }
+html.is-mobile-touch #result .card.card #btnResultPreviewClip::after { content: "▶️ Watch clip"; font-size: 11.5px; }
+html.is-mobile-touch #result .card.card #btnResultShareHighlight::after { content: "🎬 Share"; font-size: 11.5px; }
+html.is-mobile-touch #result .card.card #btnResultSaveCard::after { content: "🖼️ Cover"; font-size: 11.5px; }
+@media (max-width: 700px) {
+  html.is-mobile-touch #result .card.card { row-gap: 4px; padding-top: 8px; }
+  html.is-mobile-touch #result .card.card .series-sb-team { padding: 3px 6px; }
+  html.is-mobile-touch #result .card.card .series-sb-pts { font-size: 18px; }
+}
+
+/* Phone halftime v2: the clip-share block had no grid row and landed under everything (card 546 px on a
+   342 px screen). It becomes one compact row in the right column above the countdown; the "standout"
+   line (duplicated by the share badge) is hidden, so the whole card fits without scrolling. */
+html.is-mobile-touch #halftimeScreen .hf-card { overflow: hidden; grid-template-rows: auto auto auto auto auto auto auto; }
+html.is-mobile-touch #halftimeScreen .hf-highlight-cta {
+  grid-column: 2; grid-row: 6; margin: 0; padding: 5px 7px; border-radius: 12px;
+}
+html.is-mobile-touch #halftimeScreen .hf-highlight-cta .hf-hl-quote-row { display: none; }
+html.is-mobile-touch #halftimeScreen .hf-highlight-cta .rh-btn-row { flex-wrap: nowrap !important; gap: 5px !important; }
+html.is-mobile-touch #halftimeScreen .hf-highlight-cta .hf-share-highlight-btn {
+  flex: 1 1 0; min-width: 0; margin: 0; padding: 6px 4px; font-size: 0 !important; border-radius: 10px; white-space: nowrap;
+}
+html.is-mobile-touch #halftimeScreen #btnHalftimePreviewClip::after { content: "▶️ Watch clip"; font-size: 11.5px; }
+html.is-mobile-touch #halftimeScreen #btnHalftimeShareHighlight::after { content: "🎬 Share"; font-size: 11.5px; }
+html.is-mobile-touch #halftimeScreen .hf-progress-wrap,
+html.is-mobile-touch #halftimeScreen .hf-timer-wrap { grid-row: 7; }
+html.is-mobile-touch #halftimeScreen .hf-actions { grid-row: 6 / span 2; align-self: end; }
+html.is-mobile-touch #halftimeScreen .hf-standout,
+html.is-mobile-touch #halftimeScreen #hfStoryLine { font-size: 11px; padding: 4px 8px; }
+@media (max-height: 380px) {
+  html.is-mobile-touch #halftimeScreen .hf-banner-sub,
+  html.is-mobile-touch #halftimeScreen #hfSub { display: none; }
+  html.is-mobile-touch #halftimeScreen .hf-swap-visual { display: none; }
+}
+/* halftime v2b: shorter left column so "Start Round 2" always sits inside the card */
+html.is-mobile-touch #halftimeScreen .hf-card { row-gap: 4px; padding: 9px 16px 10px; align-items: start; }
+html.is-mobile-touch #halftimeScreen .hf-banner-title,
+html.is-mobile-touch #halftimeScreen #hfTitle { font-size: 16px; line-height: 1.15; }
+html.is-mobile-touch #halftimeScreen .hf-squad-box { padding: 4px 8px; }
+html.is-mobile-touch #halftimeScreen .hf-squad-pill { padding: 2px 8px; font-size: 9.5px; }
+html.is-mobile-touch #halftimeScreen .hf-score-num { font-size: 20px; }
+html.is-mobile-touch #halftimeScreen .hf-score-detail { font-size: 9.5px; line-height: 1.2; }
+html.is-mobile-touch #halftimeScreen .hf-standout,
+html.is-mobile-touch #halftimeScreen #hfStoryLine { display: none; }
+html.is-mobile-touch #halftimeScreen .hf-actions { grid-row: 5 / span 3; align-self: end; }
+html.is-mobile-touch #halftimeScreen .hf-go-btn { padding: 9px 14px; font-size: 15px; }
+html.is-mobile-touch #halftimeScreen .hf-swap-box { padding: 7px 9px; }
+html.is-mobile-touch #halftimeScreen .hf-swap-headline { font-size: 13px; margin: 0 0 4px; }
+html.is-mobile-touch #halftimeScreen .hf-roster-hdr { font-size: 9px; }
+html.is-mobile-touch #halftimeScreen .hf-p-tag { font-size: 11px; padding: 2px 7px; }
+
+/* Phone profile sheet v2: cloud save is a header button, so gamertag + all 7 spirits fit without scrolling */
+html.is-mobile-touch .mob-profile-dialog .mob-modal-hdr { gap: 8px; }
+html.is-mobile-touch .mob-profile-dialog .mob-modal-title-group { flex: 1 1 auto; min-width: 0; }
+html.is-mobile-touch .mob-profile-dialog #mobCloudSaveBtn.mob-hdr-cloud-btn {
+  width: auto; height: 34px; margin: 0; padding: 0 12px; flex: 0 0 auto;
+  font-size: 13px; border-radius: 12px; white-space: nowrap;
+}
+html.is-mobile-touch .mob-profile-dialog .mob-prof-sec { padding: 7px 10px; margin-top: 6px; }
+html.is-mobile-touch .mob-profile-dialog .mob-sec-lbl { margin-bottom: 4px; }
+html.is-mobile-touch .mob-profile-dialog .mob-gt-editor-row input,
+html.is-mobile-touch .mob-profile-dialog #mobRollNameBtn { height: 36px; }
+html.is-mobile-touch .mob-profile-dialog #mobSpiritGrid { gap: 6px; }
+html.is-mobile-touch .mob-profile-dialog .mob-sp-choice { height: 38px; }
+
+/* Journey/wardrobe tab strip on phones: it scrolls sideways; a soft fade on the right edge shows there are
+   more tabs (Hats, Taunts, Poofs, Skins) to swipe to. */
+html.is-mobile-touch #wardrobeModal .w-tabs {
+  -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 34px), transparent 100%);
+          mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 34px), transparent 100%);
+  padding-right: 26px;
+  scroll-snap-type: x proximity;
+}
+html.is-mobile-touch #wardrobeModal .w-tab { scroll-snap-align: start; }
+/* centred flex content that overflows cannot be scrolled back to its start: align it to the start */
+html.is-mobile-touch #wardrobeModal .w-tabs { justify-content: flex-start; overflow-x: auto; overflow-y: hidden; }
+/* narrow phones (<= 700 px wide): the score box gets one line and the links shrink, so the last row fits */
+@media (max-width: 700px) {
+  html.is-mobile-touch #result .card.card .series-sb-pill { padding: 1px 7px; font-size: 9px; }
+  html.is-mobile-touch #result .card.card .series-sb-team { display: flex; align-items: center; justify-content: center; gap: 6px; }
+  html.is-mobile-touch #result .card.card .r-row .btn { padding: 8px 8px; font-size: 15px; }
+  html.is-mobile-touch #result .card.card #btnNextMap { padding: 3px 8px; font-size: 11px; }
+  html.is-mobile-touch #result .card.card .prog-result-bar { padding: 5px 8px; }
+  html.is-mobile-touch #result .card.card > p#rSub { display: none; }
+}
+
+/* ==========================================================================
+ * v4.1 Final Zero-Scroll Mobile Result Grid (Overrides .card.card cleanly!)
+ * ========================================================================== */
+html.is-mobile-touch #result .card.card {
+  position: relative !important;
+  width: min(96vw, 820px) !important;
+  max-height: calc(100dvh - 14px) !important;
+  padding: 8px 14px 8px !important;
+  overflow: hidden !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr) !important;
+  grid-template-rows: auto auto auto auto auto auto !important;
+  grid-template-areas:
+    "title  title"
+    "news   news"
+    "score  awards"
+    "xp     vote"
+    "xp     side"
+    "play   play" !important;
+  column-gap: 12px !important;
+  row-gap: 4px !important;
+  align-items: start !important;
+}
+html.is-mobile-touch #result .card.card #resultNewsTicker {
+  grid-area: news !important;
+  margin: 0 !important;
+  padding: 3px 9px !important;
+  font-size: 10.5px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+html.is-mobile-touch #result .card.card .r-emoji,
+html.is-mobile-touch #result .card.card > p#rSub,
+html.is-mobile-touch #result .card.card #btnNextMap {
+  display: none !important;
+}
+html.is-mobile-touch #result .card.card h2 {
+  grid-area: title !important;
+  margin: 0 !important;
+  padding: 0 74px !important;
+  font-size: 17px !important;
+  line-height: 1.15 !important;
+}
+html.is-mobile-touch #result .card.card #seriesScoreboardBox,
+html.is-mobile-touch #result .card.card #seriesScoreSummary {
+  grid-area: score !important;
+  margin: 0 !important;
+}
+html.is-mobile-touch #result .card.card #resultRewardsSlot {
+  grid-area: xp !important;
+  margin: 0 !important;
+}
+html.is-mobile-touch #result .card.card #resultAwardsSlot {
+  grid-area: awards !important;
+  margin: 0 !important;
+}
+html.is-mobile-touch #result .card.card #resultMapVote {
+  grid-area: vote !important;
+  margin: 0 !important;
+}
+html.is-mobile-touch #result .card.card #mvpSectionWrap,
+html.is-mobile-touch #result .card.card #yourGameBox {
+  grid-area: side !important;
+  max-height: 118px !important;
+  overflow-y: auto !important;
+  margin: 0 !important;
+}
+html.is-mobile-touch #result .card.card .r-row {
+  grid-area: play !important;
+  position: static !important;
+  margin: 2px 0 0 !important;
+  padding: 5px 0 0 !important;
+  border-top: 1.5px solid rgba(180, 160, 120, 0.30) !important;
+  background: transparent !important;
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 8px !important;
+}
+html.is-mobile-touch #result .card.card .r-row .btn {
+  flex: 1 1 0 !important;
+  padding: 8px 8px !important;
+  font-size: 13.5px !important;
+  border-radius: 12px !important;
+}
+html.is-mobile-touch #result .card.card #btnMenu {
+  grid-area: auto !important;
+  position: absolute !important;
+  top: 7px !important;
+  right: 12px !important;
+  margin: 0 !important;
+  padding: 4px 11px !important;
+  border-radius: 999px !important;
+  background: rgba(65, 76, 54, 0.14) !important;
+  color: #3a4630 !important;
+  font-size: 11.5px !important;
+  font-weight: 900 !important;
+  text-decoration: none !important;
+  z-index: 30 !important;
+}

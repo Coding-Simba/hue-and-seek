@@ -1,0 +1,419 @@
+/* ==========================================================================
+ * Hue & Seek — Seeker Hunting Gadgets HUD & Dowsing Readout Styles
+ * Warm Storybook Cream (#fff8ea) & Sky-Blue (#286496) Tactile UI
+ * ========================================================================== */
+
+#seekerGadgetsBar {
+  position: absolute;
+  left: 14px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 58px);
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  z-index: 4;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.sg-card {
+  position: relative;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 158px;
+  padding: 8px 13px 11px 10px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #fffdf6 0%, #fff8ea 100%);
+  color: var(--ink, #33402f);
+  border: 2px solid rgba(40, 100, 150, 0.22);
+  box-shadow:
+    0 5px 0 rgba(36, 68, 94, 0.24),
+    0 10px 22px rgba(22, 38, 48, 0.20),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  overflow: hidden;
+  text-align: left;
+  transition:
+    transform 0.12s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.16s ease,
+    background 0.18s ease,
+    border-color 0.18s ease,
+    opacity 0.18s ease;
+}
+
+.sg-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(40, 100, 150, 0.46);
+  box-shadow:
+    0 7px 0 rgba(36, 68, 94, 0.26),
+    0 14px 26px rgba(22, 38, 48, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.sg-card:active {
+  transform: translateY(3px);
+  box-shadow:
+    0 2px 0 rgba(36, 68, 94, 0.25),
+    0 5px 12px rgba(22, 38, 48, 0.18);
+}
+
+.sg-card.is-ready {
+  border-color: rgba(54, 134, 198, 0.52);
+}
+
+.sg-card.is-cooling {
+  background: linear-gradient(180deg, #f5efe1 0%, #ece4d1 100%);
+  border-color: rgba(85, 100, 92, 0.24);
+  box-shadow:
+    0 4px 0 rgba(52, 62, 50, 0.20),
+    0 6px 14px rgba(22, 34, 30, 0.14);
+}
+
+.sg-card.is-cooling .sg-icon-wrap {
+  filter: saturate(0.55);
+  opacity: 0.78;
+}
+
+.sg-card.sg-fired {
+  animation: sgCardPop 0.28s cubic-bezier(0.22, 1.5, 0.36, 1);
+}
+
+.sg-card.sg-just-ready {
+  animation: sgReadyGleam 0.46s cubic-bezier(0.22, 1.4, 0.36, 1);
+}
+
+.sg-card.sg-deny {
+  animation: sgCardDeny 0.26s ease-in-out;
+}
+
+@keyframes sgCardPop {
+  0% { transform: scale(0.93) translateY(2px); }
+  55% { transform: scale(1.04) translateY(-2px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+@keyframes sgReadyGleam {
+  0% { box-shadow: 0 5px 0 rgba(36, 68, 94, 0.24), 0 0 0 0 rgba(95, 188, 248, 0.75); }
+  50% { transform: translateY(-2px) scale(1.03); box-shadow: 0 7px 0 rgba(36, 68, 94, 0.26), 0 0 0 6px rgba(95, 188, 248, 0); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+@keyframes sgCardDeny {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.sg-icon-wrap {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #dff2ff 0%, #b8def8 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    0 2px 0 rgba(40, 100, 150, 0.20);
+  transition: filter 0.2s, opacity 0.2s, transform 0.2s;
+}
+
+.sg-card[data-gadget="bomb"] .sg-icon-wrap {
+  background: linear-gradient(180deg, #d7f4ff 0%, #9cd4f7 100%);
+}
+
+.sg-icon {
+  font-size: 21px;
+  line-height: 1;
+}
+
+.sg-key {
+  position: absolute;
+  top: 5px;
+  right: 7px;
+  min-width: 20px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 6px;
+  background: #286496;
+  color: #fff8ea;
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 900;
+  font-size: 10.5px;
+  line-height: 18px;
+  text-align: center;
+  letter-spacing: 0.03em;
+  box-shadow: 0 2px 0 rgba(22, 54, 82, 0.35);
+}
+
+.sg-card.is-cooling .sg-key {
+  background: #73827a;
+  box-shadow: 0 2px 0 rgba(45, 55, 50, 0.28);
+}
+
+.sg-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding-right: 18px;
+}
+
+.sg-title {
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 14.5px;
+  line-height: 1.12;
+  color: #214d73;
+  white-space: nowrap;
+}
+
+.sg-card.is-cooling .sg-title {
+  color: #4d5a52;
+}
+
+.sg-sub {
+  margin-top: 2px;
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 800;
+  font-size: 11px;
+  line-height: 1.15;
+  color: #4f6d82;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.sg-card.is-cooling .sg-sub {
+  color: #6b766c;
+}
+
+/* Bottom Cooldown Progress Strip */
+.sg-cd-track {
+  position: absolute;
+  left: 9px;
+  right: 9px;
+  bottom: 4px;
+  height: 4.5px;
+  border-radius: 99px;
+  background: rgba(40, 100, 150, 0.14);
+  overflow: hidden;
+}
+
+.sg-cd-fill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #49a6e8 0%, #68d6c8 100%);
+  transition: width 0.08s linear, background 0.2s ease;
+}
+
+.sg-card.is-cooling .sg-cd-fill {
+  background: linear-gradient(90deg, #7fb5dc 0%, #5da1d4 100%);
+}
+
+/* ==========================================================================
+ * Dowsing Compass Readout Banner (#dowsingBanner — Slim Single-Line Pill)
+ * ========================================================================== */
+#dowsingBanner {
+  position: absolute;
+  left: 50%;
+  top: calc(env(safe-area-inset-top, 0px) + 74px);
+  transform: translate3d(-50%, 0, 0) scale(1);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 32px;
+  padding: 4px 14px 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 248, 234, 0.96);
+  color: #214d73;
+  border: 2px solid #6ab4e8;
+  box-shadow:
+    0 3px 0 rgba(36, 68, 94, 0.2),
+    0 8px 20px rgba(20, 36, 48, 0.2);
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 13.5px;
+  line-height: 1.1;
+  white-space: nowrap;
+  width: auto;
+  max-width: min(86vw, 390px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 1;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#dowsingBanner.is-fading {
+  opacity: 0;
+  transform: translate3d(-50%, -8px, 0) scale(0.96);
+}
+
+#dowsingBanner.is-popping {
+  animation: sgBannerIn 0.28s cubic-bezier(0.2, 1.35, 0.36, 1);
+}
+
+@keyframes sgBannerIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(-50%, -8px, 0) scale(0.93);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(-50%, 0, 0) scale(1);
+  }
+}
+
+/* Temperature Variants */
+#dowsingBanner.is-cold {
+  background: linear-gradient(180deg, #f2faff 0%, #d6eeff 100%);
+  border-color: #66b5ea;
+  color: #1c5078;
+}
+
+#dowsingBanner.is-warm {
+  background: linear-gradient(180deg, #fffbe8 0%, #ffe6a3 100%);
+  border-color: #e6a838;
+  color: #5b3b07;
+}
+
+#dowsingBanner.is-hot {
+  background: linear-gradient(180deg, #fff1e8 0%, #ffc4ad 100%);
+  border-color: #f06648;
+  color: #6f1e10;
+  box-shadow:
+    0 3px 0 rgba(126, 38, 22, 0.22),
+    0 0 0 2.5px rgba(240, 102, 72, 0.22),
+    0 8px 22px rgba(80, 24, 12, 0.24);
+}
+
+.sg-dowsing-txt {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sg-dowsing-timer {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 2.5px;
+  height: 2.5px;
+  border-radius: 99px;
+  background: rgba(30, 50, 65, 0.12);
+  overflow: hidden;
+}
+
+#dowsingBannerFill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  border-radius: 99px;
+  background: currentColor;
+  opacity: 0.45;
+}
+
+/* ==========================================================================
+ * Touch & Mobile Responsive Layout (Never Overlaps #btnFire on Right!)
+ * ========================================================================== */
+@media (pointer: coarse), (max-width: 680px) {
+  #seekerGadgetsBar {
+    left: 12px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
+    gap: 8px;
+    max-width: calc(100vw - 134px);
+  }
+
+  .sg-card {
+    min-width: 112px;
+    padding: 7px 10px 10px 8px;
+    gap: 7px;
+    border-radius: 17px;
+  }
+
+  .sg-icon-wrap {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+  }
+
+  .sg-icon {
+    font-size: 18px;
+  }
+
+  .sg-meta {
+    padding-right: 4px;
+  }
+
+  .sg-title {
+    font-size: 12.5px;
+  }
+
+  .sg-sub {
+    font-size: 10px;
+  }
+
+  #dowsingBanner {
+    top: calc(env(safe-area-inset-top, 0px) + 48px);
+    height: 28px;
+    padding: 4px 12px;
+    font-size: 12px;
+    line-height: 1;
+    border-radius: 999px;
+    border-width: 1.5px;
+    width: auto;
+    max-width: 280px;
+  }
+
+  .sg-dowsing-timer {
+    left: 11px;
+    right: 11px;
+    bottom: 2px;
+    height: 2px;
+  }
+}
+
+@media (max-height: 500px) {
+  #dowsingBanner {
+    top: calc(env(safe-area-inset-top, 0px) + 48px);
+    height: 28px;
+    padding: 4px 12px;
+    font-size: 12px;
+    line-height: 1;
+    border-radius: 999px;
+    border-width: 1.5px;
+    width: auto;
+    max-width: 280px;
+  }
+
+  .sg-dowsing-timer {
+    left: 11px;
+    right: 11px;
+    bottom: 2px;
+    height: 2px;
+  }
+}
+
+@media (pointer: coarse) {
+  .sg-key {
+    display: none;
+  }
+}
+
+@media (max-width: 400px) {
+  .sg-card {
+    min-width: 98px;
+    padding: 6px 8px 9px 7px;
+  }
+
+  .sg-title {
+    font-size: 11.5px;
+  }
+}

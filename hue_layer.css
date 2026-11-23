@@ -1,0 +1,121 @@
+/* ============================================================================
+ * Hue & Seek — Hue Layer HUD (paint meter, repaint pill, ghost bar, water tank)
+ * ========================================================================== */
+
+/* --- paint meter inside the top status box (#matchBox) */
+.match .hue { display: flex; flex-direction: column; align-items: center; min-width: 84px; }
+.match .hue small { font-weight: 900; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #6b7a5f; }
+.match .huebar { width: 84px; height: 10px; margin-top: 6px; border-radius: 8px; background: rgba(60, 70, 50, .16); overflow: hidden; }
+.match .huebar i { display: block; height: 100%; width: 100%; border-radius: 8px; background: #6bbf59; transition: width .25s linear, background .3s ease; }
+
+/* --- repaint pill (lives in #hiderTricksBar next to Decoy / Dash / Whistle) */
+.hue-repaint-pill.is-urgent { animation: huePulse 0.9s ease-in-out infinite; box-shadow: 0 0 0 3px rgba(232, 99, 79, .55), 0 4px 0 rgba(60, 70, 50, .2); }
+.hue-repaint-pill.is-busy { box-shadow: 0 0 0 3px rgba(107, 191, 89, .7), 0 4px 0 rgba(60, 70, 50, .2); }
+.hue-repaint-pill.is-busy .ht-ic { animation: hueBrush 0.5s ease-in-out infinite; display: inline-block; }
+@keyframes huePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.07); } }
+@keyframes hueBrush { 0%, 100% { transform: rotate(-14deg); } 50% { transform: rotate(14deg); } }
+
+/* --- ghost bar (replaces the tricks bar once you are soaked) */
+#hueGhostBar {
+  position: absolute;
+  left: 14px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 3;
+  pointer-events: none;
+}
+#hueGhostBar.hidden { display: none; }
+#help:not(:empty) ~ #hueGhostBar { bottom: calc(env(safe-area-inset-bottom, 0px) + 58px); }
+#hueGhostBar .ht-pill { pointer-events: auto; }
+#hueGhostBar .hue-ghost-tip {
+  max-width: 300px;
+  padding: 7px 12px;
+  border-radius: 14px;
+  background: rgba(36, 48, 66, .78);
+  color: #eaf6ff;
+  font: 800 12px/1.3 var(--fb, 'Nunito', sans-serif);
+  box-shadow: 0 3px 0 rgba(20, 30, 45, .25);
+}
+.hue-haunt-pill { background: linear-gradient(180deg, #f2fbff, #d4ecfb) !important; }
+
+/* --- seeker water tank (just under the crosshair) */
+#hueTank {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + 46px);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px 4px 6px;
+  border-radius: 999px;
+  background: rgba(255, 250, 236, .86);
+  box-shadow: 0 3px 0 rgba(60, 70, 50, .18);
+  font: 900 12px/1 var(--fb, 'Nunito', sans-serif);
+  color: #2b6f8f;
+  z-index: 3;
+  pointer-events: none;
+}
+#hueTank.hidden { display: none; }
+#hueTank .hue-tank-ic { font-size: 13px; }
+#hueTank .hue-tank-bar { width: 92px; height: 9px; border-radius: 8px; background: rgba(43, 111, 143, .18); overflow: hidden; }
+#hueTank .hue-tank-bar i { display: block; height: 100%; width: 100%; border-radius: 8px; background: linear-gradient(90deg, #3fb8d8, #7fdcf5); transition: width .12s linear; }
+#hueTank b { min-width: 22px; text-align: right; font-variant-numeric: tabular-nums; }
+#hueTank.is-low { color: #b9502c; }
+#hueTank.is-low .hue-tank-bar i { background: linear-gradient(90deg, #e8a33d, #f0c06a); }
+#hueTank.is-empty { animation: hueTankEmpty 0.6s ease-in-out infinite; }
+#hueTank.is-empty .hue-tank-bar { background: rgba(217, 83, 79, .35); }
+#hueTank.is-filling { box-shadow: 0 0 0 3px rgba(102, 212, 247, .7), 0 3px 0 rgba(60, 70, 50, .18); }
+#hueTank.is-filling .hue-tank-bar i { background: linear-gradient(90deg, #66d4f7, #c6f1ff); }
+#hueTank.is-boosted { box-shadow: 0 0 0 3px rgba(255, 196, 61, .85), 0 3px 0 rgba(60, 70, 50, .18); }
+#hueTank.is-boosted .hue-tank-ic::after { content: '⚡'; margin-left: 1px; }
+#hueTank em { display: inline-flex; align-items: center; gap: 3px; margin-left: 4px; padding-left: 7px; border-left: 2px solid rgba(43, 111, 143, .25); font-style: normal; color: #2b6f8f; }
+#hueTank em.hidden { display: none; }
+#hueTank em i { display: inline-block; font-style: normal; font-size: 12px; }
+@keyframes hueTankEmpty { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.06); } }
+
+/* --- "your game" card on the results screen */
+.your-game {
+  margin: 10px 0 4px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fffdf6, #fff3d6);
+  box-shadow: inset 0 0 0 2px rgba(240, 180, 70, .55), 0 3px 0 rgba(60, 70, 50, .12);
+  text-align: left;
+}
+.your-game .yg-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.your-game .yg-head b { font: 700 16px/1.1 var(--fd, 'Fredoka', sans-serif); color: #3c4632; }
+.your-game .yg-rank { padding: 3px 10px; border-radius: 999px; background: #ffd36b; font: 900 11px/1.4 var(--fb, 'Nunito', sans-serif); color: #5a4310; white-space: nowrap; }
+.your-game .yg-line { font: 800 13px/1.35 var(--fb, 'Nunito', sans-serif); color: #5d6a52; margin: 0 0 8px; }
+.your-game .yg-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 6px; }
+.your-game .yg-stat { padding: 7px 8px; border-radius: 12px; background: rgba(255, 255, 255, .8); text-align: center; }
+.your-game .yg-stat b { display: block; font: 700 17px/1.1 var(--fd, 'Fredoka', sans-serif); color: #3c4632; font-variant-numeric: tabular-nums; }
+.your-game .yg-stat span { font: 900 9.5px/1.3 var(--fb, 'Nunito', sans-serif); letter-spacing: .06em; text-transform: uppercase; color: #7b8870; }
+
+/* --- phones (landscape): compact */
+html.is-mobile-touch #hueTank { top: calc(50% + 38px); padding: 3px 8px 3px 5px; font-size: 11px; }
+html.is-mobile-touch #hueTank .hue-tank-bar { width: 72px; height: 8px; }
+html.is-mobile-touch #hud .match .hue { min-width: 54px; }
+html.is-mobile-touch #hud .match .hue small { font-size: 8px; }
+html.is-mobile-touch #hud .match .huebar { width: 54px; height: 7px; margin-top: 3px; }
+html.is-mobile-touch #hueGhostBar {
+  left: auto;
+  right: calc(env(safe-area-inset-right, 0px) + 172px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
+  flex-direction: row-reverse;
+}
+/* on phones the bottom-centre ghost status bar already says what to do; the long tip would sit underneath it */
+html.is-mobile-touch #hueGhostBar .hue-ghost-tip { display: none; }
+html.is-mobile-touch #hueGhostBar .ht-pill {
+  width: 58px; height: 58px; min-width: 58px; flex: 0 0 58px; padding: 4px 3px 5px; border-radius: 18px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+}
+html.is-mobile-touch #hueGhostBar .ht-ic { font-size: 20px; }
+html.is-mobile-touch #hueGhostBar .ht-txt small, html.is-mobile-touch #hueGhostBar .ht-key { display: none; }
+html.is-mobile-touch #hueGhostBar .ht-txt b { font-size: 9.5px; }
+@media (max-height: 430px) {
+  .your-game { padding: 8px 10px; }
+  .your-game .yg-grid { grid-template-columns: repeat(4, 1fr); }
+}

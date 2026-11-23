@@ -1,0 +1,408 @@
+/* ==========================================================================
+ * Hue & Seek — Elemental Guns HUD Pill & Action Button Themes (elemental_guns.css)
+ * Storybook Tactile Cream (#fff8ea) & Elemental Enamel Palettes
+ * Desktop + Landscape Mobile Capacitor (Android / iOS) Zero-Overlap Layout
+ * ========================================================================== */
+
+#elemGunHudPill {
+  position: absolute;
+  right: calc(env(safe-area-inset-right, 0px) + 122px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 32px);
+  z-index: 5;
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  padding: 5px 12px 5px 7px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fffef8 0%, #fff6e3 100%);
+  color: var(--ink, #33402f);
+  border: 2px solid var(--eg-accent, #2b8fb8);
+  box-shadow:
+    0 4px 0 rgba(36, 52, 44, 0.26),
+    0 9px 20px rgba(18, 30, 36, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 900;
+  font-size: 13.5px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    transform 0.12s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.16s ease,
+    border-color 0.18s ease,
+    background 0.18s ease;
+}
+
+#elemGunHudPill.hidden {
+  display: none !important;
+}
+
+#elemGunHudPill:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 0 rgba(36, 52, 44, 0.28),
+    0 12px 24px rgba(18, 30, 36, 0.26),
+    0 0 0 3px var(--eg-glow, rgba(63, 184, 216, 0.26)),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+#elemGunHudPill:active {
+  transform: translateY(2px) scale(0.97);
+  box-shadow:
+    0 2px 0 rgba(36, 52, 44, 0.26),
+    0 4px 10px rgba(18, 30, 36, 0.18);
+}
+
+#elemGunHudPill.eg-pop {
+  animation: egPillSwitchPop 0.3s cubic-bezier(0.22, 1.55, 0.36, 1);
+}
+
+@keyframes egPillSwitchPop {
+  0% {
+    transform: scale(0.91) translateY(2px);
+  }
+  55% {
+    transform: scale(1.06) translateY(-2px);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+  }
+}
+
+.eg-icon-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--eg-accent, #2b8fb8);
+  color: #fffdf8;
+  font-size: 16px;
+  line-height: 1;
+  box-shadow:
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.42),
+    0 2px 0 rgba(20, 32, 36, 0.22);
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+
+#elemGunHudPill.eg-pop .eg-icon-badge {
+  transform: rotate(-10deg) scale(1.1);
+}
+
+.eg-label-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.eg-name {
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.01em;
+  color: var(--ink, #2d3829);
+  white-space: nowrap;
+}
+
+.eg-caret {
+  font-size: 11px;
+  opacity: 0.72;
+  color: var(--eg-accent, #2b8fb8);
+  transform: translateY(0.5px);
+}
+
+.eg-trial-tag {
+  padding: 2px 5px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #ffe58f 0%, #ffb938 100%);
+  color: #4f3104;
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 900;
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  box-shadow: 0 1px 0 rgba(120, 80, 12, 0.28);
+}
+
+.eg-trial-tag.hidden {
+  display: none !important;
+}
+
+.eg-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 19px;
+  padding: 0 5px;
+  border-radius: 6px;
+  background: var(--eg-accent, #2b8fb8);
+  color: #fff8ea;
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 900;
+  font-size: 10.5px;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  box-shadow: 0 2px 0 rgba(20, 34, 42, 0.30);
+}
+
+/* Per-element CSS Custom Properties on Pill */
+#elemGunHudPill[data-elem="water"] {
+  --eg-accent: #2b8fb8;
+  --eg-glow: rgba(63, 184, 216, 0.32);
+}
+
+#elemGunHudPill[data-elem="fire"] {
+  --eg-accent: #d94e1f;
+  --eg-glow: rgba(255, 107, 36, 0.36);
+  background: linear-gradient(180deg, #fffdf8 0%, #ffefe3 100%);
+}
+
+#elemGunHudPill[data-elem="snow"] {
+  --eg-accent: #3b8ec9;
+  --eg-glow: rgba(127, 216, 255, 0.38);
+  background: linear-gradient(180deg, #ffffff 0%, #ebf7ff 100%);
+}
+
+#elemGunHudPill[data-elem="earth"] {
+  --eg-accent: #8c5a2b;
+  --eg-glow: rgba(184, 122, 61, 0.34);
+  background: linear-gradient(180deg, #fffdf7 0%, #f6ead8 100%);
+}
+
+#elemGunHudPill[data-elem="air"] {
+  --eg-accent: #2f9e88;
+  --eg-glow: rgba(158, 240, 220, 0.38);
+  background: linear-gradient(180deg, #fbfffe 0%, #e6faf5 100%);
+}
+
+/* ==========================================================================
+ * Dynamic Elemental Styling for Primary #btnFire Action Button
+ * ========================================================================== */
+#hud #btnFire[data-elem="water"],
+html.is-mobile-touch #hud #btnFire[data-elem="water"] {
+  background: linear-gradient(180deg, #c6ecff 0%, #6fc0f0 100%);
+  color: #173b52;
+}
+
+#hud #btnFire[data-elem="fire"],
+html.is-mobile-touch #hud #btnFire[data-elem="fire"] {
+  background: linear-gradient(180deg, #ffe0b5 0%, #ff7a33 100%);
+  color: #4a1805;
+  box-shadow:
+    0 5px 0 rgba(128, 42, 12, 0.34),
+    0 10px 22px rgba(217, 78, 31, 0.28);
+}
+
+#hud #btnFire[data-elem="snow"],
+html.is-mobile-touch #hud #btnFire[data-elem="snow"] {
+  background: linear-gradient(180deg, #f0fbff 0%, #8fd8ff 100%);
+  color: #163d5c;
+  box-shadow:
+    0 5px 0 rgba(42, 96, 138, 0.30),
+    0 10px 22px rgba(84, 178, 232, 0.26);
+}
+
+#hud #btnFire[data-elem="earth"],
+html.is-mobile-touch #hud #btnFire[data-elem="earth"] {
+  background: linear-gradient(180deg, #f7dfc0 0%, #c48546 100%);
+  color: #3d220a;
+  box-shadow:
+    0 5px 0 rgba(92, 54, 22, 0.34),
+    0 10px 22px rgba(140, 90, 43, 0.26);
+}
+
+#hud #btnFire[data-elem="air"],
+html.is-mobile-touch #hud #btnFire[data-elem="air"] {
+  background: linear-gradient(180deg, #e3fff7 0%, #7de3cb 100%);
+  color: #134238;
+  box-shadow:
+    0 5px 0 rgba(30, 102, 86, 0.30),
+    0 10px 22px rgba(47, 158, 136, 0.26);
+}
+
+/* ==========================================================================
+ * Landscape Mobile & Coarse-Pointer Ergonomics
+ * Docked cleanly above #seekerGadgetsBar (right: 118px, bottom: 90px)
+ * Zero overlap with #btnJump, #btnFire, #cross, #feed, or #seekerGadgetsBar!
+ * ========================================================================== */
+html.is-mobile-touch .eg-key {
+  display: none !important;
+}
+
+@media (pointer: coarse) {
+  .eg-key {
+    display: none !important;
+  }
+}
+
+html.is-mobile-touch #elemGunHudPill {
+  right: calc(env(safe-area-inset-right, 0px) + 118px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 90px);
+  height: 34px;
+  padding: 4px 10px 4px 5px;
+  gap: 6px;
+  font-size: 12px;
+  border-width: 2px;
+}
+
+html.is-mobile-touch #elemGunHudPill .eg-icon-badge {
+  width: 24px;
+  height: 24px;
+  font-size: 13.5px;
+}
+
+html.is-mobile-touch #elemGunHudPill .eg-name {
+  font-size: 13px;
+}
+
+html.is-mobile-touch #elemGunHudPill .eg-caret {
+  font-size: 10px;
+}
+
+html.is-mobile-touch #elemGunHudPill .eg-trial-tag {
+  font-size: 8px;
+  padding: 1.5px 4px;
+}
+
+@media (max-width: 680px) {
+  #elemGunHudPill {
+    right: calc(env(safe-area-inset-right, 0px) + 114px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 88px);
+    height: 34px;
+    padding: 4px 10px 4px 5px;
+    gap: 6px;
+  }
+  #elemGunHudPill .eg-icon-badge {
+    width: 24px;
+    height: 24px;
+    font-size: 13.5px;
+  }
+  #elemGunHudPill .eg-name {
+    font-size: 13px;
+  }
+}
+
+/* Keep #hint compact and above aiming reticle on short horizontal viewports */
+@media (max-height: 520px) {
+  #hint {
+    top: 66px !important;
+    transform: translateX(-50%) !important;
+    font-size: 12px !important;
+    padding: 5px 12px !important;
+    border-radius: 999px !important;
+    max-width: min(54vw, 350px) !important;
+    line-height: 1.25 !important;
+    pointer-events: none !important;
+  }
+}
+
+/* ==========================================================================
+ * Live Elemental Combat Status Pills (#elemStatusHud)
+ * Docked cleanly under the top-left Health Bar — zero overlap with center Phase/Timer!
+ * ========================================================================== */
+.elem-status-hud {
+  position: absolute;
+  left: calc(env(safe-area-inset-left, 0px) + 62px);
+  top: calc(env(safe-area-inset-top, 0px) + 56px);
+  transform: none;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 6px;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  max-width: min(38vw, 390px);
+}
+
+.elem-status-hud.hidden {
+  display: none !important;
+}
+
+.es-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-family: var(--fd, 'Fredoka', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  box-shadow: 0 3px 0 rgba(24, 34, 28, 0.28), 0 6px 14px rgba(14, 22, 24, 0.22);
+  animation: esPillPop 0.22s cubic-bezier(0.2, 1.45, 0.4, 1);
+}
+
+.es-pill b {
+  font-family: var(--fb, 'Nunito', system-ui, sans-serif);
+  font-weight: 900;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes esPillPop {
+  from { opacity: 0; transform: translateY(-4px) scale(0.92); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.es-pill.water {
+  background: linear-gradient(180deg, #dff6ff 0%, #90dbf4 100%);
+  color: #12405c;
+  border: 1.5px solid #2b8fb8;
+}
+
+.es-pill.earth {
+  background: linear-gradient(180deg, #f6e7d2 0%, #d4a373 100%);
+  color: #3d220a;
+  border: 1.5px solid #8c5a2b;
+}
+
+.es-pill.fire {
+  background: linear-gradient(180deg, #ffe2c2 0%, #ff8547 100%);
+  color: #4a1504;
+  border: 1.5px solid #d94e1f;
+}
+
+.es-pill.snow {
+  background: linear-gradient(180deg, #edf9ff 0%, #ade8f4 100%);
+  color: #153e5c;
+  border: 1.5px solid #3b8ec9;
+}
+
+.es-pill.freeze {
+  background: linear-gradient(180deg, #ffffff 0%, #72efdd 100%);
+  color: #0b3c49;
+  border: 2px solid #0096c7;
+  box-shadow: 0 3px 0 rgba(12, 68, 92, 0.34), 0 0 12px rgba(114, 239, 221, 0.55);
+}
+
+.es-pill.air {
+  background: linear-gradient(180deg, #e6fff8 0%, #8ce0c9 100%);
+  color: #114237;
+  border: 1.5px solid #2f9e88;
+}
+
+@media (max-height: 480px) {
+  .elem-status-hud {
+    left: calc(env(safe-area-inset-left, 0px) + 56px);
+    top: calc(env(safe-area-inset-top, 0px) + 48px);
+    gap: 4px;
+    max-width: min(36vw, 310px);
+  }
+  .es-pill {
+    padding: 3px 8px;
+    font-size: 10.5px;
+  }
+}
