@@ -1999,7 +1999,7 @@ export function createMultiplayerManager(hooks = {}) {
     ) {
       return `${window.location.origin}${window.location.pathname}${query}`;
     }
-    return `https://oxadow.com/hueseek/${query}`;
+    return `https://oxadow.com/hue-and-seek/${query}`;
   }
 
   function buildPartyShareText(code = partyCode, mapId = partyMapId) {

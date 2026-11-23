@@ -1218,7 +1218,7 @@ export function createViralHighlightsManager(env = {}) {
     const wmMain = activeRoom
       ? `🎭 Hue & Seek · @${gamertag} · 🔑 Join: ${activeRoom}`
       : `🎭 Hue & Seek · @${gamertag} · ${hl?.propIcon || '✨'} ${hl?.propLabel || 'Spirit'}`;
-    const wmSub = `▶ Free · No Ads on Google Play · oxadow.com/hueseek`;
+    const wmSub = `▶ Free · No Ads on Google Play · oxadow.com/hue-and-seek`;
 
     ctx.save();
     const wmFontPx = Math.round(19 * scale);
@@ -4393,8 +4393,8 @@ export function createViralHighlightsManager(env = {}) {
       const activeRoom = resolveActiveRoomCode(roomCode);
       const shareTitle = 'Hue & Seek · Crazy Prop Hunt Escape!';
       const shareUrl = activeRoom
-        ? `https://oxadow.com/hueseek/?room=${encodeURIComponent(activeRoom)}`
-        : 'https://oxadow.com/hueseek/';
+        ? `https://oxadow.com/hue-and-seek/?room=${encodeURIComponent(activeRoom)}`
+        : 'https://oxadow.com/hue-and-seek/';
       const shareText = `🔥 "${hl.headline}" — Hue & Seek: Prop Hunt Online (${hl.worldTitle})${activeRoom ? ` · Join Room: ${activeRoom}` : ''} · Free & No Ads: ${shareUrl}`;
 
       const videoInfo = preferVideo ? await ensureVideoClipReady() : { blob: null, mimeType: '', ext: 'webm' };
